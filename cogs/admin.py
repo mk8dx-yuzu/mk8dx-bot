@@ -7,7 +7,7 @@ import pymongo
 class admin(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        self.client = pymongo.MongoClient("mongodb://mongodb:27017/")
+        self.client = pymongo.MongoClient("mongodb://172.17.0.2:27017/")
         self.db = self.client["lounge"]
         self.collection = self.db["players"]
 
