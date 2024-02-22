@@ -1,6 +1,8 @@
 version: '3'
 services:
   mk8dx-bot:
+    networks:
+      - bridge
     build:
       context: .
     volumes:
