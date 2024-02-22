@@ -4,7 +4,9 @@ from discord.ext import commands
 from dotenv import load_dotenv
 load_dotenv()
 
-intents = discord.Intents().all()
+intents = discord.Intents.default()
+intents.add(discord.Intents.Guilds)
+intents.add(discord.Intents.GuildMessages)
 owners = [769525682039947314]
 
 class customBot(commands.Bot):
