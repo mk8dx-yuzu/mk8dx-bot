@@ -29,8 +29,13 @@ class mk8dx(commands.Cog):
     def cog_unload(self):
         self.client.close()
 
+    async def cog_command_error(self, ctx: commands.Context, error: commands.CommandError):
+        if isinstance(error, commands.errors.CommandOnCooldown): 
+            await ctx.respond("This command is on cooldown for {:.2f} seconds.".format(ctx.command.get_cooldown_retry_after(ctx)))
+
     @slash_command(name="mmr", description="Retrieve the MMR of a player")
-    async def mk8dx(self, ctx: discord.ApplicationContext, name: str):
+    @commands.cooldown(2, 120, commands.BucketType.user)
+    async def mmr(self, ctx: discord.ApplicationContext, name: str):
         player = self.collection.find_one({"name": name})
         if player:
             await ctx.respond(f"{name}s MMR is {player['mmr']}")
@@ -38,6 +43,7 @@ class mk8dx(commands.Cog):
             await ctx.respond(f"Couldn't find {name}s MMR")
 
     @slash_command(name="leaderboard", description="Show the leaderboard; sort options: mmr | wins | losses | name")
+    @commands.cooldown(2, 120, commands.BucketType.user)
     async def leaderboard(
         self, 
         ctx: discord.ApplicationContext, 
@@ -66,6 +72,7 @@ class mk8dx(commands.Cog):
         await ctx.respond(table_string)
 
     @slash_command(name="player", description="Show a player and their stats")
+    @commands.cooldown(2, 120, commands.BucketType.user)
     async def player(
             self, 
             ctx: discord.ApplicationContext, 
@@ -82,26 +89,6 @@ class mk8dx(commands.Cog):
         player_str += f"Winrate: {(player['wins']/games if games else 0)*100}% \n"
         player_str += "```"
         await ctx.respond(player_str)
-
-    @commands.command()
-    async def testing(self, ctx: commands.Context):
-        await ctx.send("test")
-        #documents = collection.find()
-        #for doc in documents:
-        #    print(doc)
-
-        # Example: Insert a new document
-        #new_document = {"name": "New Item", "value": 10}
-        #collection.insert_one(new_document)
-
-        # Example: Update a document
-        #collection.update_one({"name": "Existing Item"}, {"$set": {"value": 20}})
-
-        # Example: Delete a document
-        #collection.delete_one({"name": "Item to Delete"})
-
-    # admin commands
-    
 
 def setup(bot: commands.Bot):
     bot.add_cog(mk8dx(bot))
