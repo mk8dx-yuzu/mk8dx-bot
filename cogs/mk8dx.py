@@ -23,8 +23,8 @@ class mk8dx(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
-        self.db = self.client["admin"]
-        self.collection = self.db["mk8dx"]
+        self.db = self.client["lounge"]
+        self.collection = self.db["players"]
 
     def cog_unload(self):
         self.client.close()

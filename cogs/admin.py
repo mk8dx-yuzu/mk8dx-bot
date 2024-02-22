@@ -8,8 +8,8 @@ class admin(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.client = pymongo.MongoClient("mongodb://localhost:27017/")
-        self.db = self.client["admin"]
-        self.collection = self.db["mk8dx"]
+        self.db = self.client["lounge"]
+        self.collection = self.db["players"]
 
     @slash_command(name="add", description="(other stats can be added/modified trough the /edit method)")
     async def add(
