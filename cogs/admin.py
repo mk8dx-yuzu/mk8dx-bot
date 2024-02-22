@@ -1,3 +1,4 @@
+import os
 import discord
 from discord.ext import commands
 from discord import slash_command
@@ -7,7 +8,7 @@ import pymongo
 class admin(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        self.client = pymongo.MongoClient("mongodb://172.17.0.2:27017/")
+        self.client = pymongo.MongoClient(f"mongodb://{os.getenv("MONGODB_HOST")}:27017/")
         self.db = self.client["lounge"]
         self.collection = self.db["players"]
 
@@ -81,6 +82,8 @@ class admin(commands.Cog):
         ):
         if (stat != 'name') and (not new.isnumeric()):
             return await ctx.respond("invalid input")
+        if stat != "name":
+            new = int(new)
         self.collection.update_one({"name": player}, {"$set": {f"{stat}": f"{new}"}})
         await ctx.respond(f"Sucessfully edited {player}s {stat} to {new}")
 
