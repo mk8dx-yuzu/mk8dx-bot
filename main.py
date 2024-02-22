@@ -7,6 +7,7 @@ load_dotenv()
 intents = discord.Intents.default()
 intents |= discord.Intents.guilds
 intents |= discord.Intents.guild_messages
+intents |= discord.Intents.message_content
 owners = [769525682039947314]
 
 class customBot(commands.Bot):
