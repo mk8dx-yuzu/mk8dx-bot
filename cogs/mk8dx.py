@@ -4,6 +4,21 @@ from discord.ext import commands
 from discord import slash_command
 from discord import Option
 
+def calcRank(mmr):
+        ranks = [
+            {"name": "Bronze", "range": (0, 1499)},
+            {"name": "Silver", "range": (1400, 2999)},
+            {"name": "Gold", "range": (3000, 5099)},
+            {"name": "Platinum", "range": (5100, 6999)},
+            {"name": "Diamond", "range": (7000, 9499)},
+            {"name": "Master", "range": (9500, 99999)}
+        ]
+        for range_info in ranks:
+            start, end = range_info["range"]
+            if start <= mmr <= end:
+                return range_info['name']
+        return "---"
+
 class mk8dx(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -13,21 +28,6 @@ class mk8dx(commands.Cog):
 
     def cog_unload(self):
         self.client.close()
-
-    """ def calcRank(mmr):
-        ranks = [
-            {"name": "Bronze", "range": (0, 1400)},
-            {"name": "Silver", "range": (1401, 2900)},
-            {"name": "High", "range": (2901, 5000)},
-            {"name": "High", "range": (5001, 6900)},
-            {"name": "High", "range": (6901, 9400)},
-            {"name": "High", "range": (51, 100)}
-        ]
-        for range_info in ranks:
-            start, end = range_info["range"]
-            if start <= mmr <= end:
-                return f"{mmr} falls in the {range_info['name']} range"
-        return "Out of range" """
 
     @slash_command(name="mmr", description="Retrieve the MMR of a player")
     async def mk8dx(self, ctx: discord.ApplicationContext, name: str):
@@ -56,25 +56,31 @@ class mk8dx(commands.Cog):
 
         table_string = ""
         table_string += "```\n"
-        table_string += " | Name            | Rank  |  MMR  | Wins | Losses | Winrate (%) |\n"
-        table_string += " |-----------------|-------|-------|------|--------|-------------|\n"
+        table_string += " | Name            |   Rank   |  MMR  | Wins | Losses | Winrate (%) |\n"
+        table_string += " |-----------------|----------|-------|------|--------|-------------|\n"
         for player in data:
             games = player['wins']+player['losses']
-            table_string += f" | {player['name']:<15} | {"---"} | {player['mmr']:>5} | {player['wins']:>4} | {player['losses']:>6} | {(player['wins']/games if games else 0)*100:>11} |\n"
-        table_string += "```" #calcRank(player['mmr']):>5
+            table_string += f" | {player['name']:<15} | {calcRank(player['mmr']):>8} | {player['mmr']:>5} | {player['wins']:>4} | {player['losses']:>6} | {(player['wins']/games if games else 0)*100:>11} |\n"
+        table_string += "```"
 
         await ctx.respond(table_string)
 
     @slash_command(name="player", description="Show a player and their stats")
-    async def player(self, ctx: discord.ApplicationContext, name: str):
+    async def player(
+            self, 
+            ctx: discord.ApplicationContext, 
+            name = Option(str, description="Name of the player")
+        ):
         player: dict = self.collection.find_one({"name": name})
         if not player:
-            return ctx.respond("Couldn't find that player")
-        player_str = ""
-        for item in list(player.keys())[1:]:
+            return await ctx.respond("Couldn't find that player")
+        player_str = f"## {name} \n"
+        player_str += "```\n"
+        for item in list(player.keys())[2:]:
             player_str += f"{item}: {player[item]} \n"
         games = (player['wins']+player['losses'])
         player_str += f"Winrate: {(player['wins']/games if games else 0)*100}% \n"
+        player_str += "```"
         await ctx.respond(player_str)
 
     @commands.command()
@@ -95,64 +101,7 @@ class mk8dx(commands.Cog):
         #collection.delete_one({"name": "Item to Delete"})
 
     # admin commands
-    @slash_command(name="add", description="(other stats can be added/modified trough the /edit method)")
-    async def add(
-        self, 
-        ctx: discord.ApplicationContext, 
-        name = Option(
-            name="player", 
-            description="What's the name of the new player?", 
-            required=True,
-        ),
-        mmr = Option(
-            name="mmr", 
-            description="starting MMR", 
-            required=False,
-            default=None
-        ),
-        wins = Option(
-            name="wins", 
-            description="amount of won events", 
-            required=False,
-            default=None
-        ),
-        losses = Option(
-            name="losses", 
-            description="amount of lost events", 
-            required=False,
-            default=None
-        ),
-        ):
-        self.collection.insert_one({
-            "name": name,
-            "mmr": mmr,
-            "wins": wins,
-            "losses": losses
-        })
-        await ctx.respond(f"Sucessfully created user {name}")
-
-    @slash_command(name="edit")
-    async def edit(
-        self, 
-        ctx: discord.ApplicationContext, 
-        player = Option(
-            name="player", 
-            description="Which player's data to modify", 
-            required=True,
-        ),
-        stat = Option(
-            name="stat", 
-            description="Which stat to change", 
-            required=True,
-        ),
-        new = Option(
-            name="newvalue", 
-            description="The new value to overwrite", 
-            required=True,
-        )
-        ):
-        self.collection.update_one({"name": player}, {"$set": {f"{stat}": f"{new}"}})
-        await ctx.respond(f"Sucessfully edited {player}s {stat} to {new}")
+    
 
 def setup(bot: commands.Bot):
     bot.add_cog(mk8dx(bot))
