@@ -27,21 +27,21 @@ class admin(commands.Cog):
             name="mmr", 
             description="starting MMR", 
             required=False,
-            default=None
+            default=2000
         ),
         wins = Option(
             int,
             name="wins", 
             description="amount of won events", 
             required=False,
-            default=None
+            default=0
         ),
         losses = Option(
             int,
             name="losses", 
             description="amount of lost events", 
             required=False,
-            default=None
+            default=0
         ),
         ):
         self.collection.insert_one({
