@@ -84,7 +84,7 @@ class admin(commands.Cog):
             return await ctx.respond("invalid input")
         if stat != "name":
             new = int(new)
-        self.collection.update_one({"name": player}, {"$set": {f"{stat}": f"{new}"}})
+        self.collection.update_one({"name": player}, {"$set": {f"{stat}": new}})
         await ctx.respond(f"Sucessfully edited {player}s {stat} to {new}")
 
     @slash_command(name="remove", description="Remove a player from the leaderboard")
