@@ -6,7 +6,9 @@ load_dotenv()
 
 intents = discord.Intents.default()
 intents |= discord.Intents.guilds
-intents |= discord.Intents.guild_messages
+intents |= discord.Intents.messages
+intents |= discord.Intents.message_content
+intents |= discord.Intents.members
 
 owners = [769525682039947314]
 

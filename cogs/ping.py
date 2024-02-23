@@ -1,4 +1,5 @@
 from discord.ext import commands
+import discord
 
 class ping(commands.Cog):
     def __init__(self, bot):

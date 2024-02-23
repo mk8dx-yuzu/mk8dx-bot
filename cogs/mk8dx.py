@@ -112,5 +112,20 @@ class mk8dx(commands.Cog):
         player_str += "```"
         await ctx.respond(player_str)
 
+    @slash_command(name="register", description="Register for playing in the Lounge")
+    async def register(interaction: discord.Interaction, ctx: discord.ApplicationContext):
+        role = ctx.guild.get_role(1181313896695480321)
+        print(role)
+        print("ok")
+        member = ctx.user
+        if role in member.roles:
+            await ctx.respond("You already have the Lounge Player role")
+            return
+        print("wow")
+        await member.add_roles(role)
+        await ctx.respond(f"{member.name} is now registered for Lounge")
+        print("dones")
+
+
 def setup(bot: commands.Bot):
     bot.add_cog(mk8dx(bot))
