@@ -2,8 +2,8 @@ import pymongo
 
 # Replace these with your details
 client = pymongo.MongoClient("mongodb://raspberrypi:27017/")
-db = client["admin"]
-collection = db["mk8dx"]
+db = client["lounge"]
+collection = db["players"]
 
 """ collection.insert_one({
     "name": "test",

@@ -1,4 +1,5 @@
 import os
+import math
 import discord
 import pymongo
 from discord.ext import commands
@@ -53,21 +54,41 @@ class mk8dx(commands.Cog):
             description="options: mmr | wins | losses | name", 
             required=False, 
             default='mmr',
-        )):
+        ),
+        page = Option(
+            int,
+            name="page", 
+            description="which page number to show. default: 1", 
+            required=False, 
+            default=1,
+        )
+        ):
         valid_sorts = ["mmr", "wins", "losses", "name"]
         if sort not in valid_sorts:
             await ctx.respond(f"Invalid sort option. Please choose from: {', '.join(valid_sorts)}", ephemeral=True)
             return
 
         data = self.collection.find().sort(sort, pymongo.DESCENDING)
+        data = list(data)
+
+        items_per_page = 10
+        total_pages = int(math.ceil(len(data) / items_per_page))
+
+
+        if page > total_pages or page < 1:
+            raise ValueError("Invalid page number. Please provide a number between 1 and {}".format(total_pages))
+
+        start_index = (page - 1) * items_per_page
+        end_index = start_index + items_per_page
 
         table_string = ""
         table_string += "```\n"
         table_string += " | Name            |   Rank   |  MMR  | Wins | Losses | Winrate (%) |\n"
         table_string += " |-----------------|----------|-------|------|--------|-------------|\n"
-        for player in data:
+        for player in data[start_index:end_index]:
             games = player['wins']+player['losses']
             table_string += f" | {player['name']:<15} | {calcRank(player['mmr']):>8} | {player['mmr']:>5} | {player['wins']:>4} | {player['losses']:>6} | {(player['wins']/games if games else 0)*100:>11} |\n"
+        table_string += f"Page {page}"
         table_string += "```"
 
         await ctx.respond(table_string)
