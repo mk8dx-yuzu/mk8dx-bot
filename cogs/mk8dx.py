@@ -107,7 +107,7 @@ class mk8dx(commands.Cog):
         embed = discord.Embed(
             title=f"{name}",
             description="",
-            color=discord.Colour.blurple(), # Pycord provides a class with default colors you can choose from
+            color=discord.Colour.blurple(),
         )
         for item in list(player.keys())[2:]:
             embed.add_field(name=f"{item}", value=f"{player[item]}")
@@ -143,27 +143,6 @@ class mk8dx(commands.Cog):
             "losses": 0
         })
         await ctx.respond(f"{member.name} is now registered for Lounge as {username}")
-
-    @slash_command(name="test")
-    async def test(self, ctx: discord.ApplicationContext):
-        embed = discord.Embed(
-            title="My Amazing Embed",
-            description="Embeds are super easy, barely an inconvenience.",
-            color=discord.Colour.blurple(), # Pycord provides a class with default colors you can choose from
-        )
-        embed.add_field(name="A Normal Field", value="A really nice field with some information. **The description as well as the fields support markdown!**")
-        embed.add_field(name="A Normal Field", value="A really nice field with some information. **The description as well as the fields support markdown!**")
-
-        embed.add_field(name="Inline Field 1", value="Inline Field 1", inline=True)
-        embed.add_field(name="Inline Field 2", value="Inline Field 2", inline=True)
-        embed.add_field(name="Inline Field 3", value="Inline Field 3", inline=True)
-    
-        embed.set_footer(text="Footer! No markdown here.") # footers can have icons too
-        #embed.set_author(name="Pycord Team", icon_url="https://mario.wiki.gallery/images/4/40/MKT_Icon_Triple_Mushrooms.png") # tiny top
-        embed.set_thumbnail(url="https://mario.wiki.gallery/images/4/40/MKT_Icon_Triple_Mushrooms.png") # big top right
-        #embed.set_image(url="https://mario.wiki.gallery/images/4/40/MKT_Icon_Triple_Mushrooms.png") # huge bottom
-    
-        await ctx.respond("Hello! Here's a cool embed.", embed=embed) # Send the embed with some text
 
 def setup(bot: commands.Bot):
     bot.add_cog(mk8dx(bot))
