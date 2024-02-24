@@ -10,7 +10,7 @@ class admin(commands.Cog):
         self.bot: commands.Bot = bot
         self.client = pymongo.MongoClient(f"mongodb://{os.getenv('MONGODB_HOST')}:27017/")
         self.db = self.client["lounge"]
-        self.collection = self.db["players"]
+        self.players = self.db["players"]
 
     @slash_command(name="add", description="(other stats can be added/modified trough the /edit method)")
     async def add(
@@ -44,7 +44,7 @@ class admin(commands.Cog):
             default=0
         ),
         ):
-        self.collection.insert_one({
+        self.players.insert_one({
             "name": name,
             "mmr": mmr,
             "wins": wins,
@@ -84,12 +84,12 @@ class admin(commands.Cog):
             return await ctx.respond("invalid input")
         if stat != "name":
             new = int(new)
-        self.collection.update_one({"name": player}, {"$set": {f"{stat}": new}})
+        self.players.update_one({"name": player}, {"$set": {f"{stat}": new}})
         await ctx.respond(f"Sucessfully edited {player}s {stat} to {new}")
 
     @slash_command(name="remove", description="Remove a player from the leaderboard")
     async def remove(self, ctx: discord.ApplicationContext, player=Option(str, description="Name of the player")):
-        self.collection.delete_one({"name": player})
+        self.players.delete_one({"name": player})
         await ctx.respond(f"Successfully deleted {player}s player records")
 
 def setup(bot: commands.Bot):
