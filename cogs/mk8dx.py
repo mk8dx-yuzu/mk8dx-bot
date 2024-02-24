@@ -111,12 +111,14 @@ class mk8dx(commands.Cog):
         )
         for item in list(player.keys())[2:]:
             embed.add_field(name=f"{item}", value=f"{player[item]}")
+
+        rank = calcRank(player['mmr'])
         
-        embed.add_field(name="Rank", value=f"{calcRank(player['mmr'])}")
+        embed.add_field(name="Rank", value=f"{rank}")
         embed.add_field(name="Winrate", value=f"{(player['wins']/(player['wins']+player['losses']) if (player['wins']+player['losses']) else 0)*100}%")
     
-        embed.set_author(name="Yuzu-Lounge", icon_url="https://mario.wiki.gallery/images/4/40/MKT_Icon_Triple_Mushrooms.png")
-        embed.set_thumbnail(url="https://mario.wiki.gallery/images/4/40/MKT_Icon_Triple_Mushrooms.png")
+        embed.set_author(name="Yuzu-Lounge", icon_url="https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/favicon/android-icon-192x192.png")
+        embed.set_thumbnail(url=f"https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/images/ranks/{rank.lower()}.webp")
 
         await ctx.respond(f"# {name} - overview", embed=embed)
 
