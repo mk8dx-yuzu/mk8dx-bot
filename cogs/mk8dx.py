@@ -26,7 +26,8 @@ class mk8dx(commands.Cog):
         self.bot: commands.Bot = bot
         self.client = pymongo.MongoClient(f"mongodb://{os.getenv('MONGODB_HOST')}:27017/")
         self.db = self.client["lounge"]
-        self.collection = self.db["players"]
+        self.players = self.db["players"]
+        self.history = self.db["history"]
 
     def cog_unload(self):
         self.client.close()
@@ -35,12 +36,17 @@ class mk8dx(commands.Cog):
         if isinstance(error, commands.errors.CommandOnCooldown): 
             await ctx.respond("This command is on cooldown for {:.2f} seconds.".format(ctx.command.get_cooldown_retry_after(ctx)))
 
-    @slash_command(name="mmr", description="Retrieve the MMR of a player")
+    @slash_command(name="mmr", description="Retrieve the MMR history of a player")
     @commands.cooldown(2, 120, commands.BucketType.user)
     async def mmr(self, ctx: discord.ApplicationContext, name: str):
-        mmr = self.collection.find_one({"name": "probablyjassin"}, {"_id": 0, "mmr": 1}).get("mmr")
-        if mmr:
-            await ctx.respond(f"{name}s MMR is {mmr}")
+        player = self.players.find_one({"name": name})
+        history = self.history.find_one({"player_id": f"{player['_id']}"}).get('history')
+        if player['mmr']:
+            await ctx.respond(f"""
+                # {name}
+                current MMR: {player['mmr']}
+                History: {history}
+            """)
         else:
             await ctx.respond(f"Couldn't find {name}s MMR")
 
@@ -68,7 +74,7 @@ class mk8dx(commands.Cog):
             await ctx.respond(f"Invalid sort option. Please choose from: {', '.join(valid_sorts)}", ephemeral=True)
             return
 
-        data = self.collection.find().sort(sort, pymongo.DESCENDING)
+        data = self.players.find().sort(sort, pymongo.DESCENDING)
         data = list(data)
 
         items_per_page = 10
@@ -100,7 +106,7 @@ class mk8dx(commands.Cog):
             ctx: discord.ApplicationContext, 
             name = Option(str, description="Name of the player")
         ):
-        player: dict = self.collection.find_one({"name": name})
+        player: dict = self.players.find_one({"name": name})
         if not player:
             return await ctx.respond("Couldn't find that player")
 
@@ -138,11 +144,15 @@ class mk8dx(commands.Cog):
             await ctx.respond("You already have the Lounge Player role")
             return
         await member.add_roles(role)
-        self.collection.insert_one({
+        player_id = self.players.insert_one({
             "name": username,
             "mmr": 2000,
             "wins": 0,
             "losses": 0
+        }).inserted_id
+        self.history.insert_one({
+            player_id: player_id,
+            "history": []
         })
         await ctx.respond(f"{member.name} is now registered for Lounge as {username}")
 
