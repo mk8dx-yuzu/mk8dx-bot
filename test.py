@@ -7,3 +7,7 @@ history = db["history"]
 
 
 client.close()
+
+one, two, three, four = 1, 2, 3, 4
+
+print(one, two, three, four)
