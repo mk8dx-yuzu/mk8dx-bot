@@ -1,9 +1,9 @@
 import os
 import discord
-from discord.ext import commands
-from discord import slash_command
-from discord import Option
 import pymongo
+from discord import slash_command, Option
+from discord.ext import commands
+from discord.utils import get
 
 
 class admin(commands.Cog):
@@ -92,10 +92,11 @@ class admin(commands.Cog):
         player=Option(str, description="Name of the player"),
     ):
         user = self.players.find_one({"name": player})
+        user_discord = user['discord']
+        await ctx.guild.get_member(user_discord).remove_roles(get(ctx.guild.roles, name="Lounge Player"))
         self.players.delete_one({"name": player})
         self.history.delete_one({"player_id": user["_id"]})
         await ctx.respond(f"Successfully deleted {player}s player records")
-
 
 def setup(bot: commands.Bot):
     bot.add_cog(admin(bot))

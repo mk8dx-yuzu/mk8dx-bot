@@ -3,9 +3,8 @@ import math
 import discord
 import pymongo
 from discord.ext import commands
-from discord import slash_command
-from discord import Option
-
+from discord.utils import get
+from discord import slash_command, Option
 
 def calcRank(mmr):
     ranks = [
@@ -101,11 +100,7 @@ class mk8dx(commands.Cog):
         total_pages = int(math.ceil(len(data) / items_per_page))
 
         if page > total_pages or page < 1:
-            raise ValueError(
-                "Invalid page number. Please provide a number between 1 and {}".format(
-                    total_pages
-                )
-            )
+            page = total_pages
 
         start_index = (page - 1) * items_per_page
         end_index = start_index + items_per_page
@@ -156,7 +151,7 @@ class mk8dx(commands.Cog):
         embed.add_field(name="Rank", value=f"{rank}")
         embed.add_field(
             name="Winrate",
-            value=f"{(player['wins']/(player['wins']+player['losses']) if (player['wins']+player['losses']) else 0)*100}%",
+            value=f"{round(((player['wins']/(player['wins']+player['losses']) if (player['wins']+player['losses']) else 0)*100), 2)}%",
         )
 
         embed.set_author(
@@ -179,18 +174,19 @@ class mk8dx(commands.Cog):
             required=True,
         ),
     ):
-        role = ctx.guild.get_role(1181313896695480321)
+        role = get(ctx.guild.roles, name="Lounge Player")
         member = ctx.user
         if role in member.roles:
-            await ctx.respond("You already have the Lounge Player role")
-            return
+            return await ctx.respond("You already have the Lounge Player role")
+        try:
+            player_id = self.players.insert_one(
+                {"name": username, "mmr": 2000, "wins": 0, "losses": 0, "discord": int(member.id)},
+            ).inserted_id
+            self.history.insert_one({"player_id": str(player_id), "history": []})
+        except:
+            return await ctx.respond("Name already taken or another error occured")
         await member.add_roles(role)
-        player_id = self.players.insert_one(
-            {"name": username, "mmr": 2000, "wins": 0, "losses": 0, "discord": member.id}
-        ).inserted_id
-        self.history.insert_one({player_id: player_id, "history": []})
-        await ctx.respond(f"{member.name} is now registered for Lounge as {username}")
-
+        await ctx.respond(f"{member.mention} is now registered for Lounge as {username}")
 
 def setup(bot: commands.Bot):
     bot.add_cog(mk8dx(bot))
