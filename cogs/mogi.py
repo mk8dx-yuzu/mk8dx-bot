@@ -53,6 +53,11 @@ class mogi(commands.Cog):
         self.mogi['status'] = 0
         self.mogi['players'] = []
         self.mogi['running'] = 0
+        for member in ctx.guild.members:
+            try:
+                await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
+            except:
+                pass
         await ctx.respond("# The mogi has been closed")
 
     @slash_command(name="status", description="See current state of mogi")
