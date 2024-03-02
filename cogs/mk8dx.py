@@ -186,7 +186,7 @@ class mk8dx(commands.Cog):
             return
         await member.add_roles(role)
         player_id = self.players.insert_one(
-            {"name": username, "mmr": 2000, "wins": 0, "losses": 0}
+            {"name": username, "mmr": 2000, "wins": 0, "losses": 0, "discord": member.id}
         ).inserted_id
         self.history.insert_one({player_id: player_id, "history": []})
         await ctx.respond(f"{member.name} is now registered for Lounge as {username}")
