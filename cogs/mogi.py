@@ -9,7 +9,6 @@ class mogi(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.mogi = {"status": 0, "running": 0, "players": []}
-        self.votes = {"ffa": 0, "2v2": 0, "3v3": 0, "4v4": 0, "5v5": 0, "6v6": 0}
 
     @slash_command(name="open", description="Start a new mogi")
     async def open(self, ctx: ApplicationContext):
@@ -27,7 +26,7 @@ class mogi(commands.Cog):
         if len(self.mogi['players']) >= 12:
             return await ctx.respond("The mogi is already full")
         self.mogi['players'].append(ctx.author.name)
-        await ctx.user.add_roles(get(ctx.guild.roles, name="IsInMogi"))
+        await ctx.user.add_roles(get(ctx.guild.roles, name="InMogi"))
         await ctx.respond(f"{ctx.author.name} joined the mogi!\n{len(self.mogi['players'])} players are in!")
 
     @slash_command(name="leave", description="Leave the current mogi")
@@ -35,7 +34,7 @@ class mogi(commands.Cog):
         if ctx.author.name not in self.mogi['players']:
             return await ctx.respond("You are not in the mogi")
         self.mogi['players'].remove(ctx.author.name)
-        await ctx.user.remove_roles(get(ctx.guild.roles, name="IsInMogi"))
+        await ctx.user.remove_roles(get(ctx.guild.roles, name="InMogi"))
         await ctx.respond(f"{ctx.author.name} left the mogi!\n{len(self.mogi['players'])} players are in!")
 
     @slash_command(name="l", description="List all players in the current mogi")
@@ -64,7 +63,7 @@ class mogi(commands.Cog):
 
     @commands.slash_command(name="play", description="Randomize teams, vote format and start playing")
     async def play(self, ctx: ApplicationContext):
-        if not any(role.name == "IsInMogi" for role in ctx.author.roles):
+        if not any(role.name == "InMogi" for role in ctx.author.roles):
             return await ctx.respond("You can't start a mogi you aren't in", ephemeral=True)
         if self.mogi['running']:
             return await ctx.respond("Mogi is already in play")
@@ -88,16 +87,16 @@ class mogi(commands.Cog):
                 select.disabled = True
                 await interaction.response.defer()
                 if self.mogi['running']:
-                    return await ctx.respond("Mogi already decided, voting is closed")
-                if not any(role.name == "IsInMogi" for role in ctx.author.roles):
-                    return await ctx.respond("You can't vote if you aren't in the mogi", ephemeral=True)
+                    return await ctx.send("Mogi already decided, voting is closed")
+                if not any(role.name == "InMogi" for role in ctx.author.roles):
+                    return await ctx.send("You can't vote if you aren't in the mogi", ephemeral=True)
                 selected_option = select.values[0]
                 if interaction.user.name in self.voters:
                     return await interaction.response.send_message("You already voted", ephemeral=True)
                 self.voters.append(interaction.user.name)
                 self.votes[selected_option] += 1
                 await interaction.followup.send(f"+1 vote for *{selected_option}*")
-                if self.votes[max(self.votes, key=self.votes.get)] >= math.floor(len(self.mogi['players'])/2):
+                if self.votes[max(self.votes, key=self.votes.get)] >= math.ceil(len(self.mogi['players'])/2):
                     format = max(self.votes, key=self.votes.get)
                     lineup_str = ""
                     if players % 2 != 0:
@@ -109,18 +108,19 @@ class mogi(commands.Cog):
                         for i in range(0, len(self.mogi['players']), int(format[0])):
                             teams.append(self.mogi['players'][i:i + int(format[0])])
                         for i, item in enumerate(teams):
-                            lineup_str += f"\n `{i+1}.` {', '.join(item)}"
+                            lineup_str += f"\n `{i+1}`. {', '.join(item)}"
 
                     await ctx.send(f"""
                         # Mogi starting!
                         ## Format: {format}
                         ### Lineup:
-                        {lineup_str}
+                        \n{lineup_str}
                     """)
+                    self.votes = {key: 0 for key in self.votes}
                     self.mogi['running'] = 1
                         
         view = FormatView(self.mogi)
-        await ctx.respond("Vote for a format:", view=view)
+        await ctx.respond(f"{get(ctx.guild.roles, name='InMogi').mention} \nBeginning Mogi\nVote for a format:", view=view)
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
