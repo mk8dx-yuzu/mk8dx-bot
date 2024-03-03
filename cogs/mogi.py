@@ -1,6 +1,6 @@
 import math, random
 import discord
-from discord import ApplicationContext, Interaction, slash_command, Option
+from discord import ApplicationContext, Interaction, slash_command, Option, InputTextStyle
 from discord.ui import View, Modal, InputText
 from discord.utils import get
 from discord.ext import commands
@@ -8,7 +8,7 @@ from discord.ext import commands
 class mogi(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        self.mogi = {"status": 0, "running": 0, "players": []}
+        self.mogi = {"status": 0, "running": 0, "players": ["player1", "player2", "player3", "player4", "player5", "player6", "player7", "player8", "player9", "player10", "player11"], "teams": [], "calc": [], "points": []}
 
     @slash_command(name="open", description="Start a new mogi")
     async def open(self, ctx: ApplicationContext):
@@ -50,9 +50,7 @@ class mogi(commands.Cog):
 
     @slash_command(name="close", description="Stop the current Mogi if running")
     async def close(self, ctx: ApplicationContext):
-        self.mogi['status'] = 0
-        self.mogi['players'] = []
-        self.mogi['running'] = 0
+        self.mogi = {"status": 0, "running": 0, "players": [], "teams": [], "calc": []}
         for member in ctx.guild.members:
             try:
                 await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
@@ -85,7 +83,7 @@ class mogi(commands.Cog):
                 super().__init__()
                 self.mogi = mogi
                 self.voters = []
-                self.votes = {"ffa": 0, "2v2": 0, "3v3": 0, "4v4": 0, "5v5": 0, "6v6": 0}
+                self.votes = {"ffa": 0, "2v2": 5, "3v3": 0, "4v4": 0, "5v5": 0, "6v6": 0}
 
             @discord.ui.select(options=options)
             async def select_callback(self, select, interaction: discord.Interaction):
@@ -112,6 +110,7 @@ class mogi(commands.Cog):
                         teams = []
                         for i in range(0, len(self.mogi['players']), int(format[0])):
                             teams.append(self.mogi['players'][i:i + int(format[0])])
+                        self.mogi['teams'] = teams
                         for i, item in enumerate(teams):
                             lineup_str += f"\n `{i+1}`. {', '.join(item)}"
 
@@ -129,18 +128,31 @@ class mogi(commands.Cog):
 
     @discord.slash_command(name="calc", description="Input player points, calculate new mmr and make tables")
     async def calc(self, ctx: discord.ApplicationContext):
+        if not self.mogi['running']:
+            return await ctx.respond("No running mogi")
         class MogiModal(discord.ui.Modal):
-            def __init__(self, *args, **kwargs):
+            def __init__(self, mogi, *args, **kwargs):
                 super().__init__(*args, **kwargs)
+                self.mogi = mogi
 
-                self.add_item(InputText(label="Short Input"))
-                self.add_item(InputText(label="Long Input"))
+                subset = mogi['players'][len(mogi['calc']):][:4]
+                if not len(mogi['calc']):
+                    subset = mogi['players'][:4]
 
-            async def callback(self: Modal = Modal, interaction: Interaction = Interaction):
-                await interaction.response.send_message(f"results: {self.children[0].value} and {self.children[1].value}", ephemeral=True)
+                for player in subset:
+                    mogi['calc'].append(player)
+                    self.add_item(discord.ui.InputText(label=player))
+
+            async def callback(self: Modal = Modal, interaction: Interaction = Interaction, mogi=self.mogi):
+                for score in len(self.children):
+                    mogi["points"].append(self.children[score].value)
+                await interaction.response.send_message(f"use this command again until you put all players' points\nresults: {self.children[0].value}", ephemeral=True)
                 
-        modal = MogiModal(title="Input player points after match")
-        await ctx.send_modal(modal)
+        if len(self.mogi['players']) > len(self.mogi['calc']):
+            modal = MogiModal(self.mogi, title="Input player points after match")
+            await ctx.send_modal(modal)
+        else: 
+            return await ctx.respond("Already got all calcs")
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
