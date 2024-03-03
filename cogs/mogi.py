@@ -1,14 +1,21 @@
-import math, random
-import discord
+import math, random, pymongo, discord, os
 from discord import ApplicationContext, Interaction, slash_command, Option, InputTextStyle
 from discord.ui import View, Modal, InputText
 from discord.utils import get
 from discord.ext import commands
+import trueskill
+from trueskill import Rating, rate, global_env
 
 class mogi(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        self.mogi = {"status": 0, "running": 0, "players": ["player1", "player2", "player3", "player4", "player5", "player6", "player7", "player8", "player9", "player10", "player11"], "teams": [], "calc": [], "points": []}
+        self.client = pymongo.MongoClient(
+            f"mongodb://{os.getenv('MONGODB_HOST')}:27017/"
+        )
+        self.db = self.client["lounge"]
+        self.players = self.db["players"]
+        self.history = self.db["history"]
+        self.mogi = {"status": 0, "running": 0, "players": [], "teams": [], "calc": [], "points": []}
 
     @slash_command(name="open", description="Start a new mogi")
     async def open(self, ctx: ApplicationContext):
@@ -21,21 +28,21 @@ class mogi(commands.Cog):
     async def join(self, ctx: ApplicationContext):
         if not self.mogi['status']:
             return await ctx.respond("Currently no mogi open")
-        if ctx.author.name in self.mogi['players']:
+        if ctx.author.mention in self.mogi['players']:
             return await ctx.respond("You are already in the mogi")
         if len(self.mogi['players']) >= 12:
             return await ctx.respond("The mogi is already full")
-        self.mogi['players'].append(ctx.author.name)
+        self.mogi['players'].append(ctx.author.mention)
         await ctx.user.add_roles(get(ctx.guild.roles, name="InMogi"))
-        await ctx.respond(f"{ctx.author.name} joined the mogi!\n{len(self.mogi['players'])} players are in!")
+        await ctx.respond(f"{ctx.author.mention} joined the mogi!\n{len(self.mogi['players'])} players are in!")
 
     @slash_command(name="leave", description="Leave the current mogi")
     async def leave(self, ctx: ApplicationContext):
-        if ctx.author.name not in self.mogi['players']:
+        if ctx.author.mention not in self.mogi['players']:
             return await ctx.respond("You are not in the mogi")
-        self.mogi['players'].remove(ctx.author.name)
+        self.mogi['players'].remove(ctx.author.mention)
         await ctx.user.remove_roles(get(ctx.guild.roles, name="InMogi"))
-        await ctx.respond(f"{ctx.author.name} left the mogi!\n{len(self.mogi['players'])} players are in!")
+        await ctx.respond(f"{ctx.author.mention} left the mogi!\n{len(self.mogi['players'])} players are in!")
 
     @slash_command(name="l", description="List all players in the current mogi")
     async def l(self, ctx: ApplicationContext):
@@ -50,7 +57,7 @@ class mogi(commands.Cog):
 
     @slash_command(name="close", description="Stop the current Mogi if running")
     async def close(self, ctx: ApplicationContext):
-        self.mogi = {"status": 0, "running": 0, "players": [], "teams": [], "calc": []}
+        self.mogi = {"status": 0, "running": 0, "players": [], "teams": [], "calc": [], "points": []}
         for member in ctx.guild.members:
             try:
                 await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
@@ -83,7 +90,7 @@ class mogi(commands.Cog):
                 super().__init__()
                 self.mogi = mogi
                 self.voters = []
-                self.votes = {"ffa": 0, "2v2": 5, "3v3": 0, "4v4": 0, "5v5": 0, "6v6": 0}
+                self.votes = {"ffa": 0, "2v2": 0, "3v3": 0, "4v4": 0, "5v5": 0, "6v6": 0}
 
             @discord.ui.select(options=options)
             async def select_callback(self, select, interaction: discord.Interaction):
@@ -102,9 +109,10 @@ class mogi(commands.Cog):
                 if self.votes[max(self.votes, key=self.votes.get)] >= math.ceil(len(self.mogi['players'])/2):
                     format = max(self.votes, key=self.votes.get)
                     lineup_str = ""
-                    if players % 2 != 0:
+                    if True or players % 2 != 0:
                         for player in self.mogi['players']:
                             lineup_str += f"{player}\n"
+                            self.mogi['teams'].append([player])
                     else:
                         random.shuffle(self.mogi['players'])
                         teams = []
@@ -131,7 +139,7 @@ class mogi(commands.Cog):
         if not self.mogi['running']:
             return await ctx.respond("No running mogi")
         class MogiModal(discord.ui.Modal):
-            def __init__(self, mogi, *args, **kwargs):
+            def __init__(self, mogi, db, *args, **kwargs):
                 super().__init__(*args, **kwargs)
                 self.mogi = mogi
 
@@ -141,21 +149,49 @@ class mogi(commands.Cog):
 
                 for player in subset:
                     mogi['calc'].append(player)
-                    self.add_item(discord.ui.InputText(label=player))
+                    mentioned_user = db['players'].find_one({"discord": int(player.strip("<@!>"))})["name"]
+                    self.add_item(discord.ui.InputText(label=mentioned_user))
 
             async def callback(self: Modal = Modal, interaction: Interaction = Interaction, mogi=self.mogi):
                 mogi["points"].append(self.children)
                 await interaction.response.send_message(f"use this command again until you put all players' points\nresults: {self.children[0].value}", ephemeral=True)
                 
         if len(self.mogi['players']) > len(self.mogi['calc']):
-            modal = MogiModal(self.mogi, title="Input player points after match")
+            modal = MogiModal(self.mogi, self.db, title="Input player points after match")
             await ctx.send_modal(modal)
         else: 
             return await ctx.respond("Already got all calcs")
         
     @discord.slash_command(name="table", description="Input player points, calculate new mmr and make tables")
     async def table(self, ctx: discord.ApplicationContext):
-        await ctx.respond(self.mogi)
+        if not len(self.mogi['calc']):
+            return ctx.respond("There doesn't seem to be data to make calculations with")
+        print(self.mogi)
+        
+        global_env()
+        trueskill.setup(mu=2000, sigma=200, beta=1200, tau=350, draw_probability=0.05, backend=None, env=None)
+
+        calc_teams = []
+        for team in self.mogi['teams']:
+            print(team)
+            calc_teams.append([
+                Rating(self.players.find_one(
+                    {"discord": int(''.join(char for char in player if char.isdigit()))}
+                )['mmr'], 500) for player in team])
+        print(calc_teams)
+        
+        scores = [point[0] for point in self.mogi['points']]
+        rank_dict = {element: i + 1 for i, element in enumerate(sorted(scores, reverse=True))}
+
+        placements = [rank_dict[element] for element in scores]
+        print(placements)
+
+        new_ratings = rate(
+            calc_teams, placements
+        )
+
+        await ctx.respond(new_ratings)
+
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))

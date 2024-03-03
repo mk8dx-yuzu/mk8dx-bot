@@ -20,7 +20,7 @@ class commandos(commands.Cog):
 
     @commands.command()
     async def test(self, ctx: commands.Context):
-        await ctx.send("Hi!")
+        await ctx.send("Hi")
 
 def setup(bot: commands.Bot):
     bot.add_cog(commandos(bot))
