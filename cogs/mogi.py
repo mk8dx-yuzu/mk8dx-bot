@@ -153,7 +153,8 @@ class mogi(commands.Cog):
                     self.add_item(discord.ui.InputText(label=mentioned_user))
 
             async def callback(self: Modal = Modal, interaction: Interaction = Interaction, mogi=self.mogi):
-                mogi["points"].append(self.children)
+                for i in range(0, len(self.children)):
+                    mogi["points"].append(int(self.children[i].value))
                 await interaction.response.send_message(f"use this command again until you put all players' points\nresults: {self.children[0].value}", ephemeral=True)
                 
         if len(self.mogi['players']) > len(self.mogi['calc']):
@@ -172,15 +173,17 @@ class mogi(commands.Cog):
 
         calc_teams = []
         for team in self.mogi['teams']:
-            print(team)
-            calc_teams.append([
-                Rating(self.players.find_one(
-                    {"discord": int(''.join(char for char in player if char.isdigit()))}
-                )['mmr'], 500) for player in team.strip("<@!>")])
+            calc_team = []
+            for player in team:
+                mmr = self.players.find_one({"discord": int(player.strip("<@!>"))})['mmr']
+                calc_team.append(Rating(mmr, 400))
+            calc_teams.append(calc_team)
         print(calc_teams)
         
-        scores = [point[0] for point in int(self.mogi['points']['value'])]
+        scores = [point[0] for point in int(self.mogi['points'])]
+        print(scores)
         rank_dict = {element: i + 1 for i, element in enumerate(sorted(scores, reverse=True))}
+        print(rank_dict)
 
         placements = [rank_dict[element] for element in scores]
         print(placements)
