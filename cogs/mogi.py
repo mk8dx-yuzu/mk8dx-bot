@@ -166,7 +166,6 @@ class mogi(commands.Cog):
     async def table(self, ctx: discord.ApplicationContext):
         if not len(self.mogi['calc']):
             return ctx.respond("There doesn't seem to be data to make calculations with")
-        print(self.mogi)
         
         global_env()
         trueskill.setup(mu=2000, sigma=200, beta=1200, tau=350, draw_probability=0.05, backend=None, env=None)
@@ -177,10 +176,10 @@ class mogi(commands.Cog):
             calc_teams.append([
                 Rating(self.players.find_one(
                     {"discord": int(''.join(char for char in player if char.isdigit()))}
-                )['mmr'], 500) for player in team])
+                )['mmr'], 500) for player in team.strip("<@!>")])
         print(calc_teams)
         
-        scores = [point[0] for point in self.mogi['points']]
+        scores = [point[0] for point in int(self.mogi['points']['value'])]
         rank_dict = {element: i + 1 for i, element in enumerate(sorted(scores, reverse=True))}
 
         placements = [rank_dict[element] for element in scores]
