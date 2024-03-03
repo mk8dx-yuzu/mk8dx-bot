@@ -1,7 +1,7 @@
 import math, random
 import discord
 from discord import ApplicationContext, Interaction, slash_command, Option
-from discord.ui import View
+from discord.ui import View, Modal, InputText
 from discord.utils import get
 from discord.ext import commands
 
@@ -126,6 +126,21 @@ class mogi(commands.Cog):
                         
         view = FormatView(self.mogi)
         await ctx.respond(f"{get(ctx.guild.roles, name='InMogi').mention} \nBeginning Mogi\nVote for a format:", view=view)
+
+    @discord.slash_command(name="calc", description="Input player points, calculate new mmr and make tables")
+    async def calc(self, ctx: discord.ApplicationContext):
+        class MogiModal(discord.ui.Modal):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+
+                self.add_item(InputText(label="Short Input"))
+                self.add_item(InputText(label="Long Input"))
+
+            async def callback(self: Modal = Modal, interaction: Interaction = Interaction):
+                await interaction.response.send_message(f"results: {self.children[0].value} and {self.children[1].value}", ephemeral=True)
+                
+        modal = MogiModal(title="Input player points after match")
+        await ctx.send_modal(modal)
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
