@@ -144,8 +144,7 @@ class mogi(commands.Cog):
                     self.add_item(discord.ui.InputText(label=player))
 
             async def callback(self: Modal = Modal, interaction: Interaction = Interaction, mogi=self.mogi):
-                for score in len(self.children):
-                    mogi["points"].append(self.children[score].value)
+                mogi["points"].append(self.children)
                 await interaction.response.send_message(f"use this command again until you put all players' points\nresults: {self.children[0].value}", ephemeral=True)
                 
         if len(self.mogi['players']) > len(self.mogi['calc']):
@@ -153,6 +152,10 @@ class mogi(commands.Cog):
             await ctx.send_modal(modal)
         else: 
             return await ctx.respond("Already got all calcs")
+        
+    @discord.slash_command(name="table", description="Input player points, calculate new mmr and make tables")
+    async def table(self, ctx: discord.ApplicationContext):
+        await ctx.respond(self.mogi)
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
