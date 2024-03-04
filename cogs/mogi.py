@@ -20,9 +20,9 @@ class mogi(commands.Cog):
             f"mongodb://{os.getenv('MONGODB_HOST')}:27017/"
         )
         self.db = self.client["lounge"]
-        self.players = self.db["players"]
+        self.players = self.db["players2"]
         self.history = self.db["history"]
-        self.mogi = {"status": 0, "running": 0, "players": ["<@695260889296928788>", "<@769525682039947314>"], "teams": [], "calc": [], "points": [], "format": "", "results": []}
+        self.mogi = {"status": 1, "running": 0, "players": ["<@695260889296928788>", "<@769525682039947314>", "<@1210239019393486858>", "<@1063806186048192532>"], "teams": [], "calc": [], "points": [], "format": "", "results": []}
 
     @slash_command(name="open", description="Start a new mogi")
     async def open(self, ctx: ApplicationContext):
@@ -97,7 +97,7 @@ class mogi(commands.Cog):
                 super().__init__()
                 self.mogi = mogi
                 self.voters = []
-                self.votes = {"ffa": 0, "2v2": 0, "3v3": 0, "4v4": 0, "5v5": 0, "6v6": 0}
+                self.votes = {"ffa": 0, "2v2": 1, "3v3": 0, "4v4": 0, "5v5": 0, "6v6": 0}
 
             @discord.ui.select(options=options)
             async def select_callback(self, select, interaction: discord.Interaction):
@@ -117,9 +117,9 @@ class mogi(commands.Cog):
                     format = max(self.votes, key=self.votes.get)
                     self.mogi['format'] = format
                     lineup_str = ""
-                    if True or players % 2 != 0:
+                    if players % 2 != 0:
                         for i, player in enumerate(self.mogi['players']):
-                            lineup_str += f"`{i}:` {player}\n"
+                            lineup_str += f"`{i+1}:` {player}\n"
                             self.mogi['teams'].append([player])
                     else:
                         random.shuffle(self.mogi['players'])
@@ -221,42 +221,27 @@ class mogi(commands.Cog):
 
     @slash_command(name="table", description="Use after a /calc to view the results")
     async def table(self, ctx: discord.ApplicationContext):
-        return await ctx.respond(self.mogi['results'])
+        players = [self.players.find_one({"discord": int(player.strip("<@!>"))})['name'] for player in self.mogi['players']]
+        current_mmr = [self.players.find_one({"discord": int(player.strip("<@!>"))})['mmr'] for player in self.mogi['players']]
+        new_mmr = [val for sublist in self.mogi['results'] for val in sublist]
+
         data = {
-                "Name": ["Jordan", "Tario", "Mitsiku", "Leoo", "MintCheetah", "probablyjassin", "Ren", "Kevnkkm", "Juuls_poms", "dankmeme8s", "clarity", "drake"],
-                "MMR": [5448, 3763, 2638, 2355, 2320, 2189, 2802, 2647, 1658, 1495, 2000, 1971],
-                "Change": [0 for i in range(1, 13)],
-                "New MMR": [5524, 3870, 2779, 2471, 2395, 2237, 2750, 2571, 1638, 1446, 1849, 1749],
-            }
-        async def table_command(ctx):
-            """Generates a DataFrame table and sends it as an image within Discord."""
+            "Player": players,
+            "MMR": current_mmr,
+            "Change": [new_mmr[i] - current_mmr[i] for i in range(0, len(players))],
+            "New MMR": new_mmr
+        }
 
-            data = {
-                "Name": ["Jordan", "Tario", "Mitsiku", "Leoo", "MintCheetah", "probablyjassin", "Ren", "Kevnkkm", "Juuls_poms", "dankmeme8s", "clarity", "drake"],
-                "MMR": [5448, 3763, 2638, 2355, 2320, 2189, 2802, 2647, 1658, 1495, 2000, 1971],
-                "Change": [0 for i in range(1, 13)],
-                "New MMR": [5524, 3870, 2779, 2471, 2395, 2237, 2750, 2571, 1638, 1446, 1849, 1749],
-            }
+        df = pd.DataFrame(data)
+        df.index = range(1, len(df) + 1)
 
-            df = pd.DataFrame(data)
-            for i in range(len(df['Name'])):
-                df.loc[i, "Change"] = df.loc[i, "New MMR"] - df.loc[i, "MMR"]
+        buffer = BytesIO()
 
-            df.index = range(1, len(df) + 1)
+        dfi.export(df.style.background_gradient(cmap=colors.LinearSegmentedColormap.from_list("", ["red", "white", "green"]), low=0, high=0.2, subset=["Change"]), buffer)
 
-            # Create an in-memory buffer to store the image data
-            buffer = BytesIO()
-
-            # Generate the DataFrame as a styled image directly into the buffer
-            dfi.export(df.style.background_gradient(cmap=colors.LinearSegmentedColormap.from_list("", ["red", "white", "green"]), low=0, high=0.2, subset=["Change"]), buffer, format="png")
-
-            # Reset the buffer's pointer to the beginning to enable reading
-            buffer.seek(0)
-
-            # Create a Discord File object from the buffer and send it
-            file = discord.File(buffer, filename="table.png")
-            await ctx.send(content="Here's the table:", file=file)
-
+        buffer.seek(0)
+        file = discord.File(buffer, filename="table.png")
+        await ctx.respond(content="Here's the table:", file=file)
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
