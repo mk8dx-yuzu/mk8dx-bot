@@ -168,7 +168,7 @@ class mogi(commands.Cog):
                 await interaction.response.send_message("""
                     Points have been collected. 
                     Use this command again until all players' points have been collected.
-                    Then use /table to view the results
+                    Then use /calc to calculate results
                 """, ephemeral=True)
                 
         if len(self.mogi['players']) > len(self.mogi['calc']):
@@ -177,8 +177,8 @@ class mogi(commands.Cog):
         else: 
             return await ctx.respond("Already got all calcs")
         
-    @discord.slash_command(name="table", description="Input player points, calculate new mmr and make tables")
-    async def table(self, ctx: discord.ApplicationContext):
+    @discord.slash_command(name="calc", description="Input player points, calculate new mmr and make tables")
+    async def calc(self, ctx: discord.ApplicationContext):
         if not len(self.mogi['calc']):
             return ctx.respond("There doesn't seem to be data to make calculations with")
         
