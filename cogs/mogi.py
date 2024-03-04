@@ -71,7 +71,7 @@ class mogi(commands.Cog):
             return await ctx.respond("No running mogi")
         await ctx.respond(f"Currently open mogi: {len(self.mogi['players'])} players")
 
-    @commands.slash_command(name="start", description="Randomize teams, vote format and start playing")
+    @slash_command(name="start", description="Randomize teams, vote format and start playing")
     async def start(self, ctx: ApplicationContext):
         if not any(role.name == "InMogi" for role in ctx.author.roles):
             return await ctx.respond("You can't start a mogi you aren't in", ephemeral=True)
@@ -135,7 +135,7 @@ class mogi(commands.Cog):
         view = FormatView(self.mogi)
         await ctx.respond(f"{get(ctx.guild.roles, name='InMogi').mention} \nBeginning Mogi\nVote for a format:", view=view)
 
-    @discord.slash_command(name="points", description="Use after a mogi - input player points")
+    @slash_command(name="points", description="Use after a mogi - input player points")
     async def points(self, ctx: discord.ApplicationContext):
         if not self.mogi['running']:
             return await ctx.respond("No running mogi")
@@ -177,7 +177,7 @@ class mogi(commands.Cog):
         else: 
             return await ctx.respond("Already got all calcs")
         
-    @discord.slash_command(name="calc", description="Use after using /points to calculate new mmr")
+    @slash_command(name="calc", description="Use after using /points to calculate new mmr")
     async def calc(self, ctx: discord.ApplicationContext):
         if not len(self.mogi['calc']):
             return ctx.respond("There doesn't seem to be data to make calculations with")
@@ -213,6 +213,9 @@ class mogi(commands.Cog):
 
         await ctx.respond("Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr")
 
+    @slash_command(name="table", description="Use after a /calc to view the results")
+    async def table(self, ctx: discord.ApplicationContext):
+        
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
