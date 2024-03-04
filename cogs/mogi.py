@@ -71,8 +71,8 @@ class mogi(commands.Cog):
             return await ctx.respond("No running mogi")
         await ctx.respond(f"Currently open mogi: {len(self.mogi['players'])} players")
 
-    @commands.slash_command(name="play", description="Randomize teams, vote format and start playing")
-    async def play(self, ctx: ApplicationContext):
+    @commands.slash_command(name="start", description="Randomize teams, vote format and start playing")
+    async def start(self, ctx: ApplicationContext):
         if not any(role.name == "InMogi" for role in ctx.author.roles):
             return await ctx.respond("You can't start a mogi you aren't in", ephemeral=True)
         if self.mogi['running']:
@@ -135,8 +135,8 @@ class mogi(commands.Cog):
         view = FormatView(self.mogi)
         await ctx.respond(f"{get(ctx.guild.roles, name='InMogi').mention} \nBeginning Mogi\nVote for a format:", view=view)
 
-    @discord.slash_command(name="calc", description="Input player points, calculate new mmr and make tables")
-    async def calc(self, ctx: discord.ApplicationContext):
+    @discord.slash_command(name="points", description="Input player points, calculate new mmr")
+    async def points(self, ctx: discord.ApplicationContext):
         if not self.mogi['running']:
             return await ctx.respond("No running mogi")
         class MogiModal(discord.ui.Modal):
@@ -165,7 +165,11 @@ class mogi(commands.Cog):
                         points.append(self.children[i].value)
                     for i in range(0, len(points), size):
                         mogi["points"].append(points[i:i+size])
-                await interaction.response.send_message(f"use this command again until you put all players' points\nresults: {self.children[0].value}", ephemeral=True)
+                await interaction.response.send_message("""
+                    Points have been collected. 
+                    Use this command again until all players' points have been collected.
+                    Then use /table to view the results
+                """, ephemeral=True)
                 
         if len(self.mogi['players']) > len(self.mogi['calc']):
             modal = MogiModal(self.mogi, self.db, title="Input player points after match")
