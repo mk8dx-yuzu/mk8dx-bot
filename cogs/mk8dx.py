@@ -179,7 +179,7 @@ class mk8dx(commands.Cog):
             return await ctx.respond("You already have the Lounge Player role")
         try:
             player_id = self.players.insert_one(
-                {"name": username, "mmr": 2000, "wins": 0, "losses": 0, "discord": int(member.id)},
+                {"name": username, "mmr": 2000, "wins": 0, "losses": 0, "discord": str(member.id)},
             ).inserted_id
             self.history.insert_one({"player_id": str(player_id), "history": []})
         except:

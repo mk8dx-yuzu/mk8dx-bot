@@ -22,7 +22,7 @@ class mogi(commands.Cog):
         self.db = self.client["lounge"]
         self.players = self.db["players2"]
         self.history = self.db["history"]
-        self.mogi = {"status": 1, "running": 0, "players": ["<@695260889296928788>", "<@769525682039947314>", "<@1210239019393486858>", "<@1063806186048192532>"], "teams": [], "calc": [], "points": [], "format": "", "results": []}
+        self.mogi = {"status": 1, "running": 0, "players": ["<@695260889296928788>", "<@769525682039947314>", "<@1210239019393486858>", "<@1063806186048192532>"], "teams": [], "calc": [], "points": [], "format": "", "results": [], "placements": []}
 
     @slash_command(name="open", description="Start a new mogi")
     async def open(self, ctx: ApplicationContext):
@@ -64,7 +64,7 @@ class mogi(commands.Cog):
 
     @slash_command(name="close", description="Stop the current Mogi if running")
     async def close(self, ctx: ApplicationContext):
-        self.mogi = {"status": 0, "running": 0, "players": [], "teams": [], "calc": [], "points": [], "format": "", "results": []}
+        self.mogi = {"status": 0, "running": 0, "players": [], "teams": [], "calc": [], "points": [], "format": "", "results": [], "placements": []}
         for member in ctx.guild.members:
             try:
                 await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
@@ -157,7 +157,7 @@ class mogi(commands.Cog):
                 
                 for player in subset:
                     mogi['calc'].append(player)
-                    mentioned_user = db['players'].find_one({"discord": int(player.strip("<@!>"))})["name"]
+                    mentioned_user = db['players2'].find_one({"discord": player.strip("<@!>")})["name"]
                     self.add_item(InputText(label=mentioned_user))
 
             async def callback(self: Modal = Modal, interaction: Interaction = Interaction, mogi=self.mogi):
@@ -168,7 +168,7 @@ class mogi(commands.Cog):
                     size = int(mogi['format'][0])
                     points = []
                     for i in range(0, len(self.children)):
-                        points.append(self.children[i].value)
+                        points.append(int(self.children[i].value))
                     for i in range(0, len(points), size):
                         mogi["points"].append(points[i:i+size])
                 await interaction.response.send_message("""
@@ -195,7 +195,7 @@ class mogi(commands.Cog):
         for team in self.mogi['teams']:
             calc_team = []
             for player in team:
-                mmr = self.players.find_one({"discord": int(player.strip("<@!>"))})['mmr']
+                mmr = self.players.find_one({"discord": player.strip("<@!>")})['mmr']
                 calc_team.append(Rating(mmr, 400))
             calc_teams.append(calc_team)
         
@@ -209,6 +209,7 @@ class mogi(commands.Cog):
             ranks_dict[score[0]] = i+1
         for score in scores:
             placements.append(ranks_dict[score[0]])
+        self.mogi['placements'] = placements
 
         new_ratings = rate(
             calc_teams, placements
@@ -221,8 +222,8 @@ class mogi(commands.Cog):
 
     @slash_command(name="table", description="Use after a /calc to view the results")
     async def table(self, ctx: discord.ApplicationContext):
-        players = [self.players.find_one({"discord": int(player.strip("<@!>"))})['name'] for player in self.mogi['players']]
-        current_mmr = [self.players.find_one({"discord": int(player.strip("<@!>"))})['mmr'] for player in self.mogi['players']]
+        players = [self.players.find_one({"discord": player.strip("<@!>")})['name'] for player in self.mogi['players']]
+        current_mmr = [self.players.find_one({"discord": player.strip("<@!>")})['mmr'] for player in self.mogi['players']]
         new_mmr = [val for sublist in self.mogi['results'] for val in sublist]
 
         data = {
@@ -231,12 +232,12 @@ class mogi(commands.Cog):
             "Change": [new_mmr[i] - current_mmr[i] for i in range(0, len(players))],
             "New MMR": new_mmr
         }
-
+        print(self.mogi['placements'])
         df = pd.DataFrame(data)
         df.index = range(1, len(df) + 1)
 
         buffer = BytesIO()
-
+        df = df.sort_values(by="Change", ascending=False)
         dfi.export(df.style.background_gradient(cmap=colors.LinearSegmentedColormap.from_list("", ["red", "white", "green"]), low=0, high=0.2, subset=["Change"]), buffer)
 
         buffer.seek(0)
