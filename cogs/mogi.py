@@ -1,10 +1,17 @@
-import math, random, pymongo, discord, os
-from discord import ApplicationContext, Interaction, slash_command, Option, InputTextStyle
+import os, discord, pymongo, math, random
+
+from discord import ApplicationContext, Interaction, slash_command
 from discord.ui import View, Modal, InputText
 from discord.utils import get
 from discord.ext import commands
+
 import trueskill
 from trueskill import Rating, rate, global_env
+
+import pandas as pd
+import dataframe_image as dfi
+from matplotlib import colors
+from io import BytesIO
 
 class mogi(commands.Cog):
     def __init__(self, bot):
@@ -152,7 +159,7 @@ class mogi(commands.Cog):
                     print(player)
                     mogi['calc'].append(player)
                     mentioned_user = db['players'].find_one({"discord": int(player.strip("<@!>"))})["name"]
-                    self.add_item(discord.ui.InputText(label=mentioned_user))
+                    self.add_item(InputText(label=mentioned_user))
 
             async def callback(self: Modal = Modal, interaction: Interaction = Interaction, mogi=self.mogi):
                 if mogi['format'] == 'ffa':
@@ -215,7 +222,42 @@ class mogi(commands.Cog):
 
     @slash_command(name="table", description="Use after a /calc to view the results")
     async def table(self, ctx: discord.ApplicationContext):
-        
+        return await ctx.respond(self.mogi['results'])
+        data = {
+                "Name": ["Jordan", "Tario", "Mitsiku", "Leoo", "MintCheetah", "probablyjassin", "Ren", "Kevnkkm", "Juuls_poms", "dankmeme8s", "clarity", "drake"],
+                "MMR": [5448, 3763, 2638, 2355, 2320, 2189, 2802, 2647, 1658, 1495, 2000, 1971],
+                "Change": [0 for i in range(1, 13)],
+                "New MMR": [5524, 3870, 2779, 2471, 2395, 2237, 2750, 2571, 1638, 1446, 1849, 1749],
+            }
+        async def table_command(ctx):
+            """Generates a DataFrame table and sends it as an image within Discord."""
+
+            data = {
+                "Name": ["Jordan", "Tario", "Mitsiku", "Leoo", "MintCheetah", "probablyjassin", "Ren", "Kevnkkm", "Juuls_poms", "dankmeme8s", "clarity", "drake"],
+                "MMR": [5448, 3763, 2638, 2355, 2320, 2189, 2802, 2647, 1658, 1495, 2000, 1971],
+                "Change": [0 for i in range(1, 13)],
+                "New MMR": [5524, 3870, 2779, 2471, 2395, 2237, 2750, 2571, 1638, 1446, 1849, 1749],
+            }
+
+            df = pd.DataFrame(data)
+            for i in range(len(df['Name'])):
+                df.loc[i, "Change"] = df.loc[i, "New MMR"] - df.loc[i, "MMR"]
+
+            df.index = range(1, len(df) + 1)
+
+            # Create an in-memory buffer to store the image data
+            buffer = BytesIO()
+
+            # Generate the DataFrame as a styled image directly into the buffer
+            dfi.export(df.style.background_gradient(cmap=colors.LinearSegmentedColormap.from_list("", ["red", "white", "green"]), low=0, high=0.2, subset=["Change"]), buffer, format="png")
+
+            # Reset the buffer's pointer to the beginning to enable reading
+            buffer.seek(0)
+
+            # Create a Discord File object from the buffer and send it
+            file = discord.File(buffer, filename="table.png")
+            await ctx.send(content="Here's the table:", file=file)
+
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))

@@ -1,6 +1,5 @@
 import pandas as pd
 import dataframe_image as dfi
-import matplotlib
 from matplotlib import colors
 
 df = pd.DataFrame(
@@ -9,6 +8,7 @@ df = pd.DataFrame(
         "MMR": [5448, 3763, 2638, 2355, 2320, 2189, 2802, 2647, 1658, 1495, 2000, 1971],
         "Change": [0 for i in range(1, 13)],
         "New MMR": [5524, 3870, 2779, 2471, 2395, 2237, 2750, 2571, 1638, 1446, 1849, 1749],
+        "Team": ["" for i in range(1, 13)]
     }
 )
 for i in range(len(df['Name'])):

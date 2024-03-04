@@ -10,6 +10,7 @@ client.close()
 
 import trueskill
 from trueskill import Rating, rate, global_env, setup
+from collections import OrderedDict
 
 global_env()
 setup(
@@ -54,50 +55,18 @@ racers = [
     ],
 ]
 
-placements = [i for i in range(1, 7)]
+placements = [6, 2, 1, 4, 5, 3]
 
 new_ratings = rate(racers, placements)
 
-print(new_ratings)
+new_mmr = []
+for team in new_ratings:
+    new_mmr.append([round(player.mu) for player in team])
 
-[
-    "(trueskill.Rating(mu=5524.414, sigma=393.889),)",
-    "(trueskill.Rating(mu=3870.975, sigma=388.235),)",
-    "(trueskill.Rating(mu=2779.996, sigma=386.267),)",
-    "(trueskill.Rating(mu=2471.141, sigma=385.523),)",
-    "(trueskill.Rating(mu=2395.339, sigma=385.193),)",
-    "(trueskill.Rating(mu=2237.702, sigma=385.048),)",
-    "(trueskill.Rating(mu=2750.875, sigma=385.023),)",
-    "(trueskill.Rating(mu=2571.628, sigma=385.103),)",
-    "(trueskill.Rating(mu=1638.649, sigma=385.321),)",
-    "(trueskill.Rating(mu=1446.243, sigma=385.695),)",
-    "(trueskill.Rating(mu=1849.516, sigma=386.411),)",
-    "(trueskill.Rating(mu=1749.525, sigma=388.860),)",
-]
+teams_with_positions = OrderedDict(zip(tuple(new_mmr), tuple(placements)))
 
-[
-    (
-        trueskill.Rating(mu=5469.860, sigma=400.461),
-        trueskill.Rating(mu=3784.860, sigma=400.461),
-    ),
-    (
-        trueskill.Rating(mu=2726.283, sigma=396.781),
-        trueskill.Rating(mu=2443.283, sigma=396.781),
-    ),
-    (
-        trueskill.Rating(mu=2367.787, sigma=395.896),
-        trueskill.Rating(mu=2236.787, sigma=395.896),
-    ),
-    (
-        trueskill.Rating(mu=2751.169, sigma=395.811),
-        trueskill.Rating(mu=2596.169, sigma=395.811),
-    ),
-    (
-        trueskill.Rating(mu=1658.962, sigma=396.235),
-        trueskill.Rating(mu=1495.962, sigma=396.235),
-    ),
-    (
-        trueskill.Rating(mu=1891.940, sigma=397.486),
-        trueskill.Rating(mu=1862.940, sigma=397.486),
-    ),
-]
+sorted_teams = sorted(teams_with_positions.items(), key=lambda item: item[1])
+
+sorted_teams_list = [team for team, _ in sorted_teams]
+
+print(sorted_teams_list)
