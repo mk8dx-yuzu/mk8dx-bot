@@ -118,8 +118,8 @@ class mogi(commands.Cog):
                     self.mogi['format'] = format
                     lineup_str = ""
                     if True or players % 2 != 0:
-                        for player in self.mogi['players']:
-                            lineup_str += f"{player}\n"
+                        for i, player in enumerate(self.mogi['players']):
+                            lineup_str += f"`{i}:` {player}\n"
                             self.mogi['teams'].append([player])
                     else:
                         random.shuffle(self.mogi['players'])
