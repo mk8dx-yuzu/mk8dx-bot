@@ -93,8 +93,7 @@ class mk8dx(commands.Cog):
             )
             return
 
-        data = self.players.find().sort(sort, pymongo.DESCENDING)
-        data = list(data)
+        data = list(self.players.find().sort(sort, pymongo.DESCENDING))
 
         items_per_page = 10
         total_pages = int(math.ceil(len(data) / items_per_page))
