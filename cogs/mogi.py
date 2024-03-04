@@ -15,7 +15,7 @@ class mogi(commands.Cog):
         self.db = self.client["lounge"]
         self.players = self.db["players"]
         self.history = self.db["history"]
-        self.mogi = {"status": 0, "running": 0, "players": ["<@695260889296928788>", "<@769525682039947314>"], "teams": [], "calc": [], "points": [], "format": ""}
+        self.mogi = {"status": 0, "running": 0, "players": ["<@695260889296928788>", "<@769525682039947314>"], "teams": [], "calc": [], "points": [], "format": "", "results": []}
 
     @slash_command(name="open", description="Start a new mogi")
     async def open(self, ctx: ApplicationContext):
@@ -57,7 +57,7 @@ class mogi(commands.Cog):
 
     @slash_command(name="close", description="Stop the current Mogi if running")
     async def close(self, ctx: ApplicationContext):
-        self.mogi = {"status": 0, "running": 0, "players": [], "teams": [], "calc": [], "points": [], "format": ""}
+        self.mogi = {"status": 0, "running": 0, "players": [], "teams": [], "calc": [], "points": [], "format": "", "results": []}
         for member in ctx.guild.members:
             try:
                 await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
@@ -135,7 +135,7 @@ class mogi(commands.Cog):
         view = FormatView(self.mogi)
         await ctx.respond(f"{get(ctx.guild.roles, name='InMogi').mention} \nBeginning Mogi\nVote for a format:", view=view)
 
-    @discord.slash_command(name="points", description="Input player points, calculate new mmr")
+    @discord.slash_command(name="points", description="Use after a mogi - input player points")
     async def points(self, ctx: discord.ApplicationContext):
         if not self.mogi['running']:
             return await ctx.respond("No running mogi")
@@ -177,7 +177,7 @@ class mogi(commands.Cog):
         else: 
             return await ctx.respond("Already got all calcs")
         
-    @discord.slash_command(name="calc", description="Input player points, calculate new mmr and make tables")
+    @discord.slash_command(name="calc", description="Use after using /points to calculate new mmr")
     async def calc(self, ctx: discord.ApplicationContext):
         if not len(self.mogi['calc']):
             return ctx.respond("There doesn't seem to be data to make calculations with")
@@ -208,7 +208,10 @@ class mogi(commands.Cog):
             calc_teams, placements
         )
 
-        await ctx.respond(new_ratings)
+        for team in new_ratings:
+            self.mogi['results'].append([round(player.mu) for player in team])
+
+        await ctx.respond("Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr")
 
 
 def setup(bot: commands.Bot):
