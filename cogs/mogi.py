@@ -156,7 +156,6 @@ class mogi(commands.Cog):
                     subset = mogi['players'][:4]
                 
                 for player in subset:
-                    print(player)
                     mogi['calc'].append(player)
                     mentioned_user = db['players'].find_one({"discord": int(player.strip("<@!>"))})["name"]
                     self.add_item(InputText(label=mentioned_user))
