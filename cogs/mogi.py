@@ -15,7 +15,7 @@ class mogi(commands.Cog):
         self.db = self.client["lounge"]
         self.players = self.db["players"]
         self.history = self.db["history"]
-        self.mogi = {"status": 0, "running": 0, "players": [], "teams": [], "calc": [], "points": []}
+        self.mogi = {"status": 0, "running": 0, "players": ["<@695260889296928788>", "<@769525682039947314>"], "teams": [], "calc": [], "points": [], "format": ""}
 
     @slash_command(name="open", description="Start a new mogi")
     async def open(self, ctx: ApplicationContext):
@@ -57,7 +57,7 @@ class mogi(commands.Cog):
 
     @slash_command(name="close", description="Stop the current Mogi if running")
     async def close(self, ctx: ApplicationContext):
-        self.mogi = {"status": 0, "running": 0, "players": [], "teams": [], "calc": [], "points": []}
+        self.mogi = {"status": 0, "running": 0, "players": [], "teams": [], "calc": [], "points": [], "format": ""}
         for member in ctx.guild.members:
             try:
                 await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
@@ -108,6 +108,7 @@ class mogi(commands.Cog):
                 await interaction.followup.send(f"+1 vote for *{selected_option}*")
                 if self.votes[max(self.votes, key=self.votes.get)] >= math.ceil(len(self.mogi['players'])/2):
                     format = max(self.votes, key=self.votes.get)
+                    self.mogi['format'] = format
                     lineup_str = ""
                     if True or players % 2 != 0:
                         for player in self.mogi['players']:
@@ -146,15 +147,24 @@ class mogi(commands.Cog):
                 subset = mogi['players'][len(mogi['calc']):][:4]
                 if not len(mogi['calc']):
                     subset = mogi['players'][:4]
-
+                
                 for player in subset:
+                    print(player)
                     mogi['calc'].append(player)
                     mentioned_user = db['players'].find_one({"discord": int(player.strip("<@!>"))})["name"]
                     self.add_item(discord.ui.InputText(label=mentioned_user))
 
             async def callback(self: Modal = Modal, interaction: Interaction = Interaction, mogi=self.mogi):
-                for i in range(0, len(self.children)):
-                    mogi["points"].append(int(self.children[i].value))
+                if mogi['format'] == 'ffa':
+                    for i in range(0, len(self.children)):
+                        mogi["points"].append([int(self.children[i].value)])
+                else:
+                    size = int(mogi['format'][0])
+                    points = []
+                    for i in range(0, len(self.children)):
+                        points.append(self.children[i].value)
+                    for i in range(0, len(points), size):
+                        mogi["points"].append(points[i:i+size])
                 await interaction.response.send_message(f"use this command again until you put all players' points\nresults: {self.children[0].value}", ephemeral=True)
                 
         if len(self.mogi['players']) > len(self.mogi['calc']):
@@ -178,15 +188,17 @@ class mogi(commands.Cog):
                 mmr = self.players.find_one({"discord": int(player.strip("<@!>"))})['mmr']
                 calc_team.append(Rating(mmr, 400))
             calc_teams.append(calc_team)
-        print(calc_teams)
         
-        scores = [point[0] for point in int(self.mogi['points'])]
-        print(scores)
-        rank_dict = {element: i + 1 for i, element in enumerate(sorted(scores, reverse=True))}
-        print(rank_dict)
+        scores = []
+        for team_point_arr in self.mogi['points']:
+            scores.append([sum(team_point_arr)])
 
-        placements = [rank_dict[element] for element in scores]
-        print(placements)
+        ranks_dict = {}
+        placements = []
+        for i, score in enumerate(sorted(scores, reverse=True)):
+            ranks_dict[score[0]] = i+1
+        for score in scores:
+            placements.append(ranks_dict[score[0]])
 
         new_ratings = rate(
             calc_teams, placements
