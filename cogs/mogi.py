@@ -21,8 +21,8 @@ class mogi(commands.Cog):
         )
         self.db = self.client["lounge"]
         self.players = self.db["players2"]
-        self.history = self.db["history"]
-        self.mogi = {"status": 1, "running": 0, "players": ["<@695260889296928788>", "<@769525682039947314>", "<@1210239019393486858>", "<@1063806186048192532>"], "teams": [], "calc": [], "points": [], "format": "", "results": [], "placements": []}
+        self.history = self.db["history"] # "<@1063806186048192532>"
+        self.mogi = {"status": 1, "running": 0, "players": ["<@695260889296928788>", "<@769525682039947314>", "<@1210239019393486858>"], "teams": [], "calc": [], "points": [], "format": "", "results": [], "placements": []}
 
     @slash_command(name="open", description="Start a new mogi")
     async def open(self, ctx: ApplicationContext):

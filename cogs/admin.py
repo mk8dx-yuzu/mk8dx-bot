@@ -17,43 +17,6 @@ class admin(commands.Cog):
         self.history = self.db["history"]
 
     @slash_command(
-        name="add",
-        description="(other stats can be added/modified trough the /edit method)",
-    )
-    async def add(
-        self,
-        ctx: discord.ApplicationContext,
-        name=Option(
-            str,
-            name="player",
-            description="What's the name of the new player?",
-            required=True,
-        ),
-        mmr=Option(
-            int, name="mmr", description="starting MMR", required=False, default=2000
-        ),
-        wins=Option(
-            int,
-            name="wins",
-            description="amount of won events",
-            required=False,
-            default=0,
-        ),
-        losses=Option(
-            int,
-            name="losses",
-            description="amount of lost events",
-            required=False,
-            default=0,
-        ),
-    ):
-        player_id = self.players.insert_one(
-            {"name": name, "mmr": mmr, "wins": wins, "losses": losses}
-        ).inserted_id
-        self.history.insert_one({"_id": player_id, "history": []})
-        await ctx.respond(f"Sucessfully created user {name}")
-
-    @slash_command(
         name="edit",
         description="Edit a player's MMR. Wins/Losses and MMR History will be updated accordingly.",
     )
