@@ -30,7 +30,6 @@ class mk8dx(commands.Cog):
         )
         self.db = self.client["lounge"]
         self.players = self.db["players"]
-        self.history = self.db["history"]
 
     def cog_unload(self):
         self.client.close()
@@ -49,7 +48,7 @@ class mk8dx(commands.Cog):
     @commands.cooldown(2, 120, commands.BucketType.user)
     async def mmr(self, ctx: discord.ApplicationContext, name: str):
         player = self.players.find_one({"name": name})
-        history = self.history.find_one({"player_id": f"{player['_id']}"}).get(
+        history = self.players.find_one({"name": f"{name}"}).get(
             "history"
         )
         if player["mmr"]:
@@ -178,10 +177,9 @@ class mk8dx(commands.Cog):
         if role in member.roles:
             return await ctx.respond("You already have the Lounge Player role")
         try:
-            player_id = self.players.insert_one(
-                {"name": username, "mmr": 2000, "wins": 0, "losses": 0, "discord": str(member.id)},
-            ).inserted_id
-            self.history.insert_one({"player_id": str(player_id), "history": []})
+            self.players.insert_one(
+                {"name": username, "mmr": 2000, "wins": 0, "losses": 0, "discord": str(member.id), "history": []},
+            )
         except:
             return await ctx.respond("Name already taken or another error occured")
         await member.add_roles(role)

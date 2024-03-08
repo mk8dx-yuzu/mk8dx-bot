@@ -14,7 +14,6 @@ class admin(commands.Cog):
         )
         self.db = self.client["lounge"]
         self.players = self.db["players"]
-        self.history = self.db["history"]
 
     @slash_command(
         name="edit",
@@ -39,8 +38,8 @@ class admin(commands.Cog):
         player = self.players.find_one({"name": name})
         delta = new_mmr - player["mmr"]
         win = delta >= 0
-        self.history.update_one(
-            {"player_id": f"{player['_id']}"}, {"$push": {f"history": delta}}
+        self.players.update_one(
+            {"name": f"{player['name']}"}, {"$push": {f"history": delta}}
         )
         self.players.update_one(
             {"name": name}, {"$inc": {f"{'wins' if win else 'losses'}": 1}}
@@ -58,7 +57,6 @@ class admin(commands.Cog):
         user_discord = user['discord']
         await ctx.guild.get_member(user_discord).remove_roles(get(ctx.guild.roles, name="Lounge Player"))
         self.players.delete_one({"name": player})
-        self.history.delete_one({"player_id": user["_id"]})
         await ctx.respond(f"Successfully deleted {player}s player records")
 
 def setup(bot: commands.Bot):
