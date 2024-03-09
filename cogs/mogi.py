@@ -130,7 +130,7 @@ class mogi(commands.Cog):
                 self.mogi = mogi
                 self.voters = []
                 self.votes = {
-                    "ffa": 1,
+                    "ffa": 0,
                     "2v2": 0,
                     "3v3": 0,
                     "4v4": 0,

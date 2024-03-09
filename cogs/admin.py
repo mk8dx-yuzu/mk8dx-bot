@@ -57,7 +57,7 @@ class admin(commands.Cog):
         new_value = str(new_value) if stat == "name" or "discord" else new_value
 
         if stat == "mmr":
-            delta = new_value - player["mmr"]
+            delta = int(new_value) - int(player["mmr"])
             self.players.update_one({"name": name}, {"$set": {f"mmr": new_value}})
             if calc == 'y':
                 self.players.update_one(
