@@ -142,6 +142,9 @@ class mk8dx(commands.Cog):
             color=discord.Colour.blurple(),
         )
         for item in list(player.keys())[2:]:
+            if item == "discord":
+                embed.add_field(name=f"{item}", value=f"<@{player[item]}>")
+                continue
             embed.add_field(name=f"{item}", value=f"{player[item]}")
 
         rank = calcRank(player["mmr"])
