@@ -53,10 +53,13 @@ class admin(commands.Cog):
         ),
     ):
         player = self.players.find_one({"name": name})
-        new_value = int(new_value) if stat == "mmr" or "wins" or "losses" else new_value
-        new_value = str(new_value) if stat == "name" or "discord" else new_value
-
+        if stat in ["mmr", "wins", "losses"]:
+            new_value = int(new_value)
+        if stat in ["name", "discord"]:
+            new_value = str(new_value)
+            
         if stat == "mmr":
+            new_value = int(new_value)
             delta = int(new_value) - int(player["mmr"])
             self.players.update_one({"name": name}, {"$set": {f"mmr": new_value}})
             if calc == 'y':

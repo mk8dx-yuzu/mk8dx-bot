@@ -145,6 +145,9 @@ class mk8dx(commands.Cog):
             if item == "discord":
                 embed.add_field(name=f"{item}", value=f"<@{player[item]}>")
                 continue
+            if item == "history":
+                embed.add_field(name=f"{item}", value=f"{str(player[item])}")
+                continue
             embed.add_field(name=f"{item}", value=f"{player[item]}")
 
         rank = calcRank(player["mmr"])
