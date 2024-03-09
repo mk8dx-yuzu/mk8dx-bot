@@ -44,7 +44,7 @@ class admin(commands.Cog):
         player = self.players.find_one({"name": name})
         delta = new_mmr - player["mmr"]
         self.players.update_one({"name": name}, {"$set": {f"mmr": new_mmr}})
-        if calc:
+        if calc == 'y':
             self.players.update_one(
                 {"name": f"{player['name']}"}, {"$push": {f"history": delta}}
             )
