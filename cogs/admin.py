@@ -17,7 +17,7 @@ class admin(commands.Cog):
 
     @slash_command(
         name="edit",
-        description="Edit a player's MMR. Wins/Losses and MMR History will be updated accordingly.",
+        description="Edit a player's MMR. Wins/Losses and MMR History can be updated accordingly.",
     )
     async def edit(
         self,
@@ -34,17 +34,23 @@ class admin(commands.Cog):
             description="new MMR value",
             required=True,
         ),
+        calc=Option(
+            str,
+            name="mmr",
+            description="type 'y' or 'n' | add to wins/losses and history",
+            required=True,
+        ),
     ):
         player = self.players.find_one({"name": name})
         delta = new_mmr - player["mmr"]
-        win = delta >= 0
-        self.players.update_one(
-            {"name": f"{player['name']}"}, {"$push": {f"history": delta}}
-        )
-        self.players.update_one(
-            {"name": name}, {"$inc": {f"{'wins' if win else 'losses'}": 1}}
-        )
         self.players.update_one({"name": name}, {"$set": {f"mmr": new_mmr}})
+        if calc:
+            self.players.update_one(
+                {"name": f"{player['name']}"}, {"$push": {f"history": delta}}
+            )
+            self.players.update_one(
+                {"name": name}, {"$inc": {f"{'wins' if delta >= 0 else 'losses'}": 1}}
+            )
         await ctx.respond(f"Sucessfully edited {name}s MMR to {new_mmr}")
 
     @slash_command(name="remove", description="Remove a player from the leaderboard")
