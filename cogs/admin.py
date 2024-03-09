@@ -36,7 +36,7 @@ class admin(commands.Cog):
         ),
         calc=Option(
             str,
-            name="mmr",
+            name="calc",
             description="type 'y' or 'n' | add to wins/losses and history",
             required=True,
         ),
