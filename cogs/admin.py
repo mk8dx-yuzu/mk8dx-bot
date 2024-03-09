@@ -5,7 +5,6 @@ from discord import slash_command, Option
 from discord.ext import commands
 from discord.utils import get
 
-
 class admin(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -22,19 +21,31 @@ class admin(commands.Cog):
     async def edit(
         self,
         ctx: discord.ApplicationContext,
-        name=Option(
+        name = Option(
             str,
             name="player",
             description="Which player's record to modify",
             required=True,
         ),
-        new_mmr=Option(
-            int,
-            name="mmr",
+        stat = Option(
+            str,
+            name="stat",
             description="new MMR value",
             required=True,
+            choices=[
+                "name",
+                "mmr",
+                "wins",
+                "losses",
+                "discord",
+            ],
         ),
-        calc=Option(
+        new_value = Option(
+            name="value",
+            description="new value",
+            required=True,
+        ),
+        calc = Option(
             str,
             name="calc",
             description="type 'y' or 'n' | add to wins/losses and history",
@@ -42,16 +53,21 @@ class admin(commands.Cog):
         ),
     ):
         player = self.players.find_one({"name": name})
-        delta = new_mmr - player["mmr"]
-        self.players.update_one({"name": name}, {"$set": {f"mmr": new_mmr}})
-        if calc == 'y':
-            self.players.update_one(
-                {"name": f"{player['name']}"}, {"$push": {f"history": delta}}
-            )
-            self.players.update_one(
-                {"name": name}, {"$inc": {f"{'wins' if delta >= 0 else 'losses'}": 1}}
-            )
-        await ctx.respond(f"Sucessfully edited {name}s MMR to {new_mmr}")
+        new_value = int(new_value) if stat == "mmr" or "wins" or "losses" else new_value
+        new_value = str(new_value) if stat == "name" or "discord" else new_value
+
+        if stat == "mmr":
+            delta = new_value - player["mmr"]
+            self.players.update_one({"name": name}, {"$set": {f"mmr": new_value}})
+            if calc == 'y':
+                self.players.update_one(
+                    {"name": f"{player['name']}"}, {"$push": {f"history": delta}}
+                )
+                self.players.update_one(
+                    {"name": name}, {"$inc": {f"{'wins' if delta >= 0 else 'losses'}": 1}}
+                )
+            return await ctx.respond(f"Sucessfully edited {name}s MMR to {new_value}")
+        self.players.update_one({"name": name}, {"$set": {stat: new_value}})
 
     @slash_command(name="remove", description="Remove a player from the leaderboard")
     async def remove(
