@@ -159,6 +159,7 @@ class mk8dx(commands.Cog):
             name="Yuzu-Lounge",
             icon_url="https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/favicon/android-icon-192x192.png",
         )
+        rank.lower()
         embed.set_thumbnail(
             url=f"https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/images/ranks/{rank.lower()}.webp"
         )
