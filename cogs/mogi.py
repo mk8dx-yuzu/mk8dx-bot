@@ -75,7 +75,7 @@ class mogi(commands.Cog):
             return await ctx.respond("Current mogi: \n No players")
         list = "Current mogi:\n"
         for index, player in enumerate(self.mogi["players"]):
-            name = get(ctx.guild.members, id=int(player.strip("<@!>"))).nick
+            name = get(ctx.guild.members, id=int(player.strip("<@!>"))).name
             list += f"*{index+1}.* {name}\n"
         await ctx.respond(list, allowed_mentions = discord.AllowedMentions(users=False))
 
@@ -133,7 +133,7 @@ class mogi(commands.Cog):
                 self.votes = {
                     "ffa": 0,
                     "2v2": 0,
-                    "3v3": 0,
+                    "3v3": 5,
                     "4v4": 0,
                     "5v5": 0,
                     "6v6": 0,
