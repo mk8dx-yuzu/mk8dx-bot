@@ -25,20 +25,7 @@ class mogi(commands.Cog):
         self.mogi = {
             "status": 0,
             "running": 0,
-            "players": [
-                "<@319102468137156609>",
-                "<@450728788570013721>",
-                "<@1119939058190262364>",
-                "<@1117523269495558234>",
-                "<@705787788435390608>",
-                "<@986724032911114332>",
-                "<@280002723380723713>",
-                "<@146678741353889793>",
-                "<@533662085851381770>",
-                "<@769525682039947314>",
-                "<@1078943802204622880>",
-                "<@805119170269282325>",
-            ],
+            "players": [],
             "teams": [],
             "calc": [],
             "points": [],
@@ -145,7 +132,7 @@ class mogi(commands.Cog):
                 self.voters = []
                 self.votes = {
                     "ffa": 0,
-                    "2v2": 5,
+                    "2v2": 0,
                     "3v3": 0,
                     "4v4": 0,
                     "5v5": 0,
@@ -356,7 +343,7 @@ class mogi(commands.Cog):
 
         print(players, current_mmr, new_mmr)
 
-        deltas = [new_mmr[i] - current_mmr[i] for i in range(0, len([1, 2, 3]))]
+        deltas = [new_mmr[i] - current_mmr[i] for i in range(0, len(players))]
 
         for i, player in enumerate(players):
             id = self.players.update_one(
@@ -364,12 +351,11 @@ class mogi(commands.Cog):
             ).upserted_id
             self.players.update_one(
                 {"player_id": id},
-                {"history": {"$push": deltas[i]}},
-                {"$set": {"history": {"$slice": [-5, None]}}},
-                {"upsert": False},
+                {"$push": {"history": deltas[i]}},
+                False,
             )
             self.players.update_one(
-                {"player": player}, {"$inc": {"losses" if deltas[i] < 0 else "wins": new_mmr}}
+                {"player": player}, {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}}
             )
             
         await ctx.respond("Updated every racers mmr")
