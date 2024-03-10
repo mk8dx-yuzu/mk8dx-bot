@@ -25,7 +25,20 @@ class mogi(commands.Cog):
         self.mogi = {
             "status": 0,
             "running": 0,
-            "players": [],
+            "players": [
+                "<@319102468137156609>",
+                "<@450728788570013721>",
+                "<@1119939058190262364>",
+                "<@1117523269495558234>",
+                "<@705787788435390608>",
+                "<@986724032911114332>",
+                "<@280002723380723713>",
+                "<@146678741353889793>",
+                "<@533662085851381770>",
+                "<@769525682039947314>",
+                "<@1078943802204622880>",
+                "<@805119170269282325>",
+            ],
             "teams": [],
             "calc": [],
             "points": [],
@@ -132,7 +145,7 @@ class mogi(commands.Cog):
                 self.voters = []
                 self.votes = {
                     "ffa": 0,
-                    "2v2": 0,
+                    "2v2": 5,
                     "3v3": 0,
                     "4v4": 0,
                     "5v5": 0,
@@ -203,16 +216,14 @@ class mogi(commands.Cog):
                 super().__init__(*args, **kwargs)
                 self.mogi = mogi
 
-                subset = mogi["players"][len(mogi["calc"]) :][:4]
-                if not len(mogi["calc"]):
-                    subset = mogi["players"][:4]
-
-                for player in subset:
-                    mogi["calc"].append(player)
-                    mentioned_user = db["players"].find_one(
-                        {"discord": player.strip("<@!>")}
-                    )["name"]
-                    self.add_item(InputText(label=mentioned_user))
+                count = 0
+                for player in mogi['players']:
+                    if player not in mogi['calc'] and count < 4:
+                        mentioned_user = db["players"].find_one(
+                        {"discord": player.strip("<@!>")})["name"]
+                        self.add_item(InputText(label=mentioned_user))
+                        mogi["calc"].append(player)
+                        count += 1
 
             async def callback(
                 self: Modal = Modal,
