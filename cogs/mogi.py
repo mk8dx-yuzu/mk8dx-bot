@@ -21,11 +21,11 @@ class mogi(commands.Cog):
             f"mongodb://{os.getenv('MONGODB_HOST')}:27017/"
         )
         self.db = self.client["lounge"]
-        self.players = self.db["players"] # "<@1063806186048192532>" "<@695260889296928788>"
+        self.players = self.db["players"]
         self.mogi = {
-            "status": 1,
+            "status": 0,
             "running": 0,
-            "players": ["<@769525682039947314>", "<@450728788570013721>", "<@558569591115218944>"],
+            "players": [],
             "teams": [],
             "calc": [],
             "points": [],
@@ -49,10 +49,12 @@ class mogi(commands.Cog):
             return await ctx.respond("You are already in the mogi")
         if len(self.mogi["players"]) >= 12:
             return await ctx.respond("The mogi is already full")
-        self.mogi["players"].append(ctx.author.mention)
-        await ctx.user.add_roles(get(ctx.guild.roles, name="InMogi"))
+        if ctx.author.mention not in self.mogi["players"]:
+            self.mogi["players"].append(ctx.author.mention)
+        if get(ctx.guild.roles, name="InMogi") not in ctx.author.roles:
+            await ctx.user.add_roles(get(ctx.guild.roles, name="InMogi"))
         await ctx.respond(
-            f"{ctx.author.mention} joined the mogi!\n{len(self.mogi['players'])} players are in!"
+            f"{ctx.author.name} joined the mogi!\n{len(self.mogi['players'])} players are in!"
         )
 
     @slash_command(name="leave", description="Leave the current mogi")
@@ -73,8 +75,9 @@ class mogi(commands.Cog):
             return await ctx.respond("Current mogi: \n No players")
         list = "Current mogi:\n"
         for index, player in enumerate(self.mogi["players"]):
-            list += f"*{index+1}.* {player}\n"
-        await ctx.respond(list)
+            name = get(ctx.guild.members, id=int(player.strip("<@!>"))).nick
+            list += f"*{index+1}.* {name}\n"
+        await ctx.respond(list, allowed_mentions = discord.AllowedMentions(users=False))
 
     @slash_command(name="close", description="Stop the current Mogi if running")
     async def close(self, ctx: ApplicationContext):
@@ -90,10 +93,8 @@ class mogi(commands.Cog):
             "placements": [],
         }
         for member in ctx.guild.members:
-            try:
+            if get(ctx.guild.roles, name="InMogi") in member.roles:
                 await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
-            except:
-                pass
         await ctx.respond("# The mogi has been closed")
 
     @slash_command(name="status", description="See current state of mogi")
@@ -140,8 +141,8 @@ class mogi(commands.Cog):
 
             @discord.ui.select(options=options)
             async def select_callback(self, select, interaction: discord.Interaction):
-                select.disabled = True
                 await interaction.response.defer()
+                select.disabled = True
                 if self.mogi["running"]:
                     return await ctx.send("Mogi already decided, voting is closed")
                 if not any(role.name == "InMogi" for role in ctx.author.roles):
@@ -155,7 +156,7 @@ class mogi(commands.Cog):
                     )
                 self.voters.append(interaction.user.name)
                 self.votes[selected_option] += 1
-                await interaction.followup.send(f"+1 vote for *{selected_option}*")
+                await interaction.followup.send(f"+1 vote for *{selected_option}*", ephemeral=True)
                 if self.votes[max(self.votes, key=self.votes.get)] >= math.ceil(
                     len(self.mogi["players"]) / 2
                 ):
