@@ -1,6 +1,6 @@
 import os, discord, pymongo, math, random
 
-from discord import ApplicationContext, Interaction, slash_command
+from discord import ApplicationContext, Interaction, Option, slash_command
 from discord.ui import View, Modal, InputText
 from discord.utils import get
 from discord.ext import commands
@@ -116,14 +116,15 @@ class mogi(commands.Cog):
         if self.mogi["running"]:
             return await ctx.respond("Mogi is already in play")
 
-        players = len(self.mogi["players"])
+        players_len = len(self.mogi["players"])
         options = []
         options.append(discord.SelectOption(label=f"FFA", value=f"ffa"))
-        if players % 2 == 0:
-            for size in range(2, players // 2 + 1):
-                options.append(
-                    discord.SelectOption(label=f"{size}v{size}", value=f"{size}v{size}")
-                )
+        if players_len % 2 == 0:
+            for size in range(2, players_len // 2 + 1):
+                if players_len % size == 0:
+                    options.append(
+                        discord.SelectOption(label=f"{size}v{size}", value=f"{size}v{size}")
+                    )
 
         class FormatView(View):
             def __init__(self, mogi):
@@ -133,7 +134,7 @@ class mogi(commands.Cog):
                 self.votes = {
                     "ffa": 0,
                     "2v2": 0,
-                    "3v3": 5,
+                    "3v3": 0,
                     "4v4": 0,
                     "5v5": 0,
                     "6v6": 0,
@@ -163,7 +164,7 @@ class mogi(commands.Cog):
                     format = max(self.votes, key=self.votes.get)
                     self.mogi["format"] = format
                     lineup_str = ""
-                    if players % 2 != 0:
+                    if players_len % 2 != 0:
                         for i, player in enumerate(self.mogi["players"]):
                             lineup_str += f"`{i+1}:` {player}\n"
                             self.mogi["teams"].append([player])
@@ -193,8 +194,39 @@ class mogi(commands.Cog):
             view=view,
         )
 
+    @slash_command(name="force_start", description="When voting did not work - force start the mogi with a given format")
+    async def force_start(
+        self, 
+        ctx: ApplicationContext, 
+        format = Option(
+            str,
+            name="format",
+            description="format to play",
+            required=True,
+            choices=[
+                "ffa",
+                "2v2",
+                "3v3",
+                "4v4",
+                "5v5",
+                "6v6"
+            ],
+        ),):
+        random.shuffle(self.mogi["players"])
+        teams = []
+        lineup_str = "# Lineup"
+        for i in range(0, len(self.mogi["players"]), int(format[0])):
+            teams.append(self.mogi["players"][i : i + int(format[0])])
+        self.mogi["teams"] = teams
+        for i, item in enumerate(teams):
+            lineup_str += f"\n `{i+1}`. {', '.join(item)}"
+
+        self.mogi["running"] = 1
+        self.mogi["format"] = format
+        await ctx.respond(lineup_str)
+
     @slash_command(name="points", description="Use after a mogi - input player points")
-    async def points(self, ctx: discord.ApplicationContext):
+    async def points(self, ctx: ApplicationContext):
         if not self.mogi["running"]:
             return await ctx.respond("No running mogi")
 
