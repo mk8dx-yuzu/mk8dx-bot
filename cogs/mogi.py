@@ -130,7 +130,7 @@ class mogi(commands.Cog):
             def __init__(self, mogi):
                 super().__init__()
                 self.mogi = mogi
-                self.voters = []
+                self.voters = ["joe","joe","joe","joe"]
                 self.votes = {
                     "ffa": 0,
                     "2v2": 0,
@@ -143,7 +143,6 @@ class mogi(commands.Cog):
             @discord.ui.select(options=options)
             async def select_callback(self, select, interaction: discord.Interaction):
                 await interaction.response.defer()
-                select.disabled = True
                 if self.mogi["running"]:
                     return await ctx.send("Mogi already decided, voting is closed")
                 if not any(role.name == "InMogi" for role in ctx.author.roles):
@@ -158,7 +157,7 @@ class mogi(commands.Cog):
                 self.voters.append(interaction.user.name)
                 self.votes[selected_option] += 1
                 await interaction.followup.send(f"+1 vote for *{selected_option}*", ephemeral=True)
-                if self.votes[max(self.votes, key=self.votes.get)] >= math.ceil(
+                if len(self.voters) >= math.ceil(
                     len(self.mogi["players"]) / 2
                 ):
                     format = max(self.votes, key=self.votes.get)
@@ -187,6 +186,8 @@ class mogi(commands.Cog):
                     )
                     self.votes = {key: 0 for key in self.votes}
                     self.mogi["running"] = 1
+                else:
+                    pass
 
         view = FormatView(self.mogi)
         await ctx.respond(
