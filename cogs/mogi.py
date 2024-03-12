@@ -25,7 +25,13 @@ class mogi(commands.Cog):
         self.mogi = {
             "status": 0,
             "running": 0,
-            "players": [],
+            "players": ["<@769525682039947314>","<@769525682039947314>",
+                        "<@769525682039947314>","<@769525682039947314>",
+                        "<@769525682039947314>","<@769525682039947314>",
+                        "<@769525682039947314>","<@769525682039947314>",
+                        "<@769525682039947314>","<@769525682039947314>",
+                        "<@769525682039947314>","<@769525682039947314>",
+                        ],
             "teams": [],
             "calc": [],
             "points": [],
@@ -163,7 +169,7 @@ class mogi(commands.Cog):
                     format = max(self.votes, key=self.votes.get)
                     self.mogi["format"] = format
                     lineup_str = ""
-                    if players_len % 2 != 0:
+                    if players_len % 2 != 0 or format == "ffa":
                         for i, player in enumerate(self.mogi["players"]):
                             lineup_str += f"`{i+1}:` {player}\n"
                             self.mogi["teams"].append([player])
@@ -213,9 +219,16 @@ class mogi(commands.Cog):
                 "6v6"
             ],
         ),):
+        lineup_str = "# Lineup"
+
+        if format == "ffa":
+            for i, player in enumerate(self.mogi["players"]):
+                lineup_str += f"`{i+1}:` {player}\n"
+                self.mogi["teams"].append([player])
+                return await ctx.respond(lineup_str)
+
         random.shuffle(self.mogi["players"])
         teams = []
-        lineup_str = "# Lineup"
         for i in range(0, len(self.mogi["players"]), int(format[0])):
             teams.append(self.mogi["players"][i : i + int(format[0])])
         self.mogi["teams"] = teams
