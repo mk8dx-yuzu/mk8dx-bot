@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM selenium/standalone-chrome
 
 COPY requirements.txt .
 
