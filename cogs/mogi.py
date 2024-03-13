@@ -309,7 +309,7 @@ class mogi(commands.Cog):
             calc_team = []
             for player in team:
                 mmr = self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
-                calc_team.append(Rating(mmr, 400))
+                calc_team.append(Rating(mmr, 200))
             calc_teams.append(calc_team)
 
         scores = []
@@ -330,7 +330,7 @@ class mogi(commands.Cog):
             self.mogi["results"].append([round(player.mu) for player in team])
 
         await ctx.respond(
-            "Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr"
+        f"Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr \n Debug:\n current_mmr: {calc_teams}\n new_mmr: {self.mogi["results"]}"
         )
 
     @slash_command(name="table", description="Use after a /calc to view the results")
@@ -380,25 +380,23 @@ class mogi(commands.Cog):
             for player in self.mogi["players"]
         ]
         new_mmr = [val for sublist in self.mogi["results"] for val in sublist]
-
-        print(players, current_mmr, new_mmr)
-
         deltas = [new_mmr[i] - current_mmr[i] for i in range(0, len(players))]
 
         for i, player in enumerate(players):
             id = self.players.update_one(
-                {"player": player.strip("<@!>")}, {"$set": {"mmr": new_mmr}}
+                {"name": player.strip("<@!>")}, {"$set": {"mmr": new_mmr}}
             ).upserted_id
             self.players.update_one(
-                {"player_id": id},
+                {"name": player.strip("<@!>")},
                 {"$push": {"history": deltas[i]}},
                 False,
             )
             self.players.update_one(
-                {"player": player}, {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}}
+                {"name": player.strip("<@!>")}, {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}}
             )
             
         await ctx.respond("Updated every racers mmr")
+        await ctx.send(f"Debug \n Players: {players}\n Current MMR: {current_mmr} \n New MMR: {new_mmr}")
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
