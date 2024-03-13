@@ -330,7 +330,7 @@ class mogi(commands.Cog):
             self.mogi["results"].append([round(player.mu) for player in team])
 
         await ctx.respond(
-        f"Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr \n Debug:\n current_mmr: {calc_teams}\n new_mmr: {self.mogi["results"]}"
+        f'Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr \n Debug:\n current_mmr: {calc_teams}\n new_mmr: {self.mogi["results"]}'
         )
 
     @slash_command(name="table", description="Use after a /calc to view the results")
@@ -396,7 +396,7 @@ class mogi(commands.Cog):
             )
             
         await ctx.respond("Updated every racers mmr")
-        await ctx.send(f"Debug \n Players: {players}\n Current MMR: {current_mmr} \n New MMR: {new_mmr}")
+        await ctx.send(f'Debug \n Players: {players}\n Current MMR: {current_mmr} \n New MMR: {new_mmr}')
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
