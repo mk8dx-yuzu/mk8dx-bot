@@ -284,27 +284,6 @@ class mogi(commands.Cog):
         else:
             return await ctx.respond("Already got all calcs")
 
-    @slash_command(name="test")
-    async def test(self, ctx: ApplicationContext):
-        players = ["probablyjassin", "MITSIKU", "-wolf-", "MintCheetah", "Kevnkkm", "NotNiall", "KaramTNC", "ujuj"]
-        current_mmr = [2258, 2616, 3460, 2141, 2731, 1416, 2177, 1945]
-        new_mmr = [2358, 2716, 3452, 2133, 2724, 1409, 2092, 1860]
-        data = {
-                    #"#": [1, 2, 3, 4, 5, 6, 7, 8],
-                    "Player": players,
-                    "MMR": current_mmr,
-                    "Change": [new_mmr[i] - current_mmr[i] for i in range(0, len(players))],
-                    "New MMR": new_mmr
-                }
-        buffer = BytesIO()
-        df = pd.DataFrame(data)
-        #df = df.sort_values(by='#', ascending=True)
-        dfi.export(df.style.background_gradient(cmap=colors.LinearSegmentedColormap.from_list("", ["red", "white", "green"]), low=0, high=0.2, subset=["Change"]), buffer)
-        buffer.seek(0)
-        file = discord.File(buffer, filename="table.png")
-        await ctx.respond(content="Here's the table:", file=file)
-
-
     @slash_command(
         name="calc", description="Use after using /points to calculate new mmr"
     )
