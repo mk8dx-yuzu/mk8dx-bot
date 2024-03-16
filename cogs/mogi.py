@@ -383,7 +383,7 @@ class mogi(commands.Cog):
             for player in self.mogi["players"]
         ]
         current_mmr = [
-            self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
+            round(self.players.find_one({"discord": player.strip("<@!>")})["mmr"])
             for player in self.mogi["players"]
         ]
         new_mmr = [val for sublist in self.mogi["results"] for val in sublist]
@@ -391,7 +391,7 @@ class mogi(commands.Cog):
         data = {
             "Player": players,
             "MMR": current_mmr,
-            "Change": [new_mmr[i] - current_mmr[i] for i in range(0, len(players))],
+            "Change": [round(new_mmr[i] - current_mmr[i]) for i in range(0, len(players))],
             "New MMR": new_mmr,
         }
         df = pd.DataFrame(data).set_index("Player")
