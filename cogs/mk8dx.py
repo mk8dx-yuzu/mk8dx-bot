@@ -130,11 +130,16 @@ class mk8dx(commands.Cog):
     async def player(
         self,
         ctx: discord.ApplicationContext,
-        name=Option(str, description="Name of the player"),
+        name=Option(str, description="Name of the player", required=False),
     ):
-        player: dict = self.players.find_one({"name": name})
-        if not player:
-            return await ctx.respond("Couldn't find that player")
+        if not name:
+            player: dict = self.players.find_one({"discord": ctx.author.mention.strip("<@!>")})
+            if not player:
+                return await ctx.respond("Couldn't find that player")
+        else:
+            player: dict = self.players.find_one({"name": name})
+            if not player:
+                return await ctx.respond("Couldn't find that player")
 
         embed = discord.Embed(
             title=f"{name}",
