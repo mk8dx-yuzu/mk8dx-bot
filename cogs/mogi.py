@@ -25,13 +25,7 @@ class mogi(commands.Cog):
         self.mogi = {
             "status": 0,
             "running": 0,
-            "players": ["<@726079395974086680>", "<@695260889296928788>",
-                        "<@695260889296928788>","<@695260889296928788>",
-                        "<@695260889296928788>","<@695260889296928788>",
-                        "<@695260889296928788>","<@695260889296928788>",
-                        "<@695260889296928788>","<@695260889296928788>",
-                        "<@769525682039947314>","<@695260889296928788>"
-                        ],
+            "players": [],
             "teams": [],
             "calc": [],
             "points": [],
@@ -147,7 +141,7 @@ class mogi(commands.Cog):
             def __init__(self, mogi):
                 super().__init__()
                 self.mogi = mogi
-                self.voters = ["a","a","a","a","a","a","a","a","a","a","a",]
+                self.voters = []
                 self.votes = {
                     "ffa": 0,
                     "2v2": 0,
@@ -313,10 +307,11 @@ class mogi(commands.Cog):
                 else:
                     size = int(mogi["format"][0])
                     points = []
-                    for i in range(0, len(self.children)):
-                        points.append(int(self.children[i].value))
-                    for i in range(0, len(points), size):
-                        mogi["points"].append(points[i : i + size])
+                    if len(mogi['points']) % size == 0:
+                        for i in range(0, len(self.children)):
+                            points.append(int(self.children[i].value))
+                        for i in range(0, len(points), size):
+                            mogi["points"].append(points[i : i + size])
                 await interaction.response.send_message(
                     """
                     Points have been collected. 
@@ -361,7 +356,6 @@ class mogi(commands.Cog):
                 mmr = self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
                 calc_team.append(Rating(mmr, 200))
             calc_teams.append(calc_team)
-
         scores = []
         for team_point_arr in self.mogi["points"]:
             scores.append([sum(team_point_arr)])
@@ -373,15 +367,14 @@ class mogi(commands.Cog):
         for score in scores:
             placements.append(ranks_dict[score[0]])
         self.mogi["placements"] = placements
-
         new_ratings = rate(calc_teams, placements)
 
         for team in new_ratings:
             self.mogi["results"].append([round(player.mu) for player in team])
 
         await ctx.respond(
-        f'Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr \n Debug:\n current_mmr: {calc_teams}\n new_mmr: {self.mogi["results"]}'
-        )
+        f'Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr \n Debug:\n current_mmr: {calc_teams}\n new_mmr: {self.mogi["results"]}',
+        ephemeral=True)
 
     @slash_command(name="table", description="Use after a /calc to view the results")
     async def table(self, ctx: discord.ApplicationContext):
@@ -401,11 +394,9 @@ class mogi(commands.Cog):
             "Change": [new_mmr[i] - current_mmr[i] for i in range(0, len(players))],
             "New MMR": new_mmr,
         }
-        df = pd.DataFrame(data)
-        df.index = range(1, len(df) + 1)
-
-        buffer = BytesIO()
+        df = pd.DataFrame(data).set_index("Player")
         df = df.sort_values(by="Change", ascending=False)
+        buffer = BytesIO()
         dfi.export(
             df.style.background_gradient(
                 cmap=colors.LinearSegmentedColormap.from_list(
@@ -429,24 +420,23 @@ class mogi(commands.Cog):
             self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
             for player in self.mogi["players"]
         ]
-        new_mmr = [val for sublist in self.mogi["results"] for val in sublist]
+        new_mmr = [element for sublist in self.mogi["results"] for element in sublist]
         deltas = [new_mmr[i] - current_mmr[i] for i in range(0, len(players))]
 
         for i, player in enumerate(players):
-            id = self.players.update_one(
-                {"name": player.strip("<@!>")}, {"$set": {"mmr": new_mmr}}
-            ).upserted_id
             self.players.update_one(
-                {"name": player.strip("<@!>")},
+                {"discord": player.strip("<@!>")}, {"$set": {"mmr": new_mmr[i]}}
+            )
+            self.players.update_one(
+                {"discord": player.strip("<@!>")},
                 {"$push": {"history": deltas[i]}},
                 False,
             )
             self.players.update_one(
-                {"name": player.strip("<@!>")}, {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}}
+                {"discord": player.strip("<@!>")}, {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}}
             )
             
-        await ctx.respond("Updated every racers mmr")
-        await ctx.send(f'Debug \n Players: {players}\n Current MMR: {current_mmr} \n New MMR: {new_mmr}')
+        await ctx.respond(f"Updated every racers mmr \n Debug: \n Players: {players}\n Current MMR: {current_mmr} \n New MMR: {new_mmr[i]}", ephemeral=True)
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))

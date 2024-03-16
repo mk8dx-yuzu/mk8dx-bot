@@ -182,15 +182,16 @@ class mk8dx(commands.Cog):
         role = get(ctx.guild.roles, name="Lounge Player")
         member = ctx.user
         if role in member.roles:
-            return await ctx.respond("You already have the Lounge Player role")
+            return await ctx.respond("You already have the Lounge Player role", ephemeral=True)
         try:
             self.players.insert_one(
                 {"name": username, "mmr": 2000, "wins": 0, "losses": 0, "discord": str(member.id), "history": []},
             )
         except:
-            return await ctx.respond("Name already taken or another error occured")
-        await member.add_roles(role)
-        await ctx.respond(f"{member.mention} is now registered for Lounge as {username}")
+            return await ctx.respond("Name already taken or another error occured", ephemeral=True)
+        await member.add_roles(get(ctx.guild.roles, name="Lounge Player"))
+        await member.add_roles(get(ctx.guild.roles, name="Lounge - Silver"))
+        await ctx.respond(f"{member.mention} is now registered for Lounge as {username}", ephemeral=True)
 
 def setup(bot: commands.Bot):
     bot.add_cog(mk8dx(bot))
