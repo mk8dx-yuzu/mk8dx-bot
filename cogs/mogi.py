@@ -25,7 +25,13 @@ class mogi(commands.Cog):
         self.mogi = {
             "status": 0,
             "running": 0,
-            "players": [],
+            "players": ["<@726079395974086680>", "<@695260889296928788>",
+                        "<@695260889296928788>","<@695260889296928788>",
+                        "<@695260889296928788>","<@695260889296928788>",
+                        "<@695260889296928788>","<@695260889296928788>",
+                        "<@695260889296928788>","<@695260889296928788>",
+                        "<@769525682039947314>","<@695260889296928788>"
+                        ],
             "teams": [],
             "calc": [],
             "points": [],
@@ -75,7 +81,19 @@ class mogi(commands.Cog):
             return await ctx.respond("Current mogi: \n No players")
         list = "Current mogi:\n"
         for index, player in enumerate(self.mogi["players"]):
-            name = get(ctx.guild.members, id=int(player.strip("<@!>"))).name
+            try:
+                if get(ctx.guild.members, id=int(player.strip("<@!>"))).nick:
+                    name = get(ctx.guild.members, id=int(player.strip("<@!>"))).nick
+                else:
+                    try: 
+                        name = get(ctx.guild.members, id=int(player.strip("<@!>"))).name
+                    except:
+                        name = player
+            except:
+                try: 
+                    name = get(ctx.guild.members, id=int(player.strip("<@!>"))).name
+                except:
+                    name = player
             list += f"*{index+1}.* {name}\n"
         await ctx.respond(list, allowed_mentions = discord.AllowedMentions(users=False))
 
@@ -107,7 +125,7 @@ class mogi(commands.Cog):
         name="start", description="Randomize teams, vote format and start playing"
     )
     async def start(self, ctx: ApplicationContext):
-        if not any(role.name == "InMogi" for role in ctx.author.roles):
+        if not ctx.author.mention in self.mogi['players']:
             return await ctx.respond(
                 "You can't start a mogi you aren't in", ephemeral=True
             )
@@ -119,18 +137,17 @@ class mogi(commands.Cog):
         players_len = len(self.mogi["players"])
         options = []
         options.append(discord.SelectOption(label=f"FFA", value=f"ffa"))
-        if players_len % 2 == 0:
-            for size in range(2, players_len // 2 + 1):
-                if players_len % size == 0:
-                    options.append(
-                        discord.SelectOption(label=f"{size}v{size}", value=f"{size}v{size}")
-                    )
+        for size in range(2, players_len // 2 + 1):
+            if players_len % size == 0:
+                options.append(
+                    discord.SelectOption(label=f"{size}v{size}", value=f"{size}v{size}")
+                )
 
         class FormatView(View):
             def __init__(self, mogi):
                 super().__init__()
                 self.mogi = mogi
-                self.voters = []
+                self.voters = ["a","a","a","a","a","a","a","a","a","a","a",]
                 self.votes = {
                     "ffa": 0,
                     "2v2": 0,
@@ -144,9 +161,9 @@ class mogi(commands.Cog):
             async def select_callback(self, select, interaction: discord.Interaction):
                 await interaction.response.defer()
                 if self.mogi["running"]:
-                    return await ctx.send("Mogi already decided, voting is closed")
-                if not any(role.name == "InMogi" for role in ctx.author.roles):
-                    return await ctx.send(
+                    return await ctx.respond("Mogi already decided, voting is closed", ephemeral=True)
+                if not ctx.author.mention in self.mogi['players']:
+                    return await ctx.respond(
                         "You can't vote if you aren't in the mogi", ephemeral=True
                     )
                 selected_option = select.values[0]
@@ -157,13 +174,11 @@ class mogi(commands.Cog):
                 self.voters.append(interaction.user.name)
                 self.votes[selected_option] += 1
                 await interaction.followup.send(f"+1 vote for *{selected_option}*", ephemeral=True)
-                if len(self.voters) >= math.ceil(
-                    len(self.mogi["players"]) / 2
-                ):
+                if len(self.voters) >= len(self.mogi["players"]):
                     format = max(self.votes, key=self.votes.get)
                     self.mogi["format"] = format
                     lineup_str = ""
-                    if players_len % 2 != 0 or format == "ffa":
+                    if format == "ffa":
                         for i, player in enumerate(self.mogi["players"]):
                             lineup_str += f"`{i+1}:` {player}\n"
                             self.mogi["teams"].append([player])
@@ -232,6 +247,41 @@ class mogi(commands.Cog):
         self.mogi["running"] = 1
         self.mogi["format"] = format
         await ctx.respond(lineup_str)
+
+    @slash_command(name="teams", description="Show teams")
+    async def teams(self, ctx:ApplicationContext):
+        if not self.mogi['status']:
+            return await ctx.respond("No open mogi", ephemeral=True)
+        if not len(self.mogi['teams']):
+            return await ctx.respond("No teams decided yet", ephemeral=True)
+        lineup_str = "# Teams \n"
+        if self.mogi["format"] == "ffa":
+            for i, player in enumerate(self.mogi["players"]):
+                lineup_str += f"`{i+1}:` {player}\n"
+        else:
+            for i, item in enumerate(self.mogi['teams']):
+                lineup_str += f"\n `{i+1}`. {', '.join(item)}"
+        await ctx.respond(lineup_str)
+
+    @slash_command(name="sub", description="Replace a player in the mogi")
+    async def sub(
+            self, ctx: ApplicationContext, 
+            player = Option(str, name="player", description="who to replace (input @ discord mention)", required=True),
+            sub = Option(str, name="sub", description="subbing player (input @ discord mention)", required=True)
+    ):
+        if not len(self.mogi["players"]):
+            return await ctx.respond("no players", ephemeral=True)
+        if not len(self.mogi["teams"]):
+            return await ctx.respond("No teams decided yet")
+        def replace(space, player, sub):
+            if isinstance(space, list):
+                return [replace(item, player, sub) for item in space]
+            else:
+                return sub if space == player else space
+
+        self.mogi['players'] = replace(self.mogi['players'], player, sub)
+        self.mogi['teams'] = replace(self.mogi['teams'], player, sub)
+        await ctx.respond(f"Subbed {player} with {sub} if applicable")
 
     @slash_command(name="points", description="Use after a mogi - input player points")
     async def points(self, ctx: ApplicationContext):

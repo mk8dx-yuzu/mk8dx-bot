@@ -7,10 +7,11 @@ class ping(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(
-        f'Logged into Discord as {self.bot.user.name} | ID: {self.bot.user.id} \n'
-        f'------'
-        )
+        print(f'Logged into Discord as {self.bot.user.name} | ID: {self.bot.user.id}')
+        print("Guilds:")
+        for guild in list(self.bot.guilds):
+            print(guild.name)
+        print("--------")
 
     @commands.command()
     async def ping(self, ctx: commands.Context):
