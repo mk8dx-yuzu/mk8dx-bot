@@ -341,9 +341,9 @@ class mogi(commands.Cog):
         global_env()
         trueskill.setup(
             mu=2000,
-            sigma=200,
-            beta=1200,
-            tau=350,
+            sigma=100,
+            beta=9000,
+            tau=950,
             draw_probability=0.05,
             backend=None,
             env=None,
