@@ -398,7 +398,12 @@ class mogi(commands.Cog):
         df = df.sort_values(by="Change", ascending=False)
         buffer = BytesIO()
         dfi.export(
-            df.style.background_gradient(
+            df.style
+            .set_table_styles([
+                {'selector': 'tr:nth-child(even)', 'props': [('background-color', '#363f4f'), ('color', 'white')]},
+                {'selector': 'tr:nth-child(odd)', 'props': [('background-color', '#1d2735'), ('color', 'white')]}
+            ])
+            .background_gradient(
                 cmap=colors.LinearSegmentedColormap.from_list(
                     "", ["red", "red", "white", "green", "green"]
                 ),
