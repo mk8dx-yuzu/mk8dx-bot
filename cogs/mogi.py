@@ -438,6 +438,14 @@ class mogi(commands.Cog):
                 False,
             )
             self.players.update_one(
+                {"discord": player.strip("<@!>")},
+                {"$set": {
+                    "history": {
+                        "$slice": [-10, None]
+                    }
+                }}
+            )
+            self.players.update_one(
                 {"discord": player.strip("<@!>")}, {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}}
             )
             
