@@ -400,9 +400,9 @@ class mogi(commands.Cog):
         dfi.export(
             df.style.background_gradient(
                 cmap=colors.LinearSegmentedColormap.from_list(
-                    "", ["red", "white", "green"]
+                    "", ["red", "red", "white", "green", "green"]
                 ),
-                low=0,
+                low=0.3,
                 high=0.2,
                 subset=["Change"],
             ),
