@@ -1,4 +1,4 @@
-import os, discord, pymongo, math, random
+import os, discord, pymongo, math, random, asyncio
 
 from discord import ApplicationContext, Interaction, Option, slash_command
 from discord.ui import View, Modal, InputText
@@ -94,21 +94,47 @@ class mogi(commands.Cog):
     @slash_command(name="close", description="Stop the current Mogi if running")
     async def close(self, ctx: ApplicationContext):
         await ctx.response.defer()
-        self.mogi = {
-            "status": 0,
-            "running": 0,
-            "players": [],
-            "teams": [],
-            "calc": [],
-            "points": [],
-            "format": "",
-            "results": [],
-            "placements": [],
-        }
-        for member in ctx.guild.members:
-            if get(ctx.guild.roles, name="InMogi") in member.roles:
-                await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
-        await ctx.respond("# The mogi has been closed")
+
+        message = await ctx.send(f"""
+        Closing the mogi discards all teams and points.
+        Only do this after the results have been posted.
+        Are you sure, {ctx.author.mention} ?
+        """)
+
+        await message.add_reaction("✅")
+        await message.add_reaction("❌")
+
+        def check(reaction, user):
+            return user == ctx.user and str(reaction.emoji) in ("✅", "❌")
+
+        try:
+            reaction, user = await self.bot.wait_for("reaction_add", timeout=60, check=check)
+        except asyncio.TimeoutError:
+            await message.edit(content="Confirmation timed out.")
+            return await ctx.respond("Timeout")
+
+        if str(reaction.emoji) == "✅":
+            await message.edit(content="Closing...")
+            self.mogi = {
+                "status": 0,
+                "running": 0,
+                "players": [],
+                "teams": [],
+                "calc": [],
+                "points": [],
+                "format": "",
+                "results": [],
+                "placements": [],
+            }
+            for member in ctx.guild.members:
+                if get(ctx.guild.roles, name="InMogi") in member.roles:
+                    await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
+            final_message = "# The mogi has been closed"
+        else:
+            await message.edit(content="Action canceled.")
+            final_message = "‎ "
+
+        await ctx.followup.send(final_message)
 
     @slash_command(name="status", description="See current state of mogi")
     async def status(self, ctx: ApplicationContext):
