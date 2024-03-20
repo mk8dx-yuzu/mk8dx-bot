@@ -93,6 +93,7 @@ class mogi(commands.Cog):
 
     @slash_command(name="close", description="Stop the current Mogi if running")
     async def close(self, ctx: ApplicationContext):
+        await ctx.response.defer()
         self.mogi = {
             "status": 0,
             "running": 0,
