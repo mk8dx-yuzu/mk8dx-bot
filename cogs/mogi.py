@@ -231,8 +231,8 @@ class mogi(commands.Cog):
                     pass
 
         view = FormatView(self.mogi)
-        await ctx.respond(
-            f"{get(ctx.guild.roles, name='InMogi').mention} \nBeginning Mogi\nVote for a format:",
+        await ctx.respond( #<@&1213514500272033792> # get(ctx.guild.roles, name='InMogi').mention
+            "<@&1213514500272033792> \nBeginning Mogi\nVote for a format:",
             view=view,
         )
 
