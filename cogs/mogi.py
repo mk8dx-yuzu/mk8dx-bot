@@ -183,7 +183,7 @@ class mogi(commands.Cog):
                 await interaction.response.defer()
                 if self.mogi["running"]:
                     return await ctx.respond("Mogi already decided, voting is closed", ephemeral=True)
-                if not ctx.author.mention in self.mogi['players']:
+                if ctx.author.mention not in self.mogi['players']:
                     return await ctx.respond(
                         "You can't vote if you aren't in the mogi", ephemeral=True
                     )
