@@ -25,7 +25,7 @@ class mogi(commands.Cog):
         self.mogi = {
             "status": 0,
             "running": 0,
-            "players": [],
+            "players": [""],
             "teams": [],
             "calc": [],
             "points": [],
@@ -212,6 +212,10 @@ class mogi(commands.Cog):
                         for i, item in enumerate(teams):
                             lineup_str += f"\n `{i+1}`. {', '.join(item)}"
 
+                    votes = "## Vote results:\n"
+                    for item in self.votes.keys():
+                        votes += f"{item}: {self.votes[item]}\n"
+                    await ctx.send(votes)
                     await ctx.send(
                         f"""
                         # Mogi starting!
@@ -222,6 +226,7 @@ class mogi(commands.Cog):
                     )
                     self.votes = {key: 0 for key in self.votes}
                     self.mogi["running"] = 1
+
                 else:
                     pass
 
@@ -230,6 +235,20 @@ class mogi(commands.Cog):
             f"{get(ctx.guild.roles, name='InMogi').mention} \nBeginning Mogi\nVote for a format:",
             view=view,
         )
+
+    @slash_command(name="tags", description="assign team roles")
+    async def tags(self, ctx: ApplicationContext):
+        if self.mogi['format'] != 'ffa':
+            for i, team in enumerate(self.mogi['teams']):
+                for player in team:
+                    ctx.guild.fetch_member(int(player.strip("<@!>"))).add_roles(get(ctx.guild.roles, name=f"Team {i+1}"))
+
+    @slash_command(name="untag")
+    async def untag(self, ctx: ApplicationContext):
+        for i in [1, 2, 3, 4, 5]:
+            for member in ctx.guild.members:
+                    if get(ctx.guild.roles, name=f"Team {i}") in member.roles:
+                        await member.remove_roles(get(ctx.guild.roles, name=f"Team {i}"))
 
     @slash_command(name="force_start", description="When voting did not work - force start the mogi with a given format")
     async def force_start(
