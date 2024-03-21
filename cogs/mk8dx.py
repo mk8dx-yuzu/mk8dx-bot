@@ -179,12 +179,13 @@ class mk8dx(commands.Cog):
     async def register(
         self,
         ctx: discord.ApplicationContext,
-        username=Option(
+        username = Option(
             str,
             description="Your username to show up on the leaderboard",
             required=True,
         ),
     ):
+        username = username.lower().replace(" ", "")
         role = get(ctx.guild.roles, name="Lounge Player")
         member = ctx.user
         if role in member.roles:
