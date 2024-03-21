@@ -467,9 +467,7 @@ class mogi(commands.Cog):
             self.players.update_one(
                 {"discord": player.strip("<@!>")},
                 {"$set": {
-                    "history": {
-                        "$slice": [-10, None]
-                    }
+                    "history": self.players.find_one({"discord": player.strip("<@!>")})['history'][:10]
                 }}
             )
             self.players.update_one(
