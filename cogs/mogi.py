@@ -231,17 +231,21 @@ class mogi(commands.Cog):
                     pass
 
         view = FormatView(self.mogi)
-        await ctx.respond( #<@&1213514500272033792> # get(ctx.guild.roles, name='InMogi').mention
-            "<@&1213514500272033792> \nBeginning Mogi\nVote for a format:",
+        await ctx.respond(
+            f"{get(ctx.guild.roles, name='InMogi').mention} \nBeginning Mogi \nVote for a format:",
             view=view,
         )
 
     @slash_command(name="tags", description="assign team roles")
     async def tags(self, ctx: ApplicationContext):
+        if not self.mogi['format']:
+            return ctx.respond("No format chosen yet")
         if self.mogi['format'] != 'ffa':
             for i, team in enumerate(self.mogi['teams']):
                 for player in team:
                     ctx.guild.fetch_member(int(player.strip("<@!>"))).add_roles(get(ctx.guild.roles, name=f"Team {i+1}"))
+            return await ctx.respond("Assigned team roles")
+        await ctx.respond("format is ffa, not team roles assigned")
 
     @slash_command(name="untag")
     async def untag(self, ctx: ApplicationContext):
