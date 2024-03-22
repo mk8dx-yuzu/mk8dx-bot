@@ -25,7 +25,7 @@ class mogi(commands.Cog):
         self.mogi = {
             "status": 0,
             "running": 0,
-            "players": [],
+            "players": ["a", "b", "c"],
             "teams": [],
             "calc": [],
             "points": [],
@@ -181,12 +181,10 @@ class mogi(commands.Cog):
             @discord.ui.select(options=options)
             async def select_callback(self, select, interaction: discord.Interaction):
                 await interaction.response.defer()
+                if interaction.user.mention not in self.mogi['players']:
+                    return
                 if self.mogi["running"]:
                     return await ctx.respond("Mogi already decided, voting is closed", ephemeral=True)
-                if ctx.author.mention not in self.mogi['players']:
-                    return await ctx.respond(
-                        "You can't vote if you aren't in the mogi", ephemeral=True
-                    )
                 selected_option = select.values[0]
                 if interaction.user.name in self.voters:
                     return await interaction.response.send_message(
