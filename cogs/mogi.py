@@ -25,7 +25,7 @@ class mogi(commands.Cog):
         self.mogi = {
             "status": 0,
             "running": 0,
-            "players": ["a", "b", "c"],
+            "players": [],
             "teams": [],
             "calc": [],
             "points": [],
