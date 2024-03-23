@@ -276,7 +276,7 @@ class mogi(commands.Cog):
             for i, player in enumerate(self.mogi["players"]):
                 lineup_str += f"`{i+1}:` {player}\n"
                 self.mogi["teams"].append([player])
-                return await ctx.respond(lineup_str)
+            return await ctx.respond(lineup_str)
 
         random.shuffle(self.mogi["players"])
         teams = []
