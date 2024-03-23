@@ -241,7 +241,7 @@ class mogi(commands.Cog):
         if self.mogi['format'] != 'ffa':
             for i, team in enumerate(self.mogi['teams']):
                 for player in team:
-                    ctx.guild.fetch_member(int(player.strip("<@!>"))).add_roles(get(ctx.guild.roles, name=f"Team {i+1}"))
+                    await ctx.guild.fetch_member(int(player.strip("<@!>"))).add_roles(get(ctx.guild.roles, name=f"Team {i+1}"))
             return await ctx.respond("Assigned team roles")
         await ctx.respond("format is ffa, not team roles assigned")
 
