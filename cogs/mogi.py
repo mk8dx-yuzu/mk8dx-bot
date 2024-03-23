@@ -22,6 +22,7 @@ class mogi(commands.Cog):
         )
         self.db = self.client["lounge"]
         self.players = self.db["players"]
+        self.password = ""
         self.mogi = {
             "status": 0,
             "running": 0,
@@ -136,6 +137,11 @@ class mogi(commands.Cog):
 
         await ctx.followup.send(final_message)
 
+    @slash_command(name="pswd", description="change the server password to send to mogi players")
+    async def pswd(self, ctx: ApplicationContext, new = Option(str, required = True)):
+        self.password = new
+        await ctx.respond("Updated password")
+
     @slash_command(name="status", description="See current state of mogi")
     async def status(self, ctx: ApplicationContext):
         if not self.mogi["status"]:
@@ -165,8 +171,9 @@ class mogi(commands.Cog):
                 )
 
         class FormatView(View):
-            def __init__(self, mogi):
+            def __init__(self, mogi, password):
                 super().__init__()
+                self.password = password
                 self.mogi = mogi
                 self.voters = []
                 self.votes = {
@@ -222,13 +229,15 @@ class mogi(commands.Cog):
                         \n{lineup_str}
                     """
                     )
+                    if self.password:
+                        await ctx.send(f"# Server password: {self.password}")
                     self.votes = {key: 0 for key in self.votes}
                     self.mogi["running"] = 1
 
                 else:
                     pass
 
-        view = FormatView(self.mogi)
+        view = FormatView(self.mogi, self.password)
         await ctx.respond(
             f"{get(ctx.guild.roles, name='InMogi').mention} \nBeginning Mogi \nVote for a format:",
             view=view,
