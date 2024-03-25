@@ -1,5 +1,5 @@
 import os, discord, pymongo, math, random, asyncio
-from copy import copy
+from copy import deepcopy
 
 from discord import ApplicationContext, Interaction, Option, slash_command
 from discord.ui import View, Modal, InputText
@@ -36,7 +36,7 @@ class mogi(commands.Cog):
         self.db = self.client["lounge"]
         self.players = self.db["players"]
         self.password = ""
-        self.mogi = copy(default_mogi_state)
+        self.mogi = deepcopy(default_mogi_state)
 
     @slash_command(name="open", description="Start a new mogi")
     async def open(self, ctx: ApplicationContext):
@@ -123,7 +123,7 @@ class mogi(commands.Cog):
 
         if str(reaction.emoji) == "✅":
             await message.edit(content="Closing...")
-            self.mogi = copy(default_mogi_state)
+            self.mogi = deepcopy(default_mogi_state)
             for member in ctx.guild.members:
                 if get(ctx.guild.roles, name="InMogi") in member.roles:
                     await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
