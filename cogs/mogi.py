@@ -220,7 +220,7 @@ class mogi(commands.Cog):
 
                     votes = "## Vote results:\n"
                     for item in self.mogi["votes"].keys():
-                        votes += f"{item}: {self.mogi["votes"][item]}\n"
+                        votes += f"{item}: {self.mogi['votes'][item]}\n"
                     await ctx.send(votes)
                     await ctx.send(
                         f"""
