@@ -25,6 +25,7 @@ default_mogi_state = {
     "results": [],
     "placements": [],
     "voters": [],
+    "votes": { "ffa": 0, "2v2": 0, "3v3": 0, "4v4": 0, "5v5": 0, "6v6": 0}
 }
 
 class mogi(commands.Cog):
@@ -176,14 +177,6 @@ class mogi(commands.Cog):
                 super().__init__()
                 self.password = password
                 self.mogi = mogi
-                self.votes = {
-                    "ffa": 0,
-                    "2v2": 0,
-                    "3v3": 0,
-                    "4v4": 0,
-                    "5v5": 0,
-                    "6v6": 0,
-                }
 
             @discord.ui.select(options=options)
             async def select_callback(self, select, interaction: discord.Interaction):
@@ -200,14 +193,14 @@ class mogi(commands.Cog):
                         "You already voted", ephemeral=True
                     )
                 self.mogi["voters"].append(interaction.user.name)
-                self.votes[selected_option] += 1
+                self.mogi["votes"][selected_option] += 1
                 await interaction.followup.send(
                     f"+1 vote for *{selected_option}*", ephemeral=True
                 )
 
                 len_players = len(self.mogi["players"])
-                max_voted = max(self.votes, key=self.votes.get)
-                if len(self.mogi["voters"]) >= len_players or self.votes[
+                max_voted = max(self.mogi["votes"], key=self.mogi["votes"].get)
+                if len(self.mogi["voters"]) >= len_players or self.mogi["votes"][
                     max_voted
                 ] >= math.ceil(len_players / 2):
                     self.mogi["format"] = max_voted
@@ -226,8 +219,8 @@ class mogi(commands.Cog):
                             lineup_str += f"\n `{i+1}`. {', '.join(item)}"
 
                     votes = "## Vote results:\n"
-                    for item in self.votes.keys():
-                        votes += f"{item}: {self.votes[item]}\n"
+                    for item in self.mogi["votes"].keys():
+                        votes += f"{item}: {self.mogi["votes"][item]}\n"
                     await ctx.send(votes)
                     await ctx.send(
                         f"""
@@ -239,7 +232,7 @@ class mogi(commands.Cog):
                     )
                     if self.password:
                         await ctx.send(f"# Server password: {self.password}")
-                    self.votes = {key: 0 for key in self.votes}
+                    self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
                     self.mogi["running"] = 1
 
                 else:
@@ -250,6 +243,16 @@ class mogi(commands.Cog):
             f"{get(ctx.guild.roles, name='InMogi').mention} \nBeginning Mogi \nVote for a format:",
             view=view,
         )
+
+    @slash_command(name="debug_votes")
+    async def debug_votes(self, ctx: ApplicationContext):
+        await ctx.respond(f"""
+            --Current voting-- \n
+            Who voted? 
+            {self.mogi['voters']} \n
+            What are the votes?
+            {self.mogi['votes']}
+    """)
 
     @slash_command(name="tags", description="assign team roles")
     async def tags(self, ctx: ApplicationContext):
