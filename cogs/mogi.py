@@ -204,7 +204,7 @@ class mogi(commands.Cog):
                     await ctx.send("test - if got triggered - should start now??")
                     self.mogi["format"] = max_voted
                     lineup_str = ""
-                    if format == "ffa":
+                    if max_voted == "ffa":
                         for i, player in enumerate(self.mogi["players"]):
                             lineup_str += f"`{i+1}:` {player}\n"
                             self.mogi["teams"].append([player])
