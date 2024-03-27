@@ -17,6 +17,7 @@ from io import BytesIO
 default_mogi_state = {
     "status": 0,
     "running": 0,
+    "password": None,
     "players": [],
     "teams": [],
     "calc": [],
@@ -36,7 +37,6 @@ class mogi(commands.Cog):
         )
         self.db = self.client["lounge"]
         self.players = self.db["players"]
-        self.password = ""
         self.mogi = deepcopy(default_mogi_state)
 
     @slash_command(name="open", description="Start a new mogi")
@@ -141,7 +141,7 @@ class mogi(commands.Cog):
     async def pswd(self, ctx: ApplicationContext, new=Option(str, required=False)):
         if not new:
             return await ctx.respond(f"Current password: ```{new}```")
-        self.password = new
+        self.mogi["password"] = new
         await ctx.respond("Updated password")
 
     @slash_command(name="status", description="See current state of mogi")
@@ -173,9 +173,8 @@ class mogi(commands.Cog):
                 )
 
         class FormatView(View):
-            def __init__(self, mogi, password):
+            def __init__(self, mogi):
                 super().__init__()
-                self.password = password
                 self.mogi = mogi
 
             @discord.ui.select(options=options)
@@ -229,15 +228,15 @@ class mogi(commands.Cog):
                         \n{lineup_str}
                     """
                     )
-                    if self.password:
-                        await ctx.send(f"# Server password: {self.password}")
+                    if self.mogi["password"]:
+                        await ctx.send(f"# Server password: {self.mogi["password"]}")
                     self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
                     self.mogi["running"] = 1
 
                 else:
                     pass
 
-        view = FormatView(self.mogi, self.password)
+        view = FormatView(self.mogi)
         await ctx.respond(
             f"{get(ctx.guild.roles, name='InMogi').mention} \nBeginning Mogi \nVote for a format:",
             view=view,
