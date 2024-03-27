@@ -50,7 +50,7 @@ class mogi(commands.Cog):
     @slash_command(name="lock", description="Lock the current mogi from being closed")
     async def lock(self, ctx: ApplicationContext):
         self.mogi["locked"] = (not self.mogi["locked"])
-        await ctx.respond(f"New mogi locking state: {self.mogi["locked"]}")
+        await ctx.respond(f"New mogi locking state: {self.mogi['locked']}")
 
     @slash_command(name="join", description="Join the current mogi")
     async def join(self, ctx: ApplicationContext):
