@@ -241,7 +241,7 @@ class mogi(commands.Cog):
                     """
                     )
                     if self.mogi["password"]:
-                        await ctx.send(f"# Server password: {self.mogi["password"]}")
+                        await ctx.send(f"# Server password: {self.mogi['password']}")
                     self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
                     self.mogi["running"] = 1
 
