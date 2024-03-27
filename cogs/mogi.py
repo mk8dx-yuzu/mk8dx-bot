@@ -18,6 +18,7 @@ default_mogi_state = {
     "status": 0,
     "running": 0,
     "password": None,
+    "locked": False,
     "players": [],
     "teams": [],
     "calc": [],
@@ -46,10 +47,17 @@ class mogi(commands.Cog):
         self.mogi["status"] = 1
         await ctx.respond("# Started a new mogi! Use /join to participate!")
 
+    @slash_command(name="lock", description="Lock the current mogi from being closed")
+    async def lock(self, ctx: ApplicationContext):
+        self.mogi["locked"] = (not self.mogi["locked"])
+        await ctx.respond(f"New mogi locking state: {self.mogi["locked"]}")
+
     @slash_command(name="join", description="Join the current mogi")
     async def join(self, ctx: ApplicationContext):
         if not self.mogi["status"]:
             return await ctx.respond("Currently no mogi open")
+        if self.mogi["locked"]:
+            return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
         if ctx.author.mention in self.mogi["players"]:
             return await ctx.respond("You are already in the mogi")
         if len(self.mogi["players"]) >= 12:
@@ -66,6 +74,8 @@ class mogi(commands.Cog):
     async def leave(self, ctx: ApplicationContext):
         if ctx.author.mention not in self.mogi["players"]:
             return await ctx.respond("You are not in the mogi")
+        if self.mogi["locked"]:
+            return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
         self.mogi["players"].remove(ctx.author.mention)
         await ctx.user.remove_roles(get(ctx.guild.roles, name="InMogi"))
         await ctx.respond(
@@ -99,6 +109,8 @@ class mogi(commands.Cog):
     @slash_command(name="close", description="Stop the current Mogi if running")
     async def close(self, ctx: ApplicationContext):
         await ctx.response.defer()
+        if self.mogi["locked"]:
+            return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
 
         message = await ctx.send(
             f"""
