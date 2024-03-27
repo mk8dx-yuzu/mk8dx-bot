@@ -211,8 +211,8 @@ class mogi(commands.Cog):
                     else:
                         random.shuffle(self.mogi["players"])
                         teams = []
-                        for i in range(0, len(self.mogi["players"]), int(format[0])):
-                            teams.append(self.mogi["players"][i : i + int(format[0])])
+                        for i in range(0, len(self.mogi["players"]), int(max_voted[0])):
+                            teams.append(self.mogi["players"][i : i + int(max_voted[0])])
                         self.mogi["teams"] = teams
                         for i, item in enumerate(teams):
                             lineup_str += f"\n `{i+1}`. {', '.join(item)}"
@@ -224,7 +224,7 @@ class mogi(commands.Cog):
                     await ctx.send(
                         f"""
                         # Mogi starting!
-                        ## Format: {format}
+                        ## Format: {max_voted}
                         ### Lineup:
                         \n{lineup_str}
                     """
