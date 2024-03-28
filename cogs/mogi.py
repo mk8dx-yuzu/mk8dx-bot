@@ -463,8 +463,18 @@ class mogi(commands.Cog):
         for team in new_ratings:
             self.mogi["results"].append([round(player.mu) for player in team])
 
+        debug_string = "# Debug:\n Points:\n"
+        for scoring in self.mogi['points']:
+            debug_string += f"{scoring}\n"
+        debug_string += "\n Current MMR:"
+        for team in calc_teams:
+            debug_string += f"{team}\n"
+        debug_string += "\n New MMR:"
+        for new in self.mogi["results"]:
+            debug_string+= f"{new}\n"
+
         await ctx.respond(
-            f'Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr \n Debug:\n current_mmr: {calc_teams}\n new_mmr: {self.mogi["results"]}',
+            f'Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr \n {debug_string}',
             ephemeral=True,
         )
 
@@ -518,8 +528,12 @@ class mogi(commands.Cog):
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
 
+    @slash_command(name="calc_manual")
+    async def calc_manualy(self, ctx: ApplicationContext)
+        pass
+
     @slash_command(name="apply", description="Use after a /calc to apply new mmr")
-    async def apply(self, ctx: discord.ApplicationContext):
+    async def apply(self, ctx: ApplicationContext):
         players = self.mogi["players"]
         current_mmr = [
             self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
