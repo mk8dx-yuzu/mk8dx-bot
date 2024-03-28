@@ -95,12 +95,12 @@ class mogi(commands.Cog):
                     name = get(ctx.guild.members, id=int(player.strip("<@!>"))).nick
                 else:
                     try:
-                        name = get(ctx.guild.members, id=int(player.strip("<@!>"))).name
+                        name = get(ctx.guild.members, id=int(player.strip("<@!>"))).display_name
                     except:
                         name = player
             except:
                 try:
-                    name = get(ctx.guild.members, id=int(player.strip("<@!>"))).name
+                    name = get(ctx.guild.members, id=int(player.strip("<@!>"))).display_name
                 except:
                     name = player
             list += f"*{index+1}.* {name}\n"
@@ -529,7 +529,7 @@ class mogi(commands.Cog):
         await ctx.respond(content="Here's the table:", file=file)
 
     @slash_command(name="calc_manual")
-    async def calc_manualy(self, ctx: ApplicationContext)
+    async def calc_manualy(self, ctx: ApplicationContext):
         pass
 
     @slash_command(name="apply", description="Use after a /calc to apply new mmr")
@@ -570,7 +570,6 @@ class mogi(commands.Cog):
             f"Updated every racers mmr \n Debug: \n Players: {players}\n Current MMR: {current_mmr} \n New MMR: {new_mmr[i]}",
             ephemeral=True,
         )
-
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
