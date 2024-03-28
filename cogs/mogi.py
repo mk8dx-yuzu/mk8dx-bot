@@ -329,7 +329,7 @@ class mogi(commands.Cog):
         lineup_str = "# Teams \n"
         if self.mogi["format"] == "ffa":
             for i, player in enumerate(self.mogi["players"]):
-                lineup_str += f"`{i+1}:` {player}\n"
+                lineup_str += f"`{i+1}:` {get(ctx.guild.members, id=int(player.strip("<@!>"))).display_name}\n"
         else:
             for i, item in enumerate(self.mogi["teams"]):
                 lineup_str += f"\n `{i+1}`. {', '.join(item)}"
