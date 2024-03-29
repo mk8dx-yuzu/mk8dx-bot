@@ -175,7 +175,7 @@ class mk8dx(commands.Cog):
 
         await ctx.respond(f"# {name} - overview", embed=embed)
 
-    @slash_command(name="register", description="Register for playing in the Lounge")
+    @slash_command(name="register", description="Register for playing in the Lounge", guild_only=True)
     async def register(
         self,
         ctx: discord.ApplicationContext,

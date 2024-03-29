@@ -40,19 +40,19 @@ class mogi(commands.Cog):
         self.players = self.db["players"]
         self.mogi = deepcopy(default_mogi_state)
 
-    @slash_command(name="open", description="Start a new mogi")
+    @slash_command(name="open", description="Start a new mogi", guild_only=True)
     async def open(self, ctx: ApplicationContext):
         if self.mogi["status"]:
             return await ctx.respond("A mogi is already open")
         self.mogi["status"] = 1
         await ctx.respond("# Started a new mogi! Use /join to participate!")
 
-    @slash_command(name="lock", description="Lock the current mogi from being closed")
+    @slash_command(name="lock", description="Lock the current mogi from being closed", guild_only=True)
     async def lock(self, ctx: ApplicationContext):
         self.mogi["locked"] = (not self.mogi["locked"])
         await ctx.respond(f"New mogi locking state: {self.mogi['locked']}")
 
-    @slash_command(name="join", description="Join the current mogi")
+    @slash_command(name="join", description="Join the current mogi", guild_only=True)
     async def join(self, ctx: ApplicationContext):
         if not self.mogi["status"]:
             return await ctx.respond("Currently no mogi open")
@@ -70,7 +70,7 @@ class mogi(commands.Cog):
             f"{ctx.author.name} joined the mogi!\n{len(self.mogi['players'])} players are in!"
         )
 
-    @slash_command(name="leave", description="Leave the current mogi")
+    @slash_command(name="leave", description="Leave the current mogi", guild_only=True)
     async def leave(self, ctx: ApplicationContext):
         if ctx.author.mention not in self.mogi["players"]:
             return await ctx.respond("You are not in the mogi")
@@ -82,7 +82,7 @@ class mogi(commands.Cog):
             f"{ctx.author.mention} left the mogi!\n{len(self.mogi['players'])} players are in!"
         )
 
-    @slash_command(name="l", description="List all players in the current mogi")
+    @slash_command(name="l", description="List all players in the current mogi", guild_only=True)
     async def l(self, ctx: ApplicationContext):
         if not self.mogi["status"]:
             return await ctx.respond("Currently no open mogi")
@@ -106,7 +106,7 @@ class mogi(commands.Cog):
             list += f"*{index+1}.* {name}\n"
         await ctx.respond(list, allowed_mentions=discord.AllowedMentions(users=False))
 
-    @slash_command(name="close", description="Stop the current Mogi if running")
+    @slash_command(name="close", description="Stop the current Mogi if running", guild_only=True)
     async def close(self, ctx: ApplicationContext):
         await ctx.response.defer()
         if self.mogi["locked"]:
@@ -148,7 +148,7 @@ class mogi(commands.Cog):
         await ctx.followup.send(final_message)
 
     @slash_command(
-        name="pswd", description="view or change the server password (to send to mogi players)"
+        name="pswd", description="view or change the server password (to send to mogi players)", guild_only=True
     )
     async def pswd(self, ctx: ApplicationContext, new=Option(str, required=False)):
         if not new:
@@ -163,7 +163,7 @@ class mogi(commands.Cog):
         await ctx.respond(f"Currently open mogi: {len(self.mogi['players'])} players")
 
     @slash_command(
-        name="start", description="Randomize teams, vote format and start playing"
+        name="start", description="Randomize teams, vote format and start playing", guild_only=True
     )
     async def start(self, ctx: ApplicationContext):
         if not ctx.author.mention in self.mogi["players"]:
@@ -254,7 +254,7 @@ class mogi(commands.Cog):
             view=view,
         )
 
-    @slash_command(name="debug_votes")
+    @slash_command(name="debug_votes", guild_only=True)
     async def debug_votes(self, ctx: ApplicationContext):
         await ctx.respond(f"""
             --Current voting-- \n
@@ -264,7 +264,7 @@ class mogi(commands.Cog):
             {self.mogi['votes']}
     """)
 
-    @slash_command(name="tags", description="assign team roles")
+    @slash_command(name="tags", description="assign team roles", guild_only=True)
     async def tags(self, ctx: ApplicationContext):
         if not self.mogi["format"]:
             return ctx.respond("No format chosen yet")
@@ -277,7 +277,7 @@ class mogi(commands.Cog):
             return await ctx.respond("Assigned team roles")
         await ctx.respond("format is ffa, not team roles assigned")
 
-    @slash_command(name="untag")
+    @slash_command(name="untag", guild_only=True)
     async def untag(self, ctx: ApplicationContext):
         for i in [1, 2, 3, 4, 5]:
             for member in ctx.guild.members:
@@ -287,6 +287,7 @@ class mogi(commands.Cog):
     @slash_command(
         name="force_start",
         description="When voting did not work - force start the mogi with a given format",
+        guild_only=True
     )
     async def force_start(
         self,
@@ -335,7 +336,7 @@ class mogi(commands.Cog):
                 lineup_str += f"\n `{i+1}`. {', '.join(item)}"
         await ctx.respond(lineup_str)
 
-    @slash_command(name="sub", description="Replace a player in the mogi")
+    @slash_command(name="sub", description="Replace a player in the mogi", guild_only=True)
     async def sub(
         self,
         ctx: ApplicationContext,
@@ -367,7 +368,7 @@ class mogi(commands.Cog):
         self.mogi["teams"] = replace(self.mogi["teams"], player, sub)
         await ctx.respond(f"Subbed {player} with {sub} if applicable")
 
-    @slash_command(name="points", description="Use after a mogi - input player points")
+    @slash_command(name="points", description="Use after a mogi - input player points", guild_only=True)
     async def points(self, ctx: ApplicationContext):
         if not self.mogi["running"]:
             return await ctx.respond("No running mogi")
@@ -421,7 +422,7 @@ class mogi(commands.Cog):
             return await ctx.respond("Already got all calcs")
 
     @slash_command(
-        name="calc", description="Use after using /points to calculate new mmr"
+        name="calc", description="Use after using /points to calculate new mmr", guild_only=True
     )
     async def calc(self, ctx: discord.ApplicationContext):
         if not len(self.mogi["calc"]):
@@ -478,7 +479,7 @@ class mogi(commands.Cog):
             ephemeral=True,
         )
 
-    @slash_command(name="table", description="Use after a /calc to view the results")
+    @slash_command(name="table", description="Use after a /calc to view the results", guild_only=True)
     async def table(self, ctx: discord.ApplicationContext):
         players = [
             self.players.find_one({"discord": player.strip("<@!>")})["name"]
@@ -528,11 +529,11 @@ class mogi(commands.Cog):
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
 
-    @slash_command(name="calc_manual")
+    @slash_command(name="calc_manual", guild_only=True)
     async def calc_manualy(self, ctx: ApplicationContext):
         pass
 
-    @slash_command(name="apply", description="Use after a /calc to apply new mmr")
+    @slash_command(name="apply", description="Use after a /calc to apply new mmr", guild_only=True)
     async def apply(self, ctx: ApplicationContext):
         players = self.mogi["players"]
         current_mmr = [

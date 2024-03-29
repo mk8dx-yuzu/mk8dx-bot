@@ -17,6 +17,7 @@ class admin(commands.Cog):
     @slash_command(
         name="edit",
         description="Edit a player's MMR. Wins/Losses and MMR History can be updated accordingly.",
+        guild_only=True
     )
     async def edit(
         self,
@@ -72,7 +73,7 @@ class admin(commands.Cog):
             return await ctx.respond(f"Sucessfully edited {name}s MMR to {new_value}")
         self.players.update_one({"name": name}, {"$set": {stat: new_value}})
 
-    @slash_command(name="remove", description="Remove a player from the leaderboard")
+    @slash_command(name="remove", description="Remove a player from the leaderboard", guild_only=True)
     async def remove(
         self,
         ctx: discord.ApplicationContext,
