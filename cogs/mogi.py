@@ -595,7 +595,7 @@ class mogi(commands.Cog):
             sigma=100,
             beta=9000,
             tau=950,
-            draw_probability=0.05,
+            draw_probability=0.01,
             backend=None,
             env=None,
         )
