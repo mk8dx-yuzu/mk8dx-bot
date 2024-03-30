@@ -16,6 +16,7 @@ from io import BytesIO
 
 default_mogi_state = {
     "status": 0,
+    "voting": 0,
     "running": 0,
     "password": None,
     "locked": False,
@@ -167,6 +168,8 @@ class mogi(commands.Cog):
         name="start", description="Randomize teams, vote format and start playing", guild_only=True
     )
     async def start(self, ctx: ApplicationContext):
+        if self.mogi["voting"]:
+            return ctx.respond("Already started a vote", ephemeral=True)
         if not ctx.author.mention in self.mogi["players"]:
             return await ctx.respond(
                 "You can't start a mogi you aren't in", ephemeral=True
@@ -175,6 +178,8 @@ class mogi(commands.Cog):
             return await ctx.respond("Can't start a mogi with less than 3 players")
         if self.mogi["running"]:
             return await ctx.respond("Mogi is already in play")
+
+        self.mogi["voting"] = 1
 
         players_len = len(self.mogi["players"])
         options = []
@@ -238,9 +243,8 @@ class mogi(commands.Cog):
                         \n{lineup_str}
                     """
                     )
-                    if self.mogi["password"]:
-                        await ctx.send(f"# Server password: {self.mogi['password']}")
                     self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
+                    self.mogi["voting"] = 0
                     self.mogi["running"] = 1
 
                 else:
