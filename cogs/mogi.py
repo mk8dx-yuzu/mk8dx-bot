@@ -180,6 +180,7 @@ class mogi(commands.Cog):
             return await ctx.respond("Mogi is already in play")
 
         self.mogi["voting"] = 1
+        self.mogi["locked"] = True
 
         players_len = len(self.mogi["players"])
         options = []
@@ -543,6 +544,7 @@ class mogi(commands.Cog):
 
     @slash_command(name="apply", description="Use after a /calc to apply new mmr", guild_only=True)
     async def apply(self, ctx: ApplicationContext):
+        await ctx.response.defer()
         players = self.mogi["players"]
         current_mmr = [
             self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
@@ -575,10 +577,13 @@ class mogi(commands.Cog):
                 {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}},
             )
 
+        self.mogi["locked"] = False
+
         await ctx.respond(
             f"Updated every racers mmr \n Debug: \n Players: {players}\n Current MMR: {current_mmr} \n New MMR: {new_mmr[i]}",
             ephemeral=True,
         )
+        await ctx.followup.send("Applied MMR changes ✅")
 
     @slash_command(name="calc_manual", guild_only=True)
     async def calc_manual(
