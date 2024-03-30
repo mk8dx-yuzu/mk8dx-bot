@@ -358,6 +358,8 @@ class mogi(commands.Cog):
             return await ctx.respond("no players", ephemeral=True)
         if not len(self.mogi["teams"]):
             return await ctx.respond("No teams decided yet")
+        if sub in self.mogi["players"]:
+            return await ctx.respond("This sub is already in the mogi")
 
         def replace(space, player, sub):
             if isinstance(space, list):
@@ -380,12 +382,12 @@ class mogi(commands.Cog):
                 self.mogi = mogi
 
                 count = 0
-                for player in mogi["players"]:
+                for player in [val for sublist in self.mogi["teams"] for val in sublist]:
                     if player not in mogi["calc"] and count < 4:
                         mentioned_user = db["players"].find_one(
                             {"discord": player.strip("<@!>")}
                         )["name"]
-                        self.add_item(InputText(label=mentioned_user))
+                        self.add_item(InputText(label = mentioned_user))
                         mogi["calc"].append(player)
                         count += 1
 
@@ -437,7 +439,7 @@ class mogi(commands.Cog):
             sigma=100,
             beta=9000,
             tau=950,
-            draw_probability=0.05,
+            draw_probability=0.01,
             backend=None,
             env=None,
         )
@@ -453,13 +455,21 @@ class mogi(commands.Cog):
         for team_point_arr in self.mogi["points"]:
             scores.append([sum(team_point_arr)])
 
-        ranks_dict = {}
+        placement_map = {}
+        for i, score in enumerate(sorted(scores, reverse=True)):
+            if score not in placement_map:
+                placement_map[score] = i + 1
+
+        placements = [placement_map[score] for score in scores]
+        
+        """ ranks_dict = {}
         placements = []
         for i, score in enumerate(sorted(scores, reverse=True)):
             ranks_dict[score[0]] = i + 1
         for score in scores:
             placements.append(ranks_dict[score[0]])
-        self.mogi["placements"] = placements
+        self.mogi["placements"] = placements """
+
         new_ratings = rate(calc_teams, placements)
 
         for team in new_ratings:
