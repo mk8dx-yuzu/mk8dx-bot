@@ -1,7 +1,7 @@
 import os
 import discord
 import pymongo
-from discord import slash_command, Option
+from discord import slash_command, Option, ApplicationContext
 from discord.ext import commands
 from discord.utils import get
 
@@ -21,7 +21,7 @@ class admin(commands.Cog):
     )
     async def edit(
         self,
-        ctx: discord.ApplicationContext,
+        ctx: ApplicationContext,
         name = Option(
             str,
             name="player",
@@ -76,7 +76,7 @@ class admin(commands.Cog):
     @slash_command(name="remove", description="Remove a player from the leaderboard", guild_only=True)
     async def remove(
         self,
-        ctx: discord.ApplicationContext,
+        ctx: ApplicationContext,
         player=Option(str, description="Name of the player"),
     ):
         user = self.players.find_one({"name": player})
@@ -84,6 +84,10 @@ class admin(commands.Cog):
         await ctx.guild.get_member(user_discord).remove_roles(get(ctx.guild.roles, name="Lounge Player"))
         self.players.delete_one({"name": player})
         await ctx.respond(f"Successfully deleted {player}s player records")
+
+    @slash_command(name="calc_manual", guild_only=True)
+    async def calc_manualy(self, ctx: ApplicationContext):
+        pass
 
 def setup(bot: commands.Bot):
     bot.add_cog(admin(bot))

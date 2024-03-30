@@ -529,10 +529,6 @@ class mogi(commands.Cog):
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
 
-    @slash_command(name="calc_manual", guild_only=True)
-    async def calc_manualy(self, ctx: ApplicationContext):
-        pass
-
     @slash_command(name="apply", description="Use after a /calc to apply new mmr", guild_only=True)
     async def apply(self, ctx: ApplicationContext):
         players = self.mogi["players"]
