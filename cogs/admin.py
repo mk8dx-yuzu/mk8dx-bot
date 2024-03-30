@@ -85,9 +85,5 @@ class admin(commands.Cog):
         self.players.delete_one({"name": player})
         await ctx.respond(f"Successfully deleted {player}s player records")
 
-    @slash_command(name="calc_manual", guild_only=True)
-    async def calc_manualy(self, ctx: ApplicationContext):
-        pass
-
 def setup(bot: commands.Bot):
     bot.add_cog(admin(bot))

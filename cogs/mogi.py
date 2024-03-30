@@ -154,6 +154,7 @@ class mogi(commands.Cog):
         if not new:
             return await ctx.respond(f"Current password: ```{new}```")
         self.mogi["password"] = new
+        print(new, self.mogi["password"])
         await ctx.respond("Updated password")
 
     @slash_command(name="status", description="See current state of mogi")
@@ -446,7 +447,7 @@ class mogi(commands.Cog):
             calc_team = []
             for player in team:
                 mmr = self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
-                calc_team.append(Rating(mmr, 200))
+                calc_team.append(Rating(mmr, 100))
             calc_teams.append(calc_team)
         scores = []
         for team_point_arr in self.mogi["points"]:
@@ -567,6 +568,90 @@ class mogi(commands.Cog):
             f"Updated every racers mmr \n Debug: \n Players: {players}\n Current MMR: {current_mmr} \n New MMR: {new_mmr[i]}",
             ephemeral=True,
         )
+
+    @slash_command(name="calc_manual", guild_only=True)
+    async def calc_manual(
+        self,
+        ctx: ApplicationContext,
+        format = Option(str, choices = ["1v1", "2v2", "3v3", "4v4", "5v5", "6v6"]),
+        players = Option(str, description="Player @mentions in Team Order, seperated by comma and space (@Team1Player1, @Team1Player2, )"),
+        placements = Option(str, description="Total Team (or player if FFA) placements seperated by comma and space (for 4v4: 2, 3, 1)")
+    ):
+        players: list = players.split(", ")
+        size = int(format[0])
+        teams =  [players[i:i+size] for i in range(0, len(players), size)]
+        rate_teams = []
+        for team in teams:
+            rate_team = []
+            for player in team:
+                rate_team.append(Rating(self.players.find_one({"discord": player.strip('<@!>')})['mmr'], 100))
+            rate_teams.append(rate_team)
+
+        global_env()
+        trueskill.setup(
+            mu=2000,
+            sigma=100,
+            beta=9000,
+            tau=950,
+            draw_probability=0.05,
+            backend=None,
+            env=None,
+        )
+
+        results = rate(rate_teams, placements.split(", "))
+        print(rate_teams)
+        new_mmr = []
+        for team in results:
+            new_mmr.append([round(player.mu) for player in team])
+        
+        players = [
+            self.players.find_one({"discord": player.strip("<@!>")})["name"]
+            for player in players
+        ]
+        current_mmr = [
+            round(self.players.find_one({"name": player})["mmr"])
+            for player in players
+        ]
+        new_mmr = [val for sublist in new_mmr for val in sublist]
+
+        data = {
+            "Player": players,
+            "MMR": current_mmr,
+            "Change": [
+                round(new_mmr[i] - current_mmr[i]) for i in range(0, len(players))
+            ],
+            "New MMR": new_mmr,
+        }
+        df = pd.DataFrame(data).set_index("Player")
+        df = df.sort_values(by="Change", ascending=False)
+        buffer = BytesIO()
+        dfi.export(
+            df.style.set_table_styles(
+                [
+                    {
+                        "selector": "tr:nth-child(even)",
+                        "props": [("background-color", "#363f4f"), ("color", "white")],
+                    },
+                    {
+                        "selector": "tr:nth-child(odd)",
+                        "props": [("background-color", "#1d2735"), ("color", "white")],
+                    },
+                ]
+            ).background_gradient(
+                cmap=colors.LinearSegmentedColormap.from_list(
+                    "", ["red", "red", "white", "green", "green"]
+                ),
+                low=0.3,
+                high=0.2,
+                subset=["Change"],
+            ),
+            buffer,
+        )
+
+        buffer.seek(0)
+        file = discord.File(buffer, filename="table.png")
+        await ctx.respond(content="Here's the table:", file=file)
+
 
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
