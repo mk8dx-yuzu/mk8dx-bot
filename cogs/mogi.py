@@ -192,28 +192,25 @@ class mogi(commands.Cog):
 
             @discord.ui.select(options=options)
             async def select_callback(self, select, interaction: discord.Interaction):
+                if interaction.response.is_done():
+                    await interaction.followup.send("You already voted", ephemeral=True)
                 await interaction.response.defer()
                 if interaction.user.mention not in self.mogi["players"]:
                     return
                 if self.mogi["running"]:
-                    return await ctx.respond(
+                    return await interaction.respond(
                         "Mogi already decided, voting is closed", ephemeral=True
                     )
                 selected_option = select.values[0]
-                if interaction.user.name in self.mogi["voters"]:
-                    return await interaction.response.send_message(
-                        "You already voted", ephemeral=True
-                    )
                 self.mogi["voters"].append(interaction.user.name)
                 self.mogi["votes"][selected_option] += 1
                 await interaction.followup.send(
-                    f"+1 vote for *{selected_option}*", ephemeral=True
+                    f"+1 vote for *{selected_option}* \n Debug: your raw selection data:\n{select}", ephemeral=True
                 )
 
                 len_players = len(self.mogi["players"])
                 max_voted = max(self.mogi["votes"], key=self.mogi["votes"].get)
                 if (len(self.mogi["voters"]) >= len_players) or (self.mogi["votes"][max_voted] >= math.ceil(len_players / 2) + 1):
-                    await ctx.send("test - if got triggered - should start now??")
                     self.mogi["format"] = max_voted
                     lineup_str = ""
                     if max_voted == "ffa":
