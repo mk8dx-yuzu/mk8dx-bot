@@ -577,6 +577,8 @@ class mogi(commands.Cog):
         players = Option(str, description="Player @mentions in Team Order, seperated by comma and space (@Team1Player1, @Team1Player2, )"),
         placements = Option(str, description="Total Team (or player if FFA) placements seperated by comma and space (for 4v4: 2, 3, 1)")
     ):
+        await ctx.response.defer()
+
         players: list = players.split(", ")
         size = int(format[0])
         teams =  [players[i:i+size] for i in range(0, len(players), size)]
