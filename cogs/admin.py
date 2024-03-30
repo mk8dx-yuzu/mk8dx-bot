@@ -51,6 +51,7 @@ class admin(commands.Cog):
             name="calc",
             description="type 'y' or 'n' | add to wins/losses and history",
             required=True,
+            choices=["y", "n"]
         ),
     ):
         player = self.players.find_one({"name": name})
