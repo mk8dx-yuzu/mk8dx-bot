@@ -579,7 +579,7 @@ class mogi(commands.Cog):
 
         self.mogi["locked"] = False
 
-        await ctx.respond(
+        await ctx.response.send_message(
             f"Updated every racers mmr \n Debug: \n Players: {players}\n Current MMR: {current_mmr} \n New MMR: {new_mmr[i]}",
             ephemeral=True,
         )
