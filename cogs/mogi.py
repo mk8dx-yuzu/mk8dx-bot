@@ -197,7 +197,7 @@ class mogi(commands.Cog):
                 self.mogi = mogi
 
             @discord.ui.select(options=options)
-            async def select_callback(self, select, interaction: discord.Interaction):
+            async def select_callback(self, select: discord.ui.Select, interaction: discord.Interaction):
                 if interaction.response.is_done():
                     await interaction.followup.send("You already voted", ephemeral=True)
                 await interaction.response.defer()
@@ -211,7 +211,7 @@ class mogi(commands.Cog):
                 self.mogi["voters"].append(interaction.user.name)
                 self.mogi["votes"][selected_option] += 1
                 await interaction.followup.send(
-                    f"+1 vote for *{selected_option}* \n Debug: your raw selection data:\n{select}", ephemeral=True
+                    f"+1 vote for *{selected_option}* \n Debug: your raw selection data:\n{select.values}", ephemeral=True
                 )
 
                 len_players = len(self.mogi["players"])
