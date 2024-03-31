@@ -384,7 +384,7 @@ class mogi(commands.Cog):
                 self.mogi = mogi
 
                 count = 0
-                for player in [val for sublist in self.mogi["teams"] for val in sublist]:
+                for player in self.mogi["players"]:
                     if player not in mogi["calc"] and count < 4:
                         mentioned_user = db["players"].find_one(
                             {"discord": player.strip("<@!>")}
@@ -457,20 +457,20 @@ class mogi(commands.Cog):
         for team_point_arr in self.mogi["points"]:
             scores.append([sum(team_point_arr)])
 
-        placement_map = {}
+        """placement_map = {}
         for i, score in enumerate(sorted(scores, reverse=True)):
             if score not in placement_map:
                 placement_map[score] = i + 1
 
-        placements = [placement_map[score] for score in scores]
+        placements = [placement_map[score] for score in scores]"""
         
-        """ ranks_dict = {}
+        ranks_dict = {}
         placements = []
         for i, score in enumerate(sorted(scores, reverse=True)):
             ranks_dict[score[0]] = i + 1
         for score in scores:
             placements.append(ranks_dict[score[0]])
-        self.mogi["placements"] = placements """
+        self.mogi["placements"] = placements
 
         new_ratings = rate(calc_teams, placements)
 
