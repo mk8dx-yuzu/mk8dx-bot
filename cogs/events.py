@@ -14,9 +14,11 @@ class events(commands.Cog):
             print(f"An error occured: \n{error} \n")
 
     @commands.Cog.listener()
-    async def on_message(self, ctx: commands.Context, message: discord.Message):
+    async def on_message(self, message: discord.Message):
+        if message.author == self.bot.user:
+            return
         if "dk summit" in message.content.lower() and random.random() < 0.4:
-            await ctx.send(random.choice(["DDDDKKKK SUMIIIIT", "dk summit mentioned", "best track in the game"]))
+            await message.channel.send(random.choice(["DDDDKKKK SUMIIIIT", "dk summit mentioned", "best track in the game"]))
 
 def setup(bot: commands.Bot):
     bot.add_cog(events(bot))
