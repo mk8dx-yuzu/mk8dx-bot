@@ -8,7 +8,7 @@ class events(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error): 
         if isinstance(error, commands.CommandNotFound): 
-            await ctx.send(embed = discord.Embed(description="Command not found.", color=ctx.author.color))
+            pass
         else:
             print(f"An error occured: \n{error} \n")
 
