@@ -136,13 +136,14 @@ class mk8dx(commands.Cog):
             player: dict = self.players.find_one({"discord": ctx.author.mention.strip("<@!>")})
             if not player:
                 return await ctx.respond("Couldn't find that player")
-            name = player['name']
         else:
             player: dict = self.players.find_one({"name": name})
             if not player:
                 player: dict = self.players.find_one({"discord": name.strip("<@!>")})
                 if not player:
                     return await ctx.respond("Couldn't find that player")
+
+        name = player['name']
 
         embed = discord.Embed(
             title=f"{name}",
