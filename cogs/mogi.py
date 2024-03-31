@@ -343,19 +343,21 @@ class mogi(commands.Cog):
     async def sub(
         self,
         ctx: ApplicationContext,
-        player=Option(
+        player = Option(
             str,
             name="player",
             description="who to replace (input @ discord mention)",
             required=True,
         ),
-        sub=Option(
+        sub = Option(
             str,
             name="sub",
             description="subbing player (input @ discord mention)",
             required=True,
         ),
     ):
+        await ctx.response.defer()
+
         if not len(self.mogi["players"]):
             return await ctx.respond("no players", ephemeral=True)
         if not len(self.mogi["teams"]):
@@ -371,6 +373,10 @@ class mogi(commands.Cog):
 
         self.mogi["players"] = replace(self.mogi["players"], player, sub)
         self.mogi["teams"] = replace(self.mogi["teams"], player, sub)
+
+        await get(ctx.guild.members, id=int(sub.strip("<@!>"))).add_roles(get(ctx.guild.roles, name="InMogi"))
+        await get(ctx.guild.members, id=int(player.strip("<@!>"))).remove_roles(get(ctx.guild.roles, name="InMogi"))
+
         await ctx.respond(f"Subbed {player} with {sub} if applicable")
 
     @slash_command(name="points", description="Use after a mogi - input player points", guild_only=True)
