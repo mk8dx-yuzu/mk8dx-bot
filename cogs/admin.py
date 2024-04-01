@@ -17,7 +17,7 @@ class admin(commands.Cog):
     @slash_command(name="debug")
     async def debug(self, ctx: ApplicationContext, message = Option(str)):
         conv = await ctx.respond("‎")
-        conv.delete_original_message()
+        await conv.delete_original_message()
         await ctx.send(message)
 
     @slash_command(
