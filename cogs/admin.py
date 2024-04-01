@@ -14,6 +14,12 @@ class admin(commands.Cog):
         self.db = self.client["lounge"]
         self.players = self.db["players"]
 
+    @slash_command(name="debug")
+    async def debug(self, ctx: ApplicationContext, message = Option(str));
+        conv = await ctx.respond("‎")
+        conv.delete_original_message()
+        await ctx.send(message)
+
     @slash_command(
         name="edit",
         description="Edit a player's MMR. Wins/Losses and MMR History can be updated accordingly.",
