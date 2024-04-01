@@ -15,7 +15,7 @@ class admin(commands.Cog):
         self.players = self.db["players"]
 
     @slash_command(name="debug")
-    async def debug(self, ctx: ApplicationContext, message = Option(str));
+    async def debug(self, ctx: ApplicationContext, message = Option(str)):
         conv = await ctx.respond("‎")
         conv.delete_original_message()
         await ctx.send(message)
