@@ -199,7 +199,7 @@ class mogi(commands.Cog):
             @discord.ui.select(options=options)
             async def select_callback(self, select: discord.ui.Select, interaction: discord.Interaction):
                 if interaction.response.is_done():
-                    await interaction.followup.send("You already voted", ephemeral=True)
+                    return await interaction.followup.send("You already voted", ephemeral=True)
                 await interaction.response.defer()
                 if interaction.user.mention not in self.mogi["players"]:
                     return
