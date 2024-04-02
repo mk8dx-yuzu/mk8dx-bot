@@ -303,6 +303,8 @@ class mogi(commands.Cog):
             choices=["ffa", "2v2", "3v3", "4v4", "5v5", "6v6"],
         ),
     ):
+        self.mogi["teams"] = []
+
         lineup_str = "# Lineup \n"
 
         if format == "ffa":
