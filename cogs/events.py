@@ -19,6 +19,8 @@ class events(commands.Cog):
             return
         if "dk summit" in message.content.lower() and random.random() < 0.4:
             await message.channel.send(random.choice(["DDDDKKKK SUMIIIIT", "dk summit mentioned", "best track in the game"]))
+        if "election" in message.content.lower() and random.random() < 0.5:
+            await message.channel.send(":flag_us:")
 
 def setup(bot: commands.Bot):
     bot.add_cog(events(bot))

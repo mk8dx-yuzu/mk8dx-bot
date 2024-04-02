@@ -8,6 +8,7 @@ from discord import slash_command, Option
 
 def calcRank(mmr):
     ranks = [
+        {"name": "Wood", "range": (-999999999, 0)},
         {"name": "Bronze", "range": (0, 1499)},
         {"name": "Silver", "range": (1400, 2999)},
         {"name": "Gold", "range": (3000, 5099)},

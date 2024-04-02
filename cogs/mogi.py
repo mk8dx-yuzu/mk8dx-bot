@@ -406,6 +406,7 @@ class mogi(commands.Cog):
                 interaction: Interaction = Interaction,
                 mogi=self.mogi,
             ):
+                print(mogi["format"])
                 if mogi["format"] == "ffa":
                     for i in range(0, len(self.children)):
                         mogi["points"].append([int(self.children[i].value)])
@@ -621,7 +622,6 @@ class mogi(commands.Cog):
         )
 
         results = rate(rate_teams, placements.split(", "))
-        print(rate_teams)
         new_mmr = []
         for team in results:
             new_mmr.append([round(player.mu) for player in team])
