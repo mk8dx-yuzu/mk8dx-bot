@@ -587,11 +587,7 @@ class mogi(commands.Cog):
 
         self.mogi["locked"] = False
 
-        await ctx.response.send_message(
-            f"Updated every racers mmr \n Debug: \n Players: {players}\n Current MMR: {current_mmr} \n New MMR: {new_mmr[i]}",
-            ephemeral=True,
-        )
-        await ctx.followup.send("Applied MMR changes ✅")
+        await ctx.respond("Applied MMR changes ✅")
 
     @slash_command(name="calc_manual", guild_only=True)
     async def calc_manual(
