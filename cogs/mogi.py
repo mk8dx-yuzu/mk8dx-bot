@@ -170,7 +170,7 @@ class mogi(commands.Cog):
     )
     async def pswd(self, ctx: ApplicationContext, new=Option(str, required=False)):
         if not new:
-            return await ctx.respond(f"Current password: ```{new}```")
+            return await ctx.respond(f"Current password: ```{self.mogi['password']}```")
         self.mogi["password"] = new
         print(new, self.mogi["password"])
         await ctx.respond("Updated password")
@@ -324,6 +324,9 @@ class mogi(commands.Cog):
 
         lineup_str = "# Lineup \n"
 
+        self.mogi["format"] = format
+        self.mogi["running"] = 1
+
         if format == "ffa":
             for i, player in enumerate(self.mogi["players"]):
                 lineup_str += f"`{i+1}:` {player}\n"
@@ -339,8 +342,6 @@ class mogi(commands.Cog):
         for i, item in enumerate(teams):
             lineup_str += f"\n `{i+1}`. {', '.join(item)}"
 
-        self.mogi["running"] = 1
-        self.mogi["format"] = format
         await ctx.respond(lineup_str)
 
     @slash_command(name="teams", description="Show teams")
@@ -425,7 +426,6 @@ class mogi(commands.Cog):
                 interaction: Interaction = Interaction,
                 mogi=self.mogi,
             ):
-                print(mogi["format"])
                 if mogi["format"] == "ffa":
                     for i in range(0, len(self.children)):
                         mogi["points"].append([int(self.children[i].value)])
@@ -583,7 +583,7 @@ class mogi(commands.Cog):
 
         for i, player in enumerate(players):
             if player in self.mogi["subs"] and deltas[i] < 0:
-                await ctx.send(f"Excluded {self.bot.get_user(int(player.strip('<@!>'))).display_name} because they subbed")
+                await ctx.send(f"Excluded {self.bot.get_user(int(player.strip('<@!>'))).mention} because they subbed")
                 continue
             self.players.update_one(
                 {"discord": player.strip("<@!>")}, {"$set": {"mmr": new_mmr[i]}}
@@ -610,7 +610,7 @@ class mogi(commands.Cog):
             current_rank = calcRank(current_mmr[i])
             new_rank = calcRank(new_mmr[i])
             if current_rank != new_rank:
-                await ctx.send(f"{self.bot.get_user(int(player.strip('<@!>'))).display_name} is now in {new_rank}")
+                await ctx.send(f"{self.bot.get_user(int(player.strip('<@!>'))).mention} is now in {new_rank}")
 
         self.mogi["locked"] = False
 
