@@ -583,7 +583,7 @@ class mogi(commands.Cog):
 
         for i, player in enumerate(players):
             if player in self.mogi["subs"] and deltas[i] < 0:
-                await ctx.send(f"Excluded {self.bot.get_user(int(player.strip("<@!>"))).display_name} because they subbed")
+                await ctx.send(f"Excluded {self.bot.get_user(int(player.strip('<@!>'))).display_name} because they subbed")
                 continue
             self.players.update_one(
                 {"discord": player.strip("<@!>")}, {"$set": {"mmr": new_mmr[i]}}
@@ -610,7 +610,7 @@ class mogi(commands.Cog):
             current_rank = calcRank(current_mmr[i])
             new_rank = calcRank(new_mmr[i])
             if current_rank != new_rank:
-                await ctx.send(f"{self.bot.get_user(int(player.strip("<@!>"))).display_name} is now in {new_rank}")
+                await ctx.send(f"{self.bot.get_user(int(player.strip('<@!>'))).display_name} is now in {new_rank}")
 
         self.mogi["locked"] = False
 
