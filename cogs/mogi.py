@@ -14,6 +14,22 @@ import dataframe_image as dfi
 from matplotlib import colors
 from io import BytesIO
 
+def calcRank(mmr):
+    ranks = [
+        {"name": "Wood", "range": (-math.inf, 0)},
+        {"name": "Bronze", "range": (0, 1499)},
+        {"name": "Silver", "range": (1400, 2999)},
+        {"name": "Gold", "range": (3000, 5099)},
+        {"name": "Platinum", "range": (5100, 6999)},
+        {"name": "Diamond", "range": (7000, 9499)},
+        {"name": "Master", "range": (9500, math.inf)},
+    ]
+    for range_info in ranks:
+        start, end = range_info["range"]
+        if start <= mmr <= end:
+            return range_info["name"]
+    return "---"
+
 default_mogi_state = {
     "status": 0,
     "voting": 0,
@@ -591,6 +607,10 @@ class mogi(commands.Cog):
                 {"discord": player.strip("<@!>")},
                 {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}},
             )
+            current_rank = calcRank(current_mmr[i])
+            new_rank = calcRank(new_mmr[i])
+            if current_rank != new_rank:
+                await ctx.send(f"{self.bot.get_user(int(player.strip("<@!>"))).display_name} is now in {new_rank}")
 
         self.mogi["locked"] = False
 
