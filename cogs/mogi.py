@@ -21,6 +21,7 @@ default_mogi_state = {
     "password": None,
     "locked": False,
     "players": [],
+    "subs": [],
     "teams": [],
     "calc": [],
     "points": [],
@@ -379,6 +380,8 @@ class mogi(commands.Cog):
         await get(ctx.guild.members, id=int(sub.strip("<@!>"))).add_roles(get(ctx.guild.roles, name="InMogi"))
         await get(ctx.guild.members, id=int(player.strip("<@!>"))).remove_roles(get(ctx.guild.roles, name="InMogi"))
 
+        self.mogi["subs"].append(sub)
+
         await ctx.respond(f"Subbed {player} with {sub} if applicable")
 
     @slash_command(name="points", description="Use after a mogi - input player points", guild_only=True)
@@ -563,6 +566,9 @@ class mogi(commands.Cog):
         deltas = [new_mmr[i] - current_mmr[i] for i in range(0, len(players))]
 
         for i, player in enumerate(players):
+            if player in self.mogi["subs"] and deltas[i] < 0:
+                await ctx.send(f"Excluded {self.bot.get_user(int(player.strip("<@!>"))).display_name} because they subbed")
+                continue
             self.players.update_one(
                 {"discord": player.strip("<@!>")}, {"$set": {"mmr": new_mmr[i]}}
             )
