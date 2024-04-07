@@ -276,7 +276,7 @@ class mogi(commands.Cog):
 
     @slash_command(name="debug_votes", guild_only=True)
     async def debug_votes(self, ctx: ApplicationContext):
-        await ctx.respond(f"""
+        await ctx.respond(f"""\n
             --Current voting-- \n
             Who voted? 
             {self.mogi['voters']} \n
