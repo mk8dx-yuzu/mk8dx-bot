@@ -14,6 +14,7 @@ import dataframe_image as dfi
 from matplotlib import colors
 from io import BytesIO
 
+
 def calcRank(mmr):
     ranks = [
         {"name": "Wood", "range": (-math.inf, 0)},
@@ -58,6 +59,8 @@ class mogi(commands.Cog):
         self.players = self.db["players"]
         self.mogi = deepcopy(default_mogi_state)
 
+        self.join_sem = asyncio.Semaphore(1)
+
     @slash_command(name="open", description="Start a new mogi", guild_only=True)
     async def open(self, ctx: ApplicationContext):
         if self.mogi["status"]:
@@ -72,21 +75,22 @@ class mogi(commands.Cog):
 
     @slash_command(name="join", description="Join the current mogi", guild_only=True)
     async def join(self, ctx: ApplicationContext):
-        if not self.mogi["status"]:
-            return await ctx.respond("Currently no mogi open")
-        if self.mogi["locked"]:
-            return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
-        if ctx.author.mention in self.mogi["players"]:
-            return await ctx.respond("You are already in the mogi")
-        if len(self.mogi["players"]) >= 12:
-            return await ctx.respond("The mogi is already full")
-        if ctx.author.mention not in self.mogi["players"]:
-            self.mogi["players"].append(ctx.author.mention)
-        if get(ctx.guild.roles, name="InMogi") not in ctx.author.roles:
-            await ctx.user.add_roles(get(ctx.guild.roles, name="InMogi"))
-        await ctx.respond(
-            f"{ctx.author.name} joined the mogi!\n{len(self.mogi['players'])} players are in!"
-        )
+        async with self.join_sem:
+            if not self.mogi["status"]:
+                return await ctx.respond("Currently no mogi open")
+            if self.mogi["locked"]:
+                return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
+            if ctx.author.mention in self.mogi["players"]:
+                return await ctx.respond("You are already in the mogi")
+            if len(self.mogi["players"]) >= 12:
+                return await ctx.respond("The mogi is already full")
+            if ctx.author.mention not in self.mogi["players"]:
+                self.mogi["players"].append(ctx.author.mention)
+            if get(ctx.guild.roles, name="InMogi") not in ctx.author.roles:
+                await ctx.user.add_roles(get(ctx.guild.roles, name="InMogi"))
+            await ctx.respond(
+                f"{ctx.author.name} joined the mogi!\n{len(self.mogi['players'])} players are in!"
+            )
 
     @slash_command(name="leave", description="Leave the current mogi", guild_only=True)
     async def leave(self, ctx: ApplicationContext):
