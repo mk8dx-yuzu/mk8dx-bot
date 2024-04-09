@@ -330,6 +330,7 @@ class mogi(commands.Cog):
 
         self.mogi["format"] = format
         self.mogi["running"] = 1
+        self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
 
         if format == "ffa":
             for i, player in enumerate(self.mogi["players"]):
@@ -347,6 +348,21 @@ class mogi(commands.Cog):
             lineup_str += f"\n `{i+1}`. {', '.join(item)}"
 
         await ctx.respond(lineup_str)
+
+    @slash_command(name="stop", description="Revert to the state before a vote was started")
+    async def stop(self, ctx: ApplicationContext):
+        if not self.mogi["running"]:
+            return await ctx.respond("No running mogi yet")
+        if len(self.mogi["points"]):
+            return await ctx.respond("The mogi is already in the process of MMR calculation")
+        self.mogi["running"] = 0
+        self.mogi["teams"] = []
+        self.mogi["format"] = ""
+        self.mogi["locked"] = False
+        self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
+        
+        await ctx.respond("The mogi has been stopped, use /start to start it again")
+
 
     @slash_command(name="teams", description="Show teams")
     async def teams(self, ctx: ApplicationContext):
