@@ -237,7 +237,7 @@ class mogi(commands.Cog):
 
                 len_players = len(self.mogi["players"])
                 max_voted = max(self.mogi["votes"], key=self.mogi["votes"].get)
-                if (len(self.mogi["voters"]) >= len_players) or (self.mogi["votes"][max_voted] >= math.ceil(len_players / 2) + 1):
+                if (len(self.mogi["voters"]) >= len_players) or (self.mogi["votes"][max_voted] >= math.floor(len_players / 2) + 1):
                     self.mogi["format"] = max_voted
                     lineup_str = ""
                     if max_voted == "ffa":
