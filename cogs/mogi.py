@@ -105,7 +105,7 @@ class mogi(commands.Cog):
         )
 
     @slash_command(name="l", description="List all players in the current mogi", guild_only=True)
-    async def l(self, ctx: ApplicationContext):
+    async def l(self, ctx: ApplicationContext, table = Option(name="table", description="Omit numbers to copy and paste into a table maker")):
         if not self.mogi["status"]:
             return await ctx.respond("Currently no open mogi")
         if not self.mogi["players"]:
@@ -125,7 +125,10 @@ class mogi(commands.Cog):
                     name = get(ctx.guild.members, id=int(player.strip("<@!>"))).display_name
                 except:
                     name = player
-            list += f"*{index+1}.* {name}\n"
+            if table:
+                list += f"{name}\n"
+            else:
+                list += f"*{index+1}.* {name}\n"
         await ctx.respond(list, allowed_mentions=discord.AllowedMentions(users=False))
 
     @slash_command(name="close", description="Stop the current Mogi if running", guild_only=True)
