@@ -105,7 +105,13 @@ class mogi(commands.Cog):
         )
 
     @slash_command(name="l", description="List all players in the current mogi", guild_only=True)
-    async def l(self, ctx: ApplicationContext, table = Option(name="table", description="Omit numbers to copy and paste into a table maker")):
+    async def l(self, ctx: ApplicationContext, 
+                table = Option(
+                    name="table", 
+                    description="Omit numbers to copy and paste into a table maker",
+                    required=False,
+                    choices = ["y"]
+                    )):
         if not self.mogi["status"]:
             return await ctx.respond("Currently no open mogi")
         if not self.mogi["players"]:
