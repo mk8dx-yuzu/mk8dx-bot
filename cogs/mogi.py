@@ -609,7 +609,13 @@ class mogi(commands.Cog):
                 await ctx.send(f"Excluded {self.bot.get_user(int(player.strip('<@!>'))).mention} because they subbed")
                 continue
             self.players.update_one(
-                {"discord": player.strip("<@!>")}, {"$set": {"mmr": new_mmr[i] if new_mmr[i] > 1 else 1}}
+                {"discord": player.strip("<@!>")}, 
+                {"$set": {
+                    "mmr": new_mmr[i]
+                      if new_mmr[i] > 1 or get(ctx.guild.roles, name="WoodLover") in get(ctx.guild.members, id=int(player.strip("<@!>"))).roles 
+                      else 1
+                    }
+                }
             )
             self.players.update_one(
                 {"discord": player.strip("<@!>")},
