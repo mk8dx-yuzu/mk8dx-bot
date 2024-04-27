@@ -198,7 +198,7 @@ class mogi(commands.Cog):
     )
     async def start(self, ctx: ApplicationContext):
         if self.mogi["voting"]:
-            return ctx.respond("Already started a vote", ephemeral=True)
+            return await ctx.respond("Already started a vote", ephemeral=True)
         if not ctx.author.mention in self.mogi["players"]:
             return await ctx.respond(
                 "You can't start a mogi you aren't in", ephemeral=True
@@ -347,6 +347,7 @@ class mogi(commands.Cog):
 
         self.mogi["format"] = format
         self.mogi["running"] = 1
+        self.mogi["voting"] = 0
         self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
 
         if format == "ffa":
