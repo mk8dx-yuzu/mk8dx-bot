@@ -241,7 +241,7 @@ class mogi(commands.Cog):
                 self.mogi["voters"].append(interaction.user.name)
                 self.mogi["votes"][selected_option] += 1
                 await interaction.followup.send(
-                    f"+1 vote for *{selected_option}* \n Debug: your raw selection data:\n{select.values}", ephemeral=True
+                    f"+1 vote for *{selected_option}*", ephemeral=True
                 )
 
                 len_players = len(self.mogi["players"])
