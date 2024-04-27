@@ -14,6 +14,7 @@ import dataframe_image as dfi
 from matplotlib import colors
 from io import BytesIO
 
+import utils.mmr_algorithm as mmr_alg
 
 def calcRank(mmr):
     ranks = [
@@ -660,15 +661,20 @@ class mogi(commands.Cog):
 
         await ctx.respond("Applied MMR changes ✅")
 
-    @slash_command(name="calc_manual", guild_only=True)
-    async def calc_manual(
+    @slash_command(name="calc_test", guild_only=True)
+    async def calc_test(
         self,
         ctx: ApplicationContext,
         format = Option(str, choices = ["1v1", "2v2", "3v3", "4v4", "5v5", "6v6"]),
-        players = Option(str, description="Player @mentions in Team Order, seperated by space (@Team1Player1 @Team1Player2)"),
-        placements = Option(str, description="Total Team (or player if FFA) placements seperated by comma and space (for 4v4: 2, 3, 1)")
+        players = Option(str, description="by lounge username"),
+        placements = Option(str, description="array")
     ):
         await ctx.response.defer()
+
+        players = ", ".split(players)
+        player_mmrs = [self.players.find_one({"name": player})['mmr'] for player in players]
+
+        return await ctx.respond(mmr_alg.calculate_mmr(player_mmrs, ", ".split(placements), int(format[0])))
 
         players: list = players.split(" ")
         size = int(format[0])

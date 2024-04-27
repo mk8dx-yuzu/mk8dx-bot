@@ -15,6 +15,13 @@ def get_mmr_delta_when_tied(team_size, mmr1, mmr2):
 
 
 def calculate_mmr(mmrs, ranking, team_size):
+    """
+        perform the mmr calculation with the lounge algorithm\n
+        arguments: 
+            mmrs: array of the players's current mmr\n
+            ranking: array that reflects the position each player in 'mmrs' got\n
+            team_size: int, how many players per team to divide the players into
+    """
     player_count = len(mmrs)
     teams = player_count // team_size
 
