@@ -671,14 +671,16 @@ class mogi(commands.Cog):
     ):
         await ctx.response.defer()
 
-        players = ", ".split(players)
-        player_mmrs = [self.players.find_one({"name": player})['mmr'] for player in players]
+        all_players = players.split(", ")
+        player_mmrs = []
+        for player in all_players:
+            player_mmrs.append(self.players.find_one({"name": player})['mmr'])
 
-        return await ctx.respond(mmr_alg.calculate_mmr(player_mmrs, ", ".split(placements), int(format[0])))
+        return await ctx.respond(mmr_alg.calculate_mmr(player_mmrs, placements.split(", "), int(format[0])))
 
-        players: list = players.split(" ")
+        all_players: list = all_players.split(" ")
         size = int(format[0])
-        teams =  [players[i:i+size] for i in range(0, len(players), size)]
+        teams =  [all_players[i:i+size] for i in range(0, len(all_players), size)]
         rate_teams = []
         for team in teams:
             rate_team = []
@@ -702,21 +704,21 @@ class mogi(commands.Cog):
         for team in results:
             new_mmr.append([round(player.mu) for player in team])
         
-        players = [
+        all_players = [
             self.players.find_one({"discord": player.strip("<@!>")})["name"]
-            for player in players
+            for player in all_players
         ]
         current_mmr = [
             round(self.players.find_one({"name": player})["mmr"])
-            for player in players
+            for player in all_players
         ]
         new_mmr = [val for sublist in new_mmr for val in sublist]
 
         data = {
-            "Player": players,
+            "Player": all_players,
             "MMR": current_mmr,
             "Change": [
-                round(new_mmr[i] - current_mmr[i]) for i in range(0, len(players))
+                round(new_mmr[i] - current_mmr[i]) for i in range(0, len(all_players))
             ],
             "New MMR": new_mmr,
         }
