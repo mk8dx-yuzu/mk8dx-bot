@@ -370,7 +370,7 @@ class mogi(commands.Cog):
     @slash_command(name="stop", description="Revert to the state before a vote was started")
     async def stop(self, ctx: ApplicationContext):
         if not self.mogi["running"]:
-            return await ctx.respond("No running mogi yet")
+            return await ctx.respond("No running mogi yet. if vote is still in process, it needs to end or be force started before it can be stopped")
         if len(self.mogi["points"]):
             return await ctx.respond("The mogi is already in the process of MMR calculation")
         self.mogi["running"] = 0
