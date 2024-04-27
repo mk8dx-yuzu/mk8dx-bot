@@ -185,7 +185,6 @@ class mogi(commands.Cog):
         if not new:
             return await ctx.respond(f"Current password: ```{self.mogi['password']}```")
         self.mogi["password"] = new
-        print(new, self.mogi["password"])
         await ctx.respond("Updated password")
 
     @slash_command(name="status", description="See current state of mogi")
@@ -290,14 +289,16 @@ class mogi(commands.Cog):
     @slash_command(name="debug_votes", guild_only=True)
     async def debug_votes(self, ctx: ApplicationContext):
         missing = []
-        players = [int(player.strip("<@!>") for player in self.mogi["players"])]
+        players = []
+        for player in self.mogi['players']:
+            players.append(int(player.strip("<@!>")))
         for player in players:
             if player not in self.mogi["voters"]:
                 missing.append(player)
         if missing:
-            string = f"**{len(missing)} players haven't voted yet** \n"
+            string = f"**{len(missing)} player(s) haven't voted yet** \n"
             for missing_player in missing:
-                string.append(f"{get(ctx.guild.members, id=missing_player).mention}\n")
+                string += f"{get(ctx.guild.members, id=missing_player).mention}\n"
             await ctx.respond(string)
         else: 
             await ctx.respond("No missing votes")
