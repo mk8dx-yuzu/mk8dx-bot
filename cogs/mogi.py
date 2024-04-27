@@ -14,7 +14,7 @@ import dataframe_image as dfi
 from matplotlib import colors
 from io import BytesIO
 
-import utils.mmr_algorithm as mmr_alg
+import cogs.extras.mmr_algorithm as mmr_alg
 
 def calcRank(mmr):
     ranks = [
