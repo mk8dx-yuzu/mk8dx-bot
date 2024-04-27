@@ -228,7 +228,7 @@ class mogi(commands.Cog):
 
             @discord.ui.select(options=options)
             async def select_callback(self, select: discord.ui.Select, interaction: discord.Interaction):
-                if interaction.response.is_done():
+                if interaction.response.is_done() or interaction.user.id in self.mogi['voters']:
                     return await interaction.followup.send("You already voted", ephemeral=True)
                 await interaction.response.defer()
                 if interaction.user.mention not in self.mogi["players"]:
@@ -238,7 +238,7 @@ class mogi(commands.Cog):
                         "Mogi already decided, voting is closed", ephemeral=True
                     )
                 selected_option = select.values[0]
-                self.mogi["voters"].append(interaction.user.name)
+                self.mogi["voters"].append(interaction.user.id)
                 self.mogi["votes"][selected_option] += 1
                 await interaction.followup.send(
                     f"+1 vote for *{selected_option}*", ephemeral=True
@@ -289,13 +289,20 @@ class mogi(commands.Cog):
 
     @slash_command(name="debug_votes", guild_only=True)
     async def debug_votes(self, ctx: ApplicationContext):
-        await ctx.respond(f"""\n
-            --Current voting-- \n
-            Who voted? 
-            {self.mogi['voters']} \n
-            What are the votes?
-            {self.mogi['votes']}
-    """)
+        missing = []
+        players = [int(player.strip("<@!>") for player in self.mogi["players"])]
+        for player in players:
+            if player not in self.mogi["voters"]:
+                missing.append(player)
+        if missing:
+            string = f"**{len(missing)} players haven't voted yet** \n"
+            for missing_player in missing:
+                string.append(f"{get(ctx.guild.members, id=missing_player).mention}\n")
+            await ctx.respond(string)
+        else: 
+            await ctx.respond("No missing votes")
+
+        await ctx.send(self.mogi['votes'])
 
     @slash_command(name="tags", description="assign team roles", guild_only=True)
     async def tags(self, ctx: ApplicationContext):
