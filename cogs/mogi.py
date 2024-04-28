@@ -680,6 +680,8 @@ class mogi(commands.Cog):
         await ctx.send(f"{player_mmrs}; {[int(spot) for spot in placements.split(', ')]}; {int(format[0])}")
         await ctx.send(f"{deltas}")
 
+        deltas = [element for element in deltas for _ in range(int(format[0]))]
+
         data = {
             "Player": all_players,
             "MMR": player_mmrs,
