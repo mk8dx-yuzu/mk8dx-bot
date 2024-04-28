@@ -676,51 +676,13 @@ class mogi(commands.Cog):
         for player in all_players:
             player_mmrs.append(self.players.find_one({"name": player})['mmr'])
 
-        return await ctx.respond(mmr_alg.calculate_mmr(player_mmrs, placements.split(", "), int(format[0])))
-
-        all_players: list = all_players.split(" ")
-        size = int(format[0])
-        teams =  [all_players[i:i+size] for i in range(0, len(all_players), size)]
-        rate_teams = []
-        for team in teams:
-            rate_team = []
-            for player in team:
-                rate_team.append(Rating(self.players.find_one({"discord": player.strip('<@!>')})['mmr'], 100))
-            rate_teams.append(rate_team)
-
-        global_env()
-        trueskill.setup(
-            mu=2000,
-            sigma=100,
-            beta=9000,
-            tau=950,
-            draw_probability=0.01,
-            backend=None,
-            env=None,
-        )
-
-        results = rate(rate_teams, placements.split(", "))
-        new_mmr = []
-        for team in results:
-            new_mmr.append([round(player.mu) for player in team])
-        
-        all_players = [
-            self.players.find_one({"discord": player.strip("<@!>")})["name"]
-            for player in all_players
-        ]
-        current_mmr = [
-            round(self.players.find_one({"name": player})["mmr"])
-            for player in all_players
-        ]
-        new_mmr = [val for sublist in new_mmr for val in sublist]
+        deltas = mmr_alg.calculate_mmr(player_mmrs, placements.split(", "), int(format[0]))
 
         data = {
             "Player": all_players,
-            "MMR": current_mmr,
-            "Change": [
-                round(new_mmr[i] - current_mmr[i]) for i in range(0, len(all_players))
-            ],
-            "New MMR": new_mmr,
+            "MMR": player_mmrs,
+            "Change": deltas,
+            "New MMR": [player_mmrs[i] + deltas[i] for i in range(0, len(all_players))],
         }
         df = pd.DataFrame(data).set_index("Player")
         df = df.sort_values(by="Change", ascending=False)
