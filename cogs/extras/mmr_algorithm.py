@@ -14,7 +14,7 @@ def get_mmr_delta_when_tied(team_size, mmr1, mmr2):
     return caps[team_size] / (1 + math.pow(11, -(abs(mmr1 - mmr2) - offsets[team_size]) / scaling_factors[team_size])) - (caps[team_size] / 3)
 
 
-def calculate_mmr(mmrs, ranking, team_size):
+def calculate_mmr(mmrs: list, ranking: list, team_size: int):
     """
         perform the mmr calculation with the lounge algorithm\n
         arguments: 
@@ -68,8 +68,6 @@ def calculate_mmr(mmrs, ranking, team_size):
     return mmr_deltas
 
 
-#calculate_mmr([14876, 15150, 14114, 13783, 11737, 10868,
-#              11066, 15309, 13969, 10928, 11322, 12800], [1, 2, 3, 4], 3)
+#calculate_mmr([14876, 15150, 14114, 13783, 11737, 10868, 11066, 15309, 13969, 10928, 11322, 12800], [1, 2, 3, 4], 3)
 
-#calculate_mmr([15074, 15155, 15997, 12636, 14305, 14583, 14138,
-#              14169, 13889, 15973, 13060, 13536], [1, 2, 2, 4, 5, 6], 2)
+#calculate_mmr([15074, 15155, 15997, 12636, 14305, 14583, 14138, 14169, 13889, 15973, 13060, 13536], [1, 2, 2, 4, 5, 6], 2)
