@@ -455,6 +455,7 @@ class mogi(commands.Cog):
             def __init__(self, mogi, db, *args, **kwargs):
                 super().__init__(*args, **kwargs)
                 self.mogi = mogi
+                self.db = db
 
                 self.mogi["point_count"] = 0
                 for player in self.mogi["players"]:
@@ -475,8 +476,8 @@ class mogi(commands.Cog):
                     mogi["input_points"].append(int(self.children[i].value))
                         
                 if mogi["format"] == "ffa":
-                    for i in mogi["input_points"]:
-                        mogi["points"].append([i])
+                    for i in range(0, len(self.children)):
+                        mogi["points"].append([int(self.children[i].value)])
                 else:
                     size = int(mogi["format"][0])
                     points = []
@@ -496,7 +497,7 @@ class mogi(commands.Cog):
 
         if len(self.mogi["players"]) > len(self.mogi["calc"]):
             modal = MogiModal(
-                self.mogi, self.db, title="Input player points after match"
+                mogi=self.mogi, db=self.db, title="Input player points after match"
             )
             await ctx.send_modal(modal)
         else:
