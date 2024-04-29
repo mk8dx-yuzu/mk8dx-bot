@@ -352,6 +352,7 @@ class mogi(commands.Cog):
         self.mogi["running"] = 1
         self.mogi["voting"] = 0
         self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
+        self.mogi["voters"] = []
 
         if format == "ffa":
             for i, player in enumerate(self.mogi["players"]):
@@ -381,8 +382,11 @@ class mogi(commands.Cog):
         self.mogi["format"] = ""
         self.mogi["locked"] = False
         self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
+        self.mogi["voters"] = []
+        self.mogi["voting"] = 0
         
         await ctx.respond("The mogi has been stopped, use /start to start it again")
+        await ctx.send(f"Debug:\nVotes:{self.mogi['votes']}")
 
 
     @slash_command(name="teams", description="Show teams")
