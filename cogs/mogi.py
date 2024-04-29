@@ -38,7 +38,7 @@ default_mogi_state = {
     "running": 0,
     "password": None,
     "locked": False,
-    "players": [],
+    "players": ["<@158211736791547904>", "<@537735001832292383>", "<@144613162891608064>", "<@769525682039947314>", "<@542230886796623883>", "<@319102468137156609>"],
     "subs": [],
     "teams": [],
     "calc": [],
@@ -472,8 +472,7 @@ class mogi(commands.Cog):
                 mogi=self.mogi,
             ):
                 for i in range(0, len(self.children)):
-                    if self.children[i].value:
-                        mogi["input_points"].append(int(self.children[i].value))
+                    mogi["input_points"].append(int(self.children[i].value))
                         
                 if mogi["format"] == "ffa":
                     for i in mogi["input_points"]:
@@ -482,10 +481,9 @@ class mogi(commands.Cog):
                     size = int(mogi["format"][0])
                     points = []
                     if len(mogi["input_points"]) % size == 0:
-                        for i in range(0, len(self.children)):
-                            points.append(int(self.children[i].value))
-                        for i in range(0, len(points), size):
+                        for i in range(0, len(mogi["input_points"]), size):
                             mogi["points"].append(points[i : i + size])
+                            del mogi["input_points"][i : i + size]
 
                 await interaction.response.send_message(
                     """
