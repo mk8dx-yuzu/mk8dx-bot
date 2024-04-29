@@ -43,6 +43,8 @@ default_mogi_state = {
     "teams": [],
     "calc": [],
     "points": [],
+    "input_points": [],
+    "point_count": 0,
     "format": "",
     "results": [],
     "placements": [],
@@ -450,32 +452,37 @@ class mogi(commands.Cog):
                 super().__init__(*args, **kwargs)
                 self.mogi = mogi
 
-                count = 0
+                self.mogi["point_count"] = 0
                 for player in self.mogi["players"]:
-                    if player not in mogi["calc"] and count < 4:
+                    if player not in mogi["calc"] and self.mogi["point_count"] < 4:
                         mentioned_user = db["players"].find_one(
                             {"discord": player.strip("<@!>")}
                         )["name"]
                         self.add_item(InputText(label = mentioned_user))
                         mogi["calc"].append(player)
-                        count += 1
+                        self.mogi["point_count"] += 1
 
             async def callback(
                 self: Modal = Modal,
                 interaction: Interaction = Interaction,
                 mogi=self.mogi,
             ):
+                for i in range(0, len(self.children)):
+                    if self.children[i].value:
+                        mogi["input_points"].append(int(self.children[i].value))
+                        
                 if mogi["format"] == "ffa":
-                    for i in range(0, len(self.children)):
-                        mogi["points"].append([int(self.children[i].value)])
+                    for i in mogi["input_points"]:
+                        mogi["points"].append([i])
                 else:
                     size = int(mogi["format"][0])
                     points = []
-                    if len(mogi["points"]) % size == 0:
+                    if len(mogi["input_points"]) % size == 0:
                         for i in range(0, len(self.children)):
                             points.append(int(self.children[i].value))
                         for i in range(0, len(points), size):
                             mogi["points"].append(points[i : i + size])
+
                 await interaction.response.send_message(
                     """
                     Points have been collected. 
