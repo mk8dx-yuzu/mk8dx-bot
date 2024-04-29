@@ -499,6 +499,13 @@ class mogi(commands.Cog):
             await ctx.send_modal(modal)
         else:
             return await ctx.respond("Already got all calcs")
+        
+    @slash_command(name="points_reset", description="Messed up points input? Reset them")
+    async def points_reset(self, ctx: ApplicationContext):
+        self.mogi["input_points"] = []
+        self.mogi["points"] = []
+        self.mogi["calc"] = []
+        await ctx.respond("Clear all points")
 
     @slash_command(
         name="calc", description="Use after using /points to calculate new mmr", guild_only=True
