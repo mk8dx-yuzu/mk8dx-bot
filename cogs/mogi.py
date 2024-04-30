@@ -688,8 +688,9 @@ class mogi(commands.Cog):
         self,
         ctx: ApplicationContext,
         format = Option(str, choices = ["1v1", "2v2", "3v3", "4v4", "5v5", "6v6"]),
-        players = Option(str, description="by lounge username"),
-        placements = Option(str, description="array")
+        players = Option(str, description = "by lounge username"),
+        placements = Option(str, description = "array"),
+        upscale = Option(str, description = "multiply gains by 1.3x", required = False, choices = ["y"])
     ):
         await ctx.response.defer()
 
@@ -699,6 +700,9 @@ class mogi(commands.Cog):
             player_mmrs.append(self.players.find_one({"name": player})['mmr'])
 
         deltas = mmr_alg.calculate_mmr(player_mmrs, placements.split(", "), int(format[0]))
+        if upscale:
+            deltas = [1.3 * score if score > 0 else score for score in deltas]
+
         await ctx.send(f"{player_mmrs}; {[int(spot) for spot in placements.split(', ')]}; {int(format[0])}")
         await ctx.send(f"{deltas}")
 
