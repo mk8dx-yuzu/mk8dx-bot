@@ -354,6 +354,7 @@ class mogi(commands.Cog):
 
         self.mogi["format"] = format
         self.mogi["running"] = 1
+        self.mogi["locked"] = True
         self.mogi["voting"] = 0
         self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
         self.mogi["voters"] = []
