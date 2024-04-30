@@ -64,6 +64,10 @@ class mogi(commands.Cog):
 
         self.join_sem = asyncio.Semaphore(1)
 
+    @slash_command(name="debug", description="print all data in order to debug")
+    async def debug(self, ctx: ApplicationContext):
+        await ctx.respond(f"{self.mogi}")
+
     @slash_command(name="open", description="Start a new mogi", guild_only=True)
     async def open(self, ctx: ApplicationContext):
         if self.mogi["status"]:
