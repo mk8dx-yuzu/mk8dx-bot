@@ -481,10 +481,9 @@ class mogi(commands.Cog):
                         mogi["points"].append([int(self.children[i].value)])
                 else:
                     size = int(mogi["format"][0])
-                    points = []
                     if len(mogi["input_points"]) % size == 0:
                         for i in range(0, len(mogi["input_points"]), size):
-                            mogi["points"].append(points[i : i + size])
+                            mogi["points"].append(mogi["input_points"][i : i + size])
                         mogi["input_points"].clear()
 
                 await interaction.response.send_message(
