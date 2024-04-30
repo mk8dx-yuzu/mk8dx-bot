@@ -702,7 +702,7 @@ class mogi(commands.Cog):
 
         deltas = mmr_alg.calculate_mmr(player_mmrs, placements.split(", "), int(format[0]))
         if True or upscale == "y":
-            deltas = [1.3 * score if score > 0 else score for score in deltas]
+            deltas = [math.ceil(1.3 * score) if score > 0 else score for score in deltas]
 
         await ctx.send(f"{player_mmrs}; {[int(spot) for spot in placements.split(', ')]}; {int(format[0])}")
         await ctx.send(f"{deltas}")
