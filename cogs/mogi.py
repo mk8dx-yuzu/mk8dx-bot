@@ -457,15 +457,15 @@ class mogi(commands.Cog):
                 self.mogi = mogi
                 self.db = db
 
-                self.mogi["point_count"] = 0
+                count = 0
                 for player in self.mogi["players"]:
-                    if player not in mogi["calc"] and self.mogi["point_count"] < 4:
+                    if player not in mogi["calc"] and count < 4:
                         mentioned_user = db["players"].find_one(
                             {"discord": player.strip("<@!>")}
                         )["name"]
                         self.add_item(InputText(label = mentioned_user))
                         mogi["calc"].append(player)
-                        self.mogi["point_count"] += 1
+                        count += 1
 
             async def callback(
                 self: Modal = Modal,
@@ -474,6 +474,7 @@ class mogi(commands.Cog):
             ):
                 for i in range(0, len(self.children)):
                     mogi["input_points"].append(int(self.children[i].value))
+                    self.mogi["point_count"] += 1
                         
                 if mogi["format"] == "ffa":
                     for i in range(0, len(self.children)):
@@ -484,7 +485,7 @@ class mogi(commands.Cog):
                     if len(mogi["input_points"]) % size == 0:
                         for i in range(0, len(mogi["input_points"]), size):
                             mogi["points"].append(points[i : i + size])
-                            del mogi["input_points"][i : i + size]
+                        mogi["input_points"].clear()
 
                 await interaction.response.send_message(
                     """
