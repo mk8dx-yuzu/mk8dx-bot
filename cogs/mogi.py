@@ -693,6 +693,7 @@ class mogi(commands.Cog):
         upscale = Option(str, description = "multiply gains by 1.3x", required = True, choices = ["y", "n"])
     ):
         await ctx.response.defer()
+        await ctx.send("test")
 
         all_players = players.split(", ")
         player_mmrs = []
