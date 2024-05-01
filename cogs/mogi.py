@@ -314,12 +314,15 @@ class mogi(commands.Cog):
 
     @slash_command(name="tags", description="assign team roles", guild_only=True)
     async def tags(self, ctx: ApplicationContext):
+        await ctx.response.defer()
         if not self.mogi["format"]:
             return ctx.respond("No format chosen yet")
         if self.mogi["format"] != "ffa":
             for i, team in enumerate(self.mogi["teams"]):
+                await ctx.send(f"team: {team} index: {i}")
                 for player in team:
-                    await ctx.guild.fetch_member(int(player.strip("<@!>"))).add_roles(
+                    await ctx.send(f"member: {get(ctx.guild.members, id=int(player.strip("<@!>")))} role: {get(ctx.guild.roles, name=f"Team {i+1}")}")
+                    await get(ctx.guild.members, id=int(player.strip("<@!>"))).add_roles(
                         get(ctx.guild.roles, name=f"Team {i+1}")
                     )
             return await ctx.respond("Assigned team roles")
@@ -327,8 +330,10 @@ class mogi(commands.Cog):
 
     @slash_command(name="untag", guild_only=True)
     async def untag(self, ctx: ApplicationContext):
+        await ctx.response.defer()
         for i in [1, 2, 3, 4, 5]:
             for member in ctx.guild.members:
+                await ctx.send(member.roles)
                 if get(ctx.guild.roles, name=f"Team {i}") in member.roles:
                     await member.remove_roles(get(ctx.guild.roles, name=f"Team {i}"))
 
