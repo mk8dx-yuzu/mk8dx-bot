@@ -548,13 +548,6 @@ class mogi(commands.Cog):
         scores = []
         for team_point_arr in self.mogi["points"]:
             scores.append([sum(team_point_arr)])
-
-        """placement_map = {}
-        for i, score in enumerate(sorted(scores, reverse=True)):
-            if score not in placement_map:
-                placement_map[score] = i + 1
-
-        placements = [placement_map[score] for score in scores]"""
         
         ranks_dict = {}
         placements = []
