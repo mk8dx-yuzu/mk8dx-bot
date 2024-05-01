@@ -64,13 +64,9 @@ class mogi(commands.Cog):
         self.mogi = deepcopy(default_mogi_state)
 
         self.join_sem = asyncio.Semaphore(1)
-
-    @slash_command(name="debug", description="print all data in order to debug")
-    async def debug(self, ctx: ApplicationContext):
-        await ctx.respond(f"{self.mogi}")
     
-    @slash_command(name = "tag", description = "set a tag for a team")
-    async def tag(
+    @slash_command(name = "funnynumber", description = "set a tag for a team")
+    async def funnynumber(
         self, 
         ctx: ApplicationContext, 
         teamnumber = Option(int, name = "teamnumber", description = "which team's tag to set"), 
