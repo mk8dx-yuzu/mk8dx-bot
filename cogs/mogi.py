@@ -139,7 +139,7 @@ class mogi(commands.Cog):
                 except:
                     name = player
             if table:
-                list += f"{name}\n"
+                list += f"{name} + \n\n"
             else:
                 list += f"*{index+1}.* {name}\n"
         await ctx.respond(list, allowed_mentions=discord.AllowedMentions(users=False))
