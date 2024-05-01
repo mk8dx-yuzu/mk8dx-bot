@@ -745,21 +745,21 @@ class mogi(commands.Cog):
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
 
-    @commands.group(name="test", description="this is a test for so called command groups")
-    async def test(self, ctx):
+    @commands.group(name="testing", description="this is a test for so called command groups")
+    async def testing(self, ctx):
         """This group contains commands for basic math operations."""
         if ctx.invoked_subcommand is None:
             await ctx.respond_async(
                 "Please specify a subcommand: 'add' or 'subtract'.", ephemeral=True
             )
 
-    @test.command(name="add", description="Adds two numbers together.")
+    @testing.command(name="add", description="Adds two numbers together.")
     async def add(self, ctx, num1: int, num2: int):
         """Adds the specified numbers and returns the result."""
         result = num1 + num2
         await ctx.respond(f"{num1} + {num2} = {result}")
 
-    @test.command(name="subtract", description="Subtracts one number from another.")
+    @testing.command(name="subtract", description="Subtracts one number from another.")
     async def subtract(self, ctx, num1: int, num2: int):
         """Subtracts the second number from the first and returns the result."""
         result = num1 - num2
