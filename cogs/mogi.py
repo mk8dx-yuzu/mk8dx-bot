@@ -321,7 +321,7 @@ class mogi(commands.Cog):
             for i, team in enumerate(self.mogi["teams"]):
                 await ctx.send(f"team: {team} index: {i}")
                 for player in team:
-                    await ctx.send(f"member: {get(ctx.guild.members, id=int(player.strip("<@!>")))} role: {get(ctx.guild.roles, name=f"Team {i+1}")}")
+                    await ctx.send(f"member: {get(ctx.guild.members, id=int(player.strip('<@!>')))} role: {get(ctx.guild.roles, name=f'Team {i+1}')}")
                     await get(ctx.guild.members, id=int(player.strip("<@!>"))).add_roles(
                         get(ctx.guild.roles, name=f"Team {i+1}")
                     )
