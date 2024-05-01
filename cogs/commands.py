@@ -29,12 +29,12 @@ class commandos(commands.Cog):
 
     bar = discord.SlashCommandGroup("bar", "This does something else...")
 
-    @bar.command(name="testing")
-    async def testing(self, ctx: discord.ApplicationContext):
+    @bar.command(name="qwertz")
+    async def qwertz(self, ctx: discord.ApplicationContext):
         await ctx.respond("pong")
 
-    @bar.command(name="testing2")
-    async def testing(self, ctx: discord.ApplicationContext):
+    @bar.command(name="qwerty")
+    async def qwerty(self, ctx: discord.ApplicationContext):
         await ctx.respond("pong2")
 
 def setup(bot: commands.Bot):
