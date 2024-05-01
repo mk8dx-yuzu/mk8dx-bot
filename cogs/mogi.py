@@ -419,7 +419,7 @@ class mogi(commands.Cog):
                 lineup_str += f"{self.mogi['team_tags'][i]}\n"
                 team = [get(ctx.guild.members, id=int(player.strip('<@!>'))).display_name for player in team]
                 for player in team:   
-                    lineup_str += f"{player} + \n"
+                    lineup_str += f"{player} +\n"
                 lineup_str += "\n"
                     
         await ctx.respond(lineup_str)
