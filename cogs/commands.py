@@ -27,7 +27,7 @@ class commandos(commands.Cog):
     async def coin(self, ctx: commands.Context):
         await ctx.send(f"{ctx.author.display_name} flipped a coin, it turned up {'heads' if random.random() > 0.5 else 'tails'}")
 
-    bar = discord.SlashCommandGroup("bar", "This does something else...")
+    """bar = discord.SlashCommandGroup("bar", "This does something else...")
 
     @bar.command(name="qwertz")
     async def qwertz(self, ctx: discord.ApplicationContext):
@@ -36,6 +36,6 @@ class commandos(commands.Cog):
     @bar.command(name="qwerty")
     async def qwerty(self, ctx: discord.ApplicationContext):
         await ctx.respond("pong2")
-
+    """
 def setup(bot: commands.Bot):
     bot.add_cog(commandos(bot))
