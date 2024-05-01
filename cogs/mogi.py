@@ -535,12 +535,15 @@ class mogi(commands.Cog):
             env=None,
         )
 
+        new_algo_players = []
+
         calc_teams = []
         for team in self.mogi["teams"]:
             calc_team = []
             for player in team:
                 mmr = self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
                 calc_team.append(Rating(mmr, 100))
+                new_algo_players.append(mmr)
             calc_teams.append(calc_team)
         scores = []
         for team_point_arr in self.mogi["points"]:
@@ -562,6 +565,10 @@ class mogi(commands.Cog):
         self.mogi["placements"] = placements
 
         new_ratings = rate(calc_teams, placements)
+
+        form = self.mogi['format'][0]
+        new_new_ratings = mmr_alg.calculate_mmr(new_algo_players, placements, int(form) if form != "f" else 1 )
+        await ctx.send(f"Hypothetical lounge-algoritm (soon new system) output: {new_new_ratings}")
 
         for team in new_ratings:
             self.mogi["results"].append([round(player.mu) for player in team])
