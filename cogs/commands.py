@@ -20,7 +20,7 @@ class commandos(commands.Cog):
         print("Closed http session")
 
     @commands.command()
-    async def test(self, ctx: commands.Context):
+    async def hi(self, ctx: commands.Context):
         await ctx.send("Hi")
 
     @commands.command()
