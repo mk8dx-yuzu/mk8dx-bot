@@ -330,7 +330,6 @@ class mogi(commands.Cog):
             return ctx.respond("No format chosen yet")
         if self.mogi["format"] != "ffa":
             for i, team in enumerate(self.mogi["teams"]):
-                await ctx.send(f"team: {team} index: {i}")
                 for player in team:
                     await get(ctx.guild.members, id=int(player.strip("<@!>"))).add_roles(
                         get(ctx.guild.roles, name=f"Team {i+1}")
