@@ -333,7 +333,6 @@ class mogi(commands.Cog):
         await ctx.response.defer()
         for i in [1, 2, 3, 4, 5]:
             for member in ctx.guild.members:
-                await ctx.send(member.roles)
                 if get(ctx.guild.roles, name=f"Team {i}") in member.roles:
                     await member.remove_roles(get(ctx.guild.roles, name=f"Team {i}"))
 
