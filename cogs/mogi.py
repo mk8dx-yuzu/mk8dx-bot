@@ -745,7 +745,7 @@ class mogi(commands.Cog):
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
 
-    @commands.group("test", "this is a test for so called command groups")
+    @commands.group(name="test", description="this is a test for so called command groups")
     async def test(self, ctx):
         """This group contains commands for basic math operations."""
         if ctx.invoked_subcommand is None:
