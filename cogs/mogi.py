@@ -340,6 +340,7 @@ class mogi(commands.Cog):
             for member in ctx.guild.members:
                 if get(ctx.guild.roles, name=f"Team {i}") in member.roles:
                     await member.remove_roles(get(ctx.guild.roles, name=f"Team {i}"))
+        await ctx.send("Remove any team roles")
 
     @slash_command(
         name="force_start",
