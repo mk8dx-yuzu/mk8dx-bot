@@ -65,8 +65,8 @@ class mogi(commands.Cog):
 
         self.join_sem = asyncio.Semaphore(1)
     
-    @slash_command(name = "funnynumber", description = "set a tag for a team")
-    async def funnynumber(
+    @slash_command(name = "set_tag", description = "set a tag for a team")
+    async def set_tag(
         self, 
         ctx: ApplicationContext, 
         teamnumber = Option(int, name = "teamnumber", description = "which team's tag to set"), 
