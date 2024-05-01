@@ -18,19 +18,17 @@ class events(commands.Cog):
     async def on_message(self, message: discord.Message):
         if message.author == self.bot.user:
             return
+        
         if "dk summit" in message.content.lower() and random.random() < 0.4:
             await message.channel.send(random.choice(["DDDDKKKK SUMIIIIT", "dk summit mentioned", "best track in the game"]))
         if " election" in message.content.lower() and random.random() < 0.5:
             await message.channel.send(":flag_us:")
 
-    @commands.Cog.listener()
-    async def on_dm(self, message: discord.Message):
-        if message.channel.type != discord.ChannelType.private or message.author == self.bot.user:
-            return
-        for hint in ["high", "seas", "see", "yuzu", "download", "link"]:
-            if hint in message.content.lower():
-                await message.channel.send(f"{os.getenv('YUZU_URL')}")
-                await message.channel.send("Please do not share this link with others so that it stays away from big N's eyes. Instead hint others at asking me here in DMs. Thank you")
+        if message.channel.type == discord.ChannelType.private :
+            for hint in ["high", "seas", "see", "yuzu", "download", "link"]:
+                if hint in message.content.lower():
+                    await message.channel.send(f"{os.getenv('YUZU_URL')}")
+                    await message.channel.send("Please do not share this link with others so that it stays away from big N's eyes. Instead hint others at asking me here in DMs. Thank you")
 
 def setup(bot: commands.Bot):
     bot.add_cog(events(bot))
