@@ -41,6 +41,7 @@ default_mogi_state = {
     "players": [],
     "subs": [],
     "teams": [],
+    "team_tags": [f"Team {i+1}" for i in range(5)],
     "calc": [],
     "points": [],
     "input_points": [],
@@ -67,6 +68,16 @@ class mogi(commands.Cog):
     @slash_command(name="debug", description="print all data in order to debug")
     async def debug(self, ctx: ApplicationContext):
         await ctx.respond(f"{self.mogi}")
+    
+    @slash_command(name = "set_tag", description = "set a tag for a team")
+    async def set_tag(
+        self, 
+        ctx: ApplicationContext, 
+        teamnumber = Option(int, name = "teamnumber", description = "which team's tag to set"), 
+        tag = Option(str, name = "tag", description = "which tag to set")
+        ):
+        self.mogi["team_tags"][int(teamnumber)-1] = tag
+        await ctx.respond(f"Updated Team {teamnumber}'s tag to {tag}")
 
     @slash_command(name="open", description="Start a new mogi", guild_only=True)
     async def open(self, ctx: ApplicationContext):
@@ -398,28 +409,22 @@ class mogi(commands.Cog):
 
 
     @slash_command(name="teams", description="Show teams")
-    async def teams(self, ctx: ApplicationContext, table = Option(
-                    name="table", 
-                    description="Omit numbers to copy and paste into a table maker",
-                    required=False,
-                    choices = ["y"]
-                    )):
+    async def teams(self, ctx: ApplicationContext):
         if not self.mogi["status"]:
             return await ctx.respond("No open mogi", ephemeral=True)
         if not len(self.mogi["teams"]):
             return await ctx.respond("No teams decided yet", ephemeral=True)
-        lineup_str = "# Teams \n"
+        lineup_str = "# Teams \n\n"
         if self.mogi["format"] == "ffa":
             for i, player in enumerate(self.mogi["players"]):
                 lineup_str += f"`{i+1}:` {get(ctx.guild.members, id=int(player.strip('<@!>'))).display_name}\n"
         else:
-            for i, item in enumerate(self.mogi["teams"]):
-                if table:
-                    lineup_str += "\n"
-                    for player in item:
-                        lineup_str += f"{player}\n"
-                else:
-                    lineup_str += f"\n `{i+1}`. {', '.join(item)}"
+            for i, team in enumerate(self.mogi["teams"]):
+                lineup_str += self.mogi["team_tags"][i]
+                team = [get(ctx.guild.members, id=int(player.strip('<@!>'))).display_name for player in team]
+                for player in team:   
+                    lineup_str += f"{player} + \n"
+                lineup_str += "\n\n"
                     
         await ctx.respond(lineup_str)
 
