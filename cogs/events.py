@@ -28,7 +28,7 @@ class events(commands.Cog):
             for hint in ["high", "seas", "see", "yuzu", "download", "link"]:
                 if hint in message.content.lower():
                     await message.channel.send(f"{os.getenv('YUZU_URL')}")
-                    await message.channel.send("Please do not share this link with others so that it stays away from big N's eyes. Instead hint others at asking me here in DMs. Thank you")
+                    return await message.channel.send("Please do not share this link with others so that it stays away from big N's eyes. Instead hint others at asking me here in DMs. Thank you")
 
 def setup(bot: commands.Bot):
     bot.add_cog(events(bot))
