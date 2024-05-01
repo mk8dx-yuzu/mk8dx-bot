@@ -398,7 +398,12 @@ class mogi(commands.Cog):
 
 
     @slash_command(name="teams", description="Show teams")
-    async def teams(self, ctx: ApplicationContext):
+    async def teams(self, ctx: ApplicationContext, table = Option(
+                    name="table", 
+                    description="Omit numbers to copy and paste into a table maker",
+                    required=False,
+                    choices = ["y"]
+                    )):
         if not self.mogi["status"]:
             return await ctx.respond("No open mogi", ephemeral=True)
         if not len(self.mogi["teams"]):
@@ -409,7 +414,13 @@ class mogi(commands.Cog):
                 lineup_str += f"`{i+1}:` {get(ctx.guild.members, id=int(player.strip('<@!>'))).display_name}\n"
         else:
             for i, item in enumerate(self.mogi["teams"]):
-                lineup_str += f"\n `{i+1}`. {', '.join(item)}"
+                if table:
+                    lineup_str += "\n"
+                    for player in item:
+                        lineup_str += f"{player}\n"
+                else:
+                    lineup_str += f"\n `{i+1}`. {', '.join(item)}"
+                    
         await ctx.respond(lineup_str)
 
     @slash_command(name="sub", description="Replace a player in the mogi", guild_only=True)
