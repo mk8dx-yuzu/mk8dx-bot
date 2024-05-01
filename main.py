@@ -30,6 +30,9 @@ bot = customBot(
     status=discord.Status.online, activity=discord.Streaming(name="ones and zeroes", url="https://www.youtube.com/watch?v=xvFZjo5PgG0")
 )
 
+votes = bot.create_group("votes", "commands related to voting the format in mogis")
+bot.add_application_command(votes)
+
 @tasks.loop(seconds=15)
 async def change_activity():
     activities = [
