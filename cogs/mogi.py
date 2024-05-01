@@ -69,8 +69,8 @@ class mogi(commands.Cog):
     async def debug(self, ctx: ApplicationContext):
         await ctx.respond(f"{self.mogi}")
     
-    @slash_command(name = "set_tag", description = "set a tag for a team")
-    async def set_tag(
+    @slash_command(name = "tag", description = "set a tag for a team")
+    async def tag(
         self, 
         ctx: ApplicationContext, 
         teamnumber = Option(int, name = "teamnumber", description = "which team's tag to set"), 
