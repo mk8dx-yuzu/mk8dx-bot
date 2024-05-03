@@ -763,6 +763,12 @@ class mogi(commands.Cog):
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
 
+
+    testing = discord.SlashCommandGroup(name = "testing", description = "This does something else...")
+
+    @testing.command(name="ping")
+    async def ping(self, ctx: ApplicationContext):
+        await ctx.respond("pong")
     
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
