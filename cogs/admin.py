@@ -14,10 +14,6 @@ class admin(commands.Cog):
         self.db = self.client["lounge"]
         self.players = self.db["players"]
 
-    @slash_command(name="debug")
-    async def debug(self, ctx: ApplicationContext):
-        await ctx.respond(self["mogi"], ephemeral = True)
-
     @slash_command(
         name="edit",
         description="Edit a player's MMR. Wins/Losses and MMR History can be updated accordingly.",
