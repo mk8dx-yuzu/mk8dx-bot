@@ -337,10 +337,10 @@ class mogi(commands.Cog):
     async def untag(self, ctx: ApplicationContext):
         await ctx.response.defer()
         for i in [1, 2, 3, 4, 5]:
-            for member in ctx.guild.members:
-                if get(ctx.guild.roles, name=f"Team {i}") in member.roles:
-                    await member.remove_roles(get(ctx.guild.roles, name=f"Team {i}"))
-        await ctx.send("Remove any team roles")
+            role = get(ctx.guild.roles, name=f"Team {i}")
+            for member in role.members:
+                await member.remove_roles(role)
+        await ctx.respond("Removed team roles")
 
     @slash_command(
         name="force_start",
