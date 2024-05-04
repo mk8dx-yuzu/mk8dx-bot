@@ -35,9 +35,11 @@ class mogi(commands.Cog):
     @slash_command(name="debug")
     async def debug(self, ctx: ApplicationContext):
         await ctx.respond(self.mogi, ephemeral = True)
-    
-    @slash_command(name = "set_tag", description = "set a tag for a team")
-    async def set_tag(
+
+    tags = discord.SlashCommandGroup(name = "tags", description = "Edit Team tags and apply/remove respective roles")
+
+    @tags.command(name = "set", description = "set a tag for a team")
+    async def set(
         self, 
         ctx: ApplicationContext, 
         teamnumber = Option(int, name = "teamnumber", description = "which team's tag to set"), 
@@ -45,6 +47,29 @@ class mogi(commands.Cog):
         ):
         self.mogi["team_tags"][int(teamnumber)-1] = tag
         await ctx.respond(f"Updated Team {teamnumber}'s tag to {tag}")
+
+    @tags.command(name = "apply_roles", description = "assign team roles", guild_only=True)
+    async def apply_roles(self, ctx: ApplicationContext):
+        await ctx.response.defer()
+        if not self.mogi["format"]:
+            return ctx.respond("No format chosen yet")
+        if self.mogi["format"] != "ffa":
+            for i, team in enumerate(self.mogi["teams"]):
+                for player in team:
+                    await get(ctx.guild.members, id=int(player.strip("<@!>"))).add_roles(
+                        get(ctx.guild.roles, name=f"Team {i+1}")
+                    )
+            return await ctx.respond("Assigned team roles")
+        await ctx.respond("format is ffa, not team roles assigned")
+
+    @tags.command(name="unapply_roles", guild_only=True)
+    async def unapply_roles(self, ctx: ApplicationContext):
+        await ctx.response.defer()
+        for i in [1, 2, 3, 4, 5]:
+            role = get(ctx.guild.roles, name=f"Team {i}")
+            for member in role.members:
+                await member.remove_roles(role)
+        await ctx.respond("Removed team roles")
 
     @slash_command(name="open", description="Start a new mogi", guild_only=True)
     async def open(self, ctx: ApplicationContext):
@@ -290,28 +315,7 @@ class mogi(commands.Cog):
 
         await ctx.send(self.mogi['votes'])
 
-    @slash_command(name="tags", description="assign team roles", guild_only=True)
-    async def tags(self, ctx: ApplicationContext):
-        await ctx.response.defer()
-        if not self.mogi["format"]:
-            return ctx.respond("No format chosen yet")
-        if self.mogi["format"] != "ffa":
-            for i, team in enumerate(self.mogi["teams"]):
-                for player in team:
-                    await get(ctx.guild.members, id=int(player.strip("<@!>"))).add_roles(
-                        get(ctx.guild.roles, name=f"Team {i+1}")
-                    )
-            return await ctx.respond("Assigned team roles")
-        await ctx.respond("format is ffa, not team roles assigned")
-
-    @slash_command(name="untag", guild_only=True)
-    async def untag(self, ctx: ApplicationContext):
-        await ctx.response.defer()
-        for i in [1, 2, 3, 4, 5]:
-            role = get(ctx.guild.roles, name=f"Team {i}")
-            for member in role.members:
-                await member.remove_roles(role)
-        await ctx.respond("Removed team roles")
+    
 
     @slash_command(
         name="force_start",
