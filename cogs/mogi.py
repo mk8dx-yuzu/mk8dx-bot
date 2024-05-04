@@ -188,14 +188,14 @@ class mogi(commands.Cog):
 
         await ctx.followup.send(final_message)
 
-    @slash_command(
+    """ @slash_command(
         name="pswd", description="view or change the server password (to send to mogi players)", guild_only=True
     )
     async def pswd(self, ctx: ApplicationContext, new=Option(str, required=False)):
         if not new:
             return await ctx.respond(f"Current password: ```{self.mogi['password']}```")
         self.mogi["password"] = new
-        await ctx.respond("Updated password")
+        await ctx.respond("Updated password") """
 
     @slash_command(name="status", description="See current state of mogi")
     async def status(self, ctx: ApplicationContext):
