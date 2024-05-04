@@ -1,0 +1,20 @@
+mogi_config = {
+    "status": 0,
+    "voting": 0,
+    "running": 0,
+    "password": None,
+    "locked": False,
+    "players": [],
+    "subs": [],
+    "teams": [],
+    "team_tags": [f"Team {i+1}" for i in range(5)],
+    "calc": [],
+    "points": [],
+    "input_points": [],
+    "point_count": 0,
+    "format": "",
+    "results": [],
+    "placements": [],
+    "voters": [],
+    "votes": { "ffa": 0, "2v2": 0, "3v3": 0, "4v4": 0, "5v5": 0, "6v6": 0}
+}
