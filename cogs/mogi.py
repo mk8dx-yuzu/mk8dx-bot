@@ -551,7 +551,6 @@ class mogi(commands.Cog):
 
         form = self.mogi['format'][0]
         new_new_ratings = mmr_alg.calculate_mmr(new_algo_players, placements, int(form) if form != "f" else 1 )
-        await ctx.send(f"Hypothetical lounge-algoritm (soon new system) output: {new_new_ratings}")
 
         for team in new_ratings:
             self.mogi["results"].append([round(player.mu) for player in team])
