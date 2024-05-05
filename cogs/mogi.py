@@ -566,7 +566,7 @@ class mogi(commands.Cog):
             debug_string+= f"{new}\n"
 
         await ctx.respond(
-            f'Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr \n {debug_string}',
+            f'Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr \n {calc_teams} {placements} \n {debug_string}',
             ephemeral=True,
         )
 
