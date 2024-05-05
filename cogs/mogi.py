@@ -1,7 +1,7 @@
 import os, discord, pymongo, math, random, asyncio
 from copy import deepcopy
 
-from discord import ApplicationContext, Interaction, Option, slash_command
+from discord import SlashCommandGroup, ApplicationContext, Interaction, Option, slash_command
 from discord.ui import View, Modal, InputText
 from discord.utils import get
 from discord.ext import commands
@@ -16,6 +16,7 @@ from io import BytesIO
 
 import cogs.extras.mmr_algorithm as mmr_alg
 from cogs.extras.ranks import calcRank
+from cogs.extras.replacement_logic import replace, swap
 import cogs.extras.mogi_config as config
 
 default_mogi_state = config.mogi_config
@@ -36,7 +37,7 @@ class mogi(commands.Cog):
     async def debug(self, ctx: ApplicationContext):
         await ctx.respond(self.mogi, ephemeral = True)
 
-    tags = discord.SlashCommandGroup(name = "tags", description = "Edit Team tags and apply/remove respective roles")
+    tags = SlashCommandGroup(name = "tags", description = "Edit Team tags and apply/remove respective roles")
 
     @tags.command(name = "set", description = "set a tag for a team")
     async def set(
@@ -399,7 +400,15 @@ class mogi(commands.Cog):
                     
         await ctx.respond(lineup_str)
 
-    @slash_command(name="sub", description="Replace a player in the mogi", guild_only=True)
+    replace = SlashCommandGroup(name = "replace", description = "sub or swap players")
+
+    @replace.command(name="swap", description="Swap 2 players with each other", guild_only=True)
+    async def swap(self, ctx: ApplicationContext, player1 = Option(str, name = "player1", description = "use @ mention"), player2 = Option(str, name = "player2", description = "use @ mention")):
+        self.mogi["players"] = swap(self.mogi["players"], player1, player2)
+        self.mogi["teams"] = swap(self.mogi["teams"], player1, player2)
+        await ctx.respond(f"Swapped {player1} and {player2}")
+
+    @replace.command(name="sub", description="Replace a player in the mogi, dismissing mmr loss for the subbing player", guild_only=True)
     async def sub(
         self,
         ctx: ApplicationContext,
@@ -424,12 +433,6 @@ class mogi(commands.Cog):
             return await ctx.respond("No teams decided yet")
         if sub in self.mogi["players"]:
             return await ctx.respond("This sub is already in the mogi")
-
-        def replace(space, player, sub):
-            if isinstance(space, list):
-                return [replace(item, player, sub) for item in space]
-            else:
-                return sub if space == player else space
 
         self.mogi["players"] = replace(self.mogi["players"], player, sub)
         self.mogi["teams"] = replace(self.mogi["teams"], player, sub)
