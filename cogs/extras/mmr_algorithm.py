@@ -62,12 +62,12 @@ def calculate_mmr(mmrs: list, ranking: list, team_size: int):
         delta = new_mmr - mmrs[i]
 
         delta_str = str(delta) if delta < 0 else "+" + str(delta)
-        print("Change player {}: {}".format(i + 1, delta_str))
-        print("New MMR player {}: {}".format(i + 1, new_mmr))
+        #print("Change player {}: {}".format(i + 1, delta_str))
+        #print("New MMR player {}: {}".format(i + 1, new_mmr))
 
     return mmr_deltas
 
 
-#calculate_mmr([14876, 15150, 14114, 13783, 11737, 10868, 11066, 15309, 13969, 10928, 11322, 12800], [1, 2, 3, 4], 3)
+#calculate_mmr([4678, 5747, 1820, 767], [1, 2, 3, 4], 1)
 
 #calculate_mmr([15074, 15155, 15997, 12636, 14305, 14583, 14138, 14169, 13889, 15973, 13060, 13536], [1, 2, 2, 4, 5, 6], 2)
