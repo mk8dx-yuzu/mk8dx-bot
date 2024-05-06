@@ -68,6 +68,8 @@ def calculate_mmr(mmrs: list, ranking: list, team_size: int):
     return mmr_deltas
 
 
-#calculate_mmr([4678, 5747, 1820, 767], [1, 2, 3, 4], 1)
+#result1 = calculate_mmr([6000, 6000, 6000, 500, 500, 500], [2, 1], 3)
 
 #calculate_mmr([15074, 15155, 15997, 12636, 14305, 14583, 14138, 14169, 13889, 15973, 13060, 13536], [1, 2, 2, 4, 5, 6], 2)
+
+#print(result1)
