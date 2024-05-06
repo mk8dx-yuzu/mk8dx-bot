@@ -179,9 +179,14 @@ class mogi(commands.Cog):
         if str(reaction.emoji) == "✅":
             await message.edit(content="Closing...")
             self.mogi = deepcopy(default_mogi_state)
-            for member in ctx.guild.members:
-                if get(ctx.guild.roles, name="InMogi") in member.roles:
-                    await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
+            mogi_members = get(ctx.guild.roles, name="InMogi").members
+            for member in mogi_members:
+                await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
+
+            for i in [1, 2, 3, 4, 5]:
+                role = get(ctx.guild.roles, name=f"Team {i}")
+                for member in role.members:
+                    await member.remove_roles(role)
             final_message = "# The mogi has been closed"
         else:
             await message.edit(content="Action canceled.")
