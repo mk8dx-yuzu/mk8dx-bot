@@ -1,9 +1,15 @@
 import os
 import discord
 import random
+from copy import deepcopy
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 load_dotenv()
+
+import cogs.extras.mogi_config as config
+
+default_mogi_state = deepcopy(config.mogi_config)
+
 
 intents = discord.Intents.default()
 intents |= discord.Intents.guilds
@@ -15,6 +21,7 @@ owners = [769525682039947314, 450728788570013721]
 
 class customBot(commands.Bot):
     def __init__(self, *args, **kwargs):
+        self.mogi: object = default_mogi_state
         return super().__init__(*args, **kwargs)
 
     async def close(self):

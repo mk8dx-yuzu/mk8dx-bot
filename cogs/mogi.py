@@ -19,7 +19,7 @@ from cogs.extras.ranks import calcRank
 from cogs.extras.replacement_logic import replace, swap
 import cogs.extras.mogi_config as config
 
-default_mogi_state = config.mogi_config
+default_mogi_state = deepcopy(config.mogi_config)
 
 class mogi(commands.Cog):
     def __init__(self, bot):
@@ -29,13 +29,14 @@ class mogi(commands.Cog):
         )
         self.db = self.client["lounge"]
         self.players = self.db["players"]
-        self.mogi = deepcopy(default_mogi_state)
+        
 
         self.join_sem = asyncio.Semaphore(1)
 
     @slash_command(name="debug")
     async def debug(self, ctx: ApplicationContext):
-        await ctx.respond(self.mogi, ephemeral = True)
+        print(self.bot.globalvar)
+        await ctx.respond(self.bot.mogi, ephemeral = True)
 
     tags = SlashCommandGroup(name = "tags", description = "Edit Team tags and apply/remove respective roles")
 
@@ -46,16 +47,16 @@ class mogi(commands.Cog):
         teamnumber = Option(int, name = "teamnumber", description = "which team's tag to set"), 
         tag = Option(str, name = "tag", description = "which tag to set")
         ):
-        self.mogi["team_tags"][int(teamnumber)-1] = tag
+        self.bot.mogi["team_tags"][int(teamnumber)-1] = tag
         await ctx.respond(f"Updated Team {teamnumber}'s tag to {tag}")
 
     @tags.command(name = "apply_roles", description = "assign team roles", guild_only=True)
     async def apply_roles(self, ctx: ApplicationContext):
         await ctx.response.defer()
-        if not self.mogi["format"]:
+        if not self.bot.mogi["format"]:
             return ctx.respond("No format chosen yet")
-        if self.mogi["format"] != "ffa":
-            for i, team in enumerate(self.mogi["teams"]):
+        if self.bot.mogi["format"] != "ffa":
+            for i, team in enumerate(self.bot.mogi["teams"]):
                 for player in team:
                     await get(ctx.guild.members, id=int(player.strip("<@!>"))).add_roles(
                         get(ctx.guild.roles, name=f"Team {i+1}")
@@ -74,45 +75,45 @@ class mogi(commands.Cog):
 
     @slash_command(name="open", description="Start a new mogi", guild_only=True)
     async def open(self, ctx: ApplicationContext):
-        if self.mogi["status"]:
+        if self.bot.mogi["status"]:
             return await ctx.respond("A mogi is already open")
-        self.mogi["status"] = 1
+        self.bot.mogi["status"] = 1
         await ctx.respond("# Started a new mogi! Use /join to participate!")
 
     @slash_command(name="lock", description="Lock the current mogi from being closed", guild_only=True)
     async def lock(self, ctx: ApplicationContext):
-        self.mogi["locked"] = (not self.mogi["locked"])
-        await ctx.respond(f"New mogi locking state: {self.mogi['locked']}")
+        self.bot.mogi["locked"] = (not self.bot.mogi["locked"])
+        await ctx.respond(f"New mogi locking state: {self.bot.mogi['locked']}")
 
     @slash_command(name="join", description="Join the current mogi", guild_only=True)
     async def join(self, ctx: ApplicationContext):
         async with self.join_sem:
-            if not self.mogi["status"]:
+            if not self.bot.mogi["status"]:
                 return await ctx.respond("Currently no mogi open")
-            if self.mogi["locked"]:
+            if self.bot.mogi["locked"]:
                 return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
-            if ctx.author.mention in self.mogi["players"]:
+            if ctx.author.mention in self.bot.mogi["players"]:
                 return await ctx.respond("You are already in the mogi")
-            if len(self.mogi["players"]) >= 12:
+            if len(self.bot.mogi["players"]) >= 12:
                 return await ctx.respond("The mogi is already full")
-            if ctx.author.mention not in self.mogi["players"]:
-                self.mogi["players"].append(ctx.author.mention)
+            if ctx.author.mention not in self.bot.mogi["players"]:
+                self.bot.mogi["players"].append(ctx.author.mention)
             if get(ctx.guild.roles, name="InMogi") not in ctx.author.roles:
                 await ctx.user.add_roles(get(ctx.guild.roles, name="InMogi"))
             await ctx.respond(
-                f"{ctx.author.name} joined the mogi!\n{len(self.mogi['players'])} players are in!"
+                f"{ctx.author.name} joined the mogi!\n{len(self.bot.mogi['players'])} players are in!"
             )
 
     @slash_command(name="leave", description="Leave the current mogi", guild_only=True)
     async def leave(self, ctx: ApplicationContext):
-        if ctx.author.mention not in self.mogi["players"]:
+        if ctx.author.mention not in self.bot.mogi["players"]:
             return await ctx.respond("You are not in the mogi")
-        if self.mogi["locked"]:
+        if self.bot.mogi["locked"]:
             return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
-        self.mogi["players"].remove(ctx.author.mention)
+        self.bot.mogi["players"].remove(ctx.author.mention)
         await ctx.user.remove_roles(get(ctx.guild.roles, name="InMogi"))
         await ctx.respond(
-            f"{ctx.author.mention} left the mogi!\n{len(self.mogi['players'])} players are in!"
+            f"{ctx.author.mention} left the mogi!\n{len(self.bot.mogi['players'])} players are in!"
         )
 
     @slash_command(name="l", description="List all players in the current mogi", guild_only=True)
@@ -123,12 +124,12 @@ class mogi(commands.Cog):
                     required=False,
                     choices = ["y"]
                     )):
-        if not self.mogi["status"]:
+        if not self.bot.mogi["status"]:
             return await ctx.respond("Currently no open mogi")
-        if not self.mogi["players"]:
+        if not self.bot.mogi["players"]:
             return await ctx.respond("Current mogi: \n No players")
         list = "Current mogi:\n"
-        for index, player in enumerate(self.mogi["players"]):
+        for index, player in enumerate(self.bot.mogi["players"]):
             try:
                 if get(ctx.guild.members, id=int(player.strip("<@!>"))).nick:
                     name = get(ctx.guild.members, id=int(player.strip("<@!>"))).nick
@@ -151,7 +152,7 @@ class mogi(commands.Cog):
     @slash_command(name="close", description="Stop the current Mogi if running", guild_only=True)
     async def close(self, ctx: ApplicationContext):
         await ctx.response.defer()
-        if self.mogi["locked"]:
+        if self.bot.mogi["locked"]:
             return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
 
         message = await ctx.send(
@@ -178,7 +179,7 @@ class mogi(commands.Cog):
 
         if str(reaction.emoji) == "✅":
             await message.edit(content="Closing...")
-            self.mogi = deepcopy(default_mogi_state)
+            self.bot.mogi = default_mogi_state
             mogi_members = get(ctx.guild.roles, name="InMogi").members
             for member in mogi_members:
                 await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
@@ -205,17 +206,17 @@ class mogi(commands.Cog):
 
     @slash_command(name="status", description="See current state of mogi")
     async def status(self, ctx: ApplicationContext):
-        if not self.mogi["status"]:
+        if not self.bot.mogi["status"]:
             return await ctx.respond("No running mogi")
-        await ctx.respond(f"Currently open mogi: {len(self.mogi['players'])} players")
+        await ctx.respond(f"Currently open mogi: {len(self.bot.mogi['players'])} players")
 
     @slash_command(
         name="start", description="Randomize teams, vote format and start playing", guild_only=True
     )
     async def start(self, ctx: ApplicationContext):
-        if self.mogi["voting"]:
+        if self.bot.mogi["voting"]:
             return await ctx.respond("Already started a vote", ephemeral=True)
-        if not ctx.author.mention in self.mogi["players"]:
+        if not ctx.author.mention in self.bot.mogi["players"]:
             return await ctx.respond(
                 "You can't start a mogi you aren't in", ephemeral=True
             )
@@ -296,7 +297,7 @@ class mogi(commands.Cog):
                 else:
                     pass
 
-        view = FormatView(self.mogi)
+        view = FormatView(self.bot.mogi)
         await ctx.respond(
             f"<@&{get(ctx.guild.roles, name='InMogi').id}> \nBeginning Mogi \nVote for a format:",
             view=view,
@@ -306,10 +307,10 @@ class mogi(commands.Cog):
     async def debug_votes(self, ctx: ApplicationContext):
         missing = []
         players = []
-        for player in self.mogi['players']:
+        for player in self.bot.mogi['players']:
             players.append(int(player.strip("<@!>")))
         for player in players:
-            if player not in self.mogi["voters"]:
+            if player not in self.bot.mogi["voters"]:
                 missing.append(player)
         if missing:
             string = f"**{len(missing)} player(s) haven't voted yet** \n"
@@ -319,7 +320,7 @@ class mogi(commands.Cog):
         else: 
             await ctx.respond("No missing votes")
 
-        await ctx.send(self.mogi['votes'])
+        await ctx.send(self.bot.mogi['votes'])
 
     
 
@@ -339,29 +340,29 @@ class mogi(commands.Cog):
             choices=["ffa", "2v2", "3v3", "4v4", "5v5", "6v6"],
         ),
     ):
-        self.mogi["teams"] = []
+        self.bot.mogi["teams"] = []
 
         lineup_str = "# Lineup \n"
 
-        self.mogi["format"] = format
-        self.mogi["running"] = 1
-        self.mogi["locked"] = True
-        self.mogi["voting"] = 0
-        self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
-        self.mogi["voters"] = []
+        self.bot.mogi["format"] = format
+        self.bot.mogi["running"] = 1
+        self.bot.mogi["locked"] = True
+        self.bot.mogi["voting"] = 0
+        self.bot.mogi["votes"] = {key: 0 for key in self.bot.mogi["votes"]}
+        self.bot.mogi["voters"] = []
 
         if format == "ffa":
-            for i, player in enumerate(self.mogi["players"]):
+            for i, player in enumerate(self.bot.mogi["players"]):
                 lineup_str += f"`{i+1}:` {player}\n"
-                self.mogi["teams"].append([player])
-                self.mogi["running"] = 1
+                self.bot.mogi["teams"].append([player])
+                self.bot.mogi["running"] = 1
             return await ctx.respond(lineup_str)
 
-        random.shuffle(self.mogi["players"])
+        random.shuffle(self.bot.mogi["players"])
         teams = []
-        for i in range(0, len(self.mogi["players"]), int(format[0])):
-            teams.append(self.mogi["players"][i : i + int(format[0])])
-        self.mogi["teams"] = teams
+        for i in range(0, len(self.bot.mogi["players"]), int(format[0])):
+            teams.append(self.bot.mogi["players"][i : i + int(format[0])])
+        self.bot.mogi["teams"] = teams
         for i, item in enumerate(teams):
             lineup_str += f"\n `{i+1}`. {', '.join(item)}"
 
@@ -369,35 +370,35 @@ class mogi(commands.Cog):
 
     @slash_command(name="stop", description="Revert to the state before a vote was started")
     async def stop(self, ctx: ApplicationContext):
-        if not self.mogi["running"]:
+        if not self.bot.mogi["running"]:
             return await ctx.respond("No running mogi yet. if vote is still in process, it needs to end or be force started before it can be stopped")
-        if len(self.mogi["points"]):
+        if len(self.bot.mogi["points"]):
             return await ctx.respond("The mogi is already in the process of MMR calculation")
-        self.mogi["running"] = 0
-        self.mogi["teams"] = []
-        self.mogi["format"] = ""
-        self.mogi["locked"] = False
-        self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
-        self.mogi["voters"] = []
-        self.mogi["voting"] = 0
+        self.bot.mogi["running"] = 0
+        self.bot.mogi["teams"] = []
+        self.bot.mogi["format"] = ""
+        self.bot.mogi["locked"] = False
+        self.bot.mogi["votes"] = {key: 0 for key in self.bot.mogi["votes"]}
+        self.bot.mogi["voters"] = []
+        self.bot.mogi["voting"] = 0
         
         await ctx.respond("The mogi has been stopped, use /start to start it again")
-        await ctx.send(f"Debug:\nVotes:{self.mogi['votes']}")
+        await ctx.send(f"Debug:\nVotes:{self.bot.mogi['votes']}")
 
 
     @slash_command(name="teams", description="Show teams")
     async def teams(self, ctx: ApplicationContext):
-        if not self.mogi["status"]:
+        if not self.bot.mogi["status"]:
             return await ctx.respond("No open mogi", ephemeral=True)
-        if not len(self.mogi["teams"]):
+        if not len(self.bot.mogi["teams"]):
             return await ctx.respond("No teams decided yet", ephemeral=True)
         lineup_str = "# Teams \n\n"
-        if self.mogi["format"] == "ffa":
-            for i, player in enumerate(self.mogi["players"]):
+        if self.bot.mogi["format"] == "ffa":
+            for i, player in enumerate(self.bot.mogi["players"]):
                 lineup_str += f"`{i+1}:` {get(ctx.guild.members, id=int(player.strip('<@!>'))).display_name}\n"
         else:
-            for i, team in enumerate(self.mogi["teams"]):
-                lineup_str += f"{self.mogi['team_tags'][i]}\n"
+            for i, team in enumerate(self.bot.mogi["teams"]):
+                lineup_str += f"{self.bot.mogi['team_tags'][i]}\n"
                 team = [get(ctx.guild.members, id=int(player.strip('<@!>'))).display_name for player in team]
                 for player in team:   
                     lineup_str += f"{player} +\n"
@@ -409,8 +410,8 @@ class mogi(commands.Cog):
 
     @replace.command(name="swap", description="Swap 2 players with each other", guild_only=True)
     async def swap(self, ctx: ApplicationContext, player1 = Option(str, name = "player1", description = "use @ mention"), player2 = Option(str, name = "player2", description = "use @ mention")):
-        self.mogi["players"] = swap(self.mogi["players"], player1, player2)
-        self.mogi["teams"] = swap(self.mogi["teams"], player1, player2)
+        self.bot.mogi["players"] = swap(self.bot.mogi["players"], player1, player2)
+        self.bot.mogi["teams"] = swap(self.bot.mogi["teams"], player1, player2)
         await ctx.respond(f"Swapped {player1} and {player2}")
 
     @replace.command(name="sub", description="Replace a player in the mogi, dismissing mmr loss for the subbing player", guild_only=True)
@@ -432,26 +433,26 @@ class mogi(commands.Cog):
     ):
         await ctx.response.defer()
 
-        if not len(self.mogi["players"]):
+        if not len(self.bot.mogi["players"]):
             return await ctx.respond("no players", ephemeral=True)
-        if not len(self.mogi["teams"]):
+        if not len(self.bot.mogi["teams"]):
             return await ctx.respond("No teams decided yet")
-        if sub in self.mogi["players"]:
+        if sub in self.bot.mogi["players"]:
             return await ctx.respond("This sub is already in the mogi")
 
-        self.mogi["players"] = replace(self.mogi["players"], player, sub)
-        self.mogi["teams"] = replace(self.mogi["teams"], player, sub)
+        self.bot.mogi["players"] = replace(self.bot.mogi["players"], player, sub)
+        self.bot.mogi["teams"] = replace(self.bot.mogi["teams"], player, sub)
 
         await get(ctx.guild.members, id=int(sub.strip("<@!>"))).add_roles(get(ctx.guild.roles, name="InMogi"))
         await get(ctx.guild.members, id=int(player.strip("<@!>"))).remove_roles(get(ctx.guild.roles, name="InMogi"))
 
-        self.mogi["subs"].append(sub)
+        self.bot.mogi["subs"].append(sub)
 
         await ctx.respond(f"Subbed {player} with {sub} if applicable")
 
     @slash_command(name="points", description="Use after a mogi - input player points", guild_only=True)
     async def points(self, ctx: ApplicationContext):
-        if not self.mogi["running"]:
+        if not self.bot.mogi["running"]:
             return await ctx.respond("No running mogi")
 
         class MogiModal(discord.ui.Modal):
@@ -461,7 +462,7 @@ class mogi(commands.Cog):
                 self.db = db
 
                 count = 0
-                for player in self.mogi["players"]:
+                for player in self.bot.mogi["players"]:
                     if player not in mogi["calc"] and count < 4:
                         mentioned_user = db["players"].find_one(
                             {"discord": player.strip("<@!>")}
@@ -498,9 +499,9 @@ class mogi(commands.Cog):
                     ephemeral=True,
                 )
 
-        if len(self.mogi["players"]) > len(self.mogi["calc"]):
+        if len(self.bot.mogi["players"]) > len(self.bot.mogi["calc"]):
             modal = MogiModal(
-                mogi=self.mogi, db=self.db, title="Input player points after match"
+                mogi=self.bot.mogi, db=self.db, title="Input player points after match"
             )
             await ctx.send_modal(modal)
         else:
@@ -508,17 +509,17 @@ class mogi(commands.Cog):
         
     @slash_command(name="points_reset", description="Messed up points input? Reset them")
     async def points_reset(self, ctx: ApplicationContext):
-        self.mogi["point_count"] = 0
-        self.mogi["input_points"] = []
-        self.mogi["points"] = []
-        self.mogi["calc"] = []
+        self.bot.mogi["point_count"] = 0
+        self.bot.mogi["input_points"] = []
+        self.bot.mogi["points"] = []
+        self.bot.mogi["calc"] = []
         await ctx.respond("Cleared all points", ephemeral = True)
 
     @slash_command(
         name="calc", description="Use after using /points to calculate new mmr", guild_only=True
     )
     async def calc(self, ctx: discord.ApplicationContext):
-        if not len(self.mogi["calc"]):
+        if not len(self.bot.mogi["calc"]):
             return ctx.respond(
                 "There doesn't seem to be data to make calculations with"
             )
@@ -537,7 +538,7 @@ class mogi(commands.Cog):
         new_algo_players = []
 
         calc_teams = []
-        for team in self.mogi["teams"]:
+        for team in self.bot.mogi["teams"]:
             calc_team = []
             for player in team:
                 mmr = self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
@@ -545,7 +546,7 @@ class mogi(commands.Cog):
                 new_algo_players.append(mmr)
             calc_teams.append(calc_team)
         scores = []
-        for team_point_arr in self.mogi["points"]:
+        for team_point_arr in self.bot.mogi["points"]:
             scores.append([sum(team_point_arr)])
         
         ranks_dict = {}
@@ -554,24 +555,24 @@ class mogi(commands.Cog):
             ranks_dict[score[0]] = i + 1
         for score in scores:
             placements.append(ranks_dict[score[0]])
-        self.mogi["placements"] = placements
+        self.bot.mogi["placements"] = placements
 
         new_ratings = rate(calc_teams, placements)
 
-        form = self.mogi['format'][0]
+        form = self.bot.mogi['format'][0]
         new_new_ratings = mmr_alg.calculate_mmr(new_algo_players, placements, int(form) if form != "f" else 1 )
 
         for team in new_ratings:
-            self.mogi["results"].append([round(player.mu) for player in team])
+            self.bot.mogi["results"].append([round(player.mu) for player in team])
 
         debug_string = "# Debug:\n Points:\n"
-        for scoring in self.mogi['points']:
+        for scoring in self.bot.mogi['points']:
             debug_string += f"{scoring}\n"
         debug_string += "\n Current MMR:"
         for team in calc_teams:
             debug_string += f"{team}\n"
         debug_string += "\n New MMR:"
-        for new in self.mogi["results"]:
+        for new in self.bot.mogi["results"]:
             debug_string+= f"{new}\n"
 
         await ctx.respond(
@@ -583,13 +584,13 @@ class mogi(commands.Cog):
     async def table(self, ctx: discord.ApplicationContext):
         players = [
             self.players.find_one({"discord": player.strip("<@!>")})["name"]
-            for player in self.mogi["players"]
+            for player in self.bot.mogi["players"]
         ]
         current_mmr = [
             round(self.players.find_one({"discord": player.strip("<@!>")})["mmr"])
-            for player in self.mogi["players"]
+            for player in self.bot.mogi["players"]
         ]
-        new_mmr = [val for sublist in self.mogi["results"] for val in sublist]
+        new_mmr = [val for sublist in self.bot.mogi["results"] for val in sublist]
 
         data = {
             "Player": players,
@@ -632,16 +633,16 @@ class mogi(commands.Cog):
     @slash_command(name="apply", description="Use after a /calc to apply new mmr", guild_only=True)
     async def apply(self, ctx: ApplicationContext):
         await ctx.response.defer()
-        players = self.mogi["players"]
+        players = self.bot.mogi["players"]
         current_mmr = [
             self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
-            for player in self.mogi["players"]
+            for player in self.bot.mogi["players"]
         ]
-        new_mmr = [element for sublist in self.mogi["results"] for element in sublist]
+        new_mmr = [element for sublist in self.bot.mogi["results"] for element in sublist]
         deltas = [new_mmr[i] - current_mmr[i] for i in range(0, len(players))]
 
         for i, player in enumerate(players):
-            if player in self.mogi["subs"] and deltas[i] < 0:
+            if player in self.bot.mogi["subs"] and deltas[i] < 0:
                 await ctx.send(f"Excluded {self.bot.get_user(int(player.strip('<@!>'))).mention} because they subbed")
                 continue
             self.players.update_one(
@@ -677,7 +678,7 @@ class mogi(commands.Cog):
             if current_rank != new_rank:
                 await ctx.send(f"{self.bot.get_user(int(player.strip('<@!>'))).mention} is now in {new_rank}")
 
-        self.mogi["locked"] = False
+        self.bot.mogi["locked"] = False
 
         await ctx.respond("Applied MMR changes ✅")
 
