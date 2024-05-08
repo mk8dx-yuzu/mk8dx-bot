@@ -68,6 +68,6 @@ for filename in os.listdir('./cogs'):
 
 for filename in os.listdir('./cogs/mogi'):
     if filename.endswith('.py'):
-        bot.load_extension(f'cogs.{filename[:-3]}')
+        bot.load_extension(f'cogs.mogi{filename[:-3]}')
 
 bot.run(os.getenv('DISCORD_TOKEN'))
