@@ -554,7 +554,7 @@ class mogi(commands.Cog):
             player_mmrs.append(self.players.find_one({"name": player})['mmr'])
 
         deltas = mmr_alg.calculate_mmr(player_mmrs, placements.split(", "), int(format[0]))
-        if True or upscale == "y":
+        if upscale == "y":
             deltas = [math.ceil(1.3 * score) if score > 0 else score for score in deltas]
 
         await ctx.send(f"{player_mmrs}; {[int(spot) for spot in placements.split(', ')]}; {int(format[0])}")
@@ -597,7 +597,7 @@ class mogi(commands.Cog):
         buffer.seek(0)
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
-        
+
     
 def setup(bot: commands.Bot):
     bot.add_cog(mogi(bot))
