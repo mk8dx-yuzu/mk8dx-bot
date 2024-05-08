@@ -63,7 +63,11 @@ async def on_ready():
     change_activity.start()
 
 for filename in os.listdir('./cogs'):
-    if filename.endswith('.py') and not filename.endswith('.extra.py'):
+    if filename.endswith('.py'):
+        bot.load_extension(f'cogs.{filename[:-3]}')
+
+for filename in os.listdir('./cogs/mogi'):
+    if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
 
 bot.run(os.getenv('DISCORD_TOKEN'))
