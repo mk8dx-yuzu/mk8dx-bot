@@ -1,6 +1,7 @@
 import os
 import discord
 import pymongo
+from pymongo import collection, database
 from discord import slash_command, Option, ApplicationContext
 from discord.ext import commands
 from discord.utils import get
@@ -8,11 +9,8 @@ from discord.utils import get
 class admin(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        self.client = pymongo.MongoClient(
-            f"mongodb://{os.getenv('MONGODB_HOST')}:27017/"
-        )
-        self.db = self.client["lounge"]
-        self.players = self.db["players"]
+        self.db: database.Database = self.bot.db
+        self.players: collection.Collection = self.bot.players
 
     @slash_command(
         name="edit",

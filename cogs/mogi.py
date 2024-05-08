@@ -1,5 +1,6 @@
 import os, discord, pymongo, math, random, asyncio
 from copy import deepcopy
+from pymongo import collection, database
 
 from discord import SlashCommandGroup, ApplicationContext, Interaction, Option, slash_command
 from discord.ui import View, Modal, InputText
@@ -24,17 +25,15 @@ default_mogi_state = config.mogi_config
 class mogi(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        self.client = pymongo.MongoClient(
-            f"mongodb://{os.getenv('MONGODB_HOST')}:27017/"
-        )
-        self.db = self.client["lounge"]
-        self.players = self.db["players"]
+        self.db: database.Database = self.bot.db
+        self.players: collection.Collection = self.bot.players
 
 
     @slash_command(name="lock", description="Lock the current mogi from being closed", guild_only=True)
     async def lock(self, ctx: ApplicationContext):
         self.bot.mogi["locked"] = (not self.bot.mogi["locked"])
         await ctx.respond(f"New mogi locking state: {self.bot.mogi['locked']}")
+        
 
     @slash_command(name="l", description="List all players in the current mogi", guild_only=True)
     async def l(self, ctx: ApplicationContext, 

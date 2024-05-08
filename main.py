@@ -1,6 +1,5 @@
-import os
-import discord
-import random
+import os, discord, pymongo, random
+from pymongo import collection
 from copy import deepcopy
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
@@ -22,7 +21,14 @@ owners = [769525682039947314, 450728788570013721]
 class customBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.mogi: object = default_mogi_state
+        self.client = pymongo.MongoClient(
+            f"mongodb://{os.getenv('MONGODB_HOST')}:27017/"
+        )
+        self.db = self.client["lounge"]
+        self.players: collection = self.db["players"]
+
         return super().__init__(*args, **kwargs)
+    
 
     async def close(self):
         for name,cog in self.cogs.items():
