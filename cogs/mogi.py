@@ -19,7 +19,7 @@ from cogs.extras.ranks import calcRank
 from cogs.extras.replacement_logic import replace, swap
 import cogs.extras.mogi_config as config
 
-default_mogi_state = deepcopy(config.mogi_config)
+default_mogi_state = config.mogi_config
 
 class mogi(commands.Cog):
     def __init__(self, bot):
@@ -178,7 +178,7 @@ class mogi(commands.Cog):
 
         if str(reaction.emoji) == "✅":
             await message.edit(content="Closing...")
-            self.bot.mogi = default_mogi_state
+            self.bot.mogi = deepcopy(default_mogi_state)
             mogi_members = get(ctx.guild.roles, name="InMogi").members
             for member in mogi_members:
                 await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
