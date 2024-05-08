@@ -29,7 +29,7 @@ class mogi(commands.Cog):
         )
         self.db = self.client["lounge"]
         self.players = self.db["players"]
-        
+
 
         self.join_sem = asyncio.Semaphore(1)
 
@@ -458,21 +458,22 @@ class mogi(commands.Cog):
             def __init__(self, mogi, db, *args, **kwargs):
                 super().__init__(*args, **kwargs)
                 self.db = db
+                self.mogi = mogi
 
                 count = 0
-                for player in mogi["players"]:
-                    if player not in mogi["calc"] and count < 4:
+                for player in self.mogi["players"]:
+                    if player not in self.mogi["calc"] and count < 4:
                         mentioned_user = db["players"].find_one(
                             {"discord": player.strip("<@!>")}
                         )["name"]
                         self.add_item(InputText(label = mentioned_user))
-                        mogi["calc"].append(player)
+                        self.mogi["calc"].append(player)
                         count += 1
 
             async def callback(
                 self: Modal = Modal,
                 interaction: Interaction = Interaction,
-                mogi=self.mogi,
+                mogi=self.bot.mogi,
             ):
                 for i in range(0, len(self.children)):
                     mogi["input_points"].append(int(self.children[i].value))
