@@ -461,7 +461,7 @@ class mogi(commands.Cog):
                 self.db = db
 
                 count = 0
-                for player in self.bot.mogi["players"]:
+                for player in mogi["players"]:
                     if player not in mogi["calc"] and count < 4:
                         mentioned_user = db["players"].find_one(
                             {"discord": player.strip("<@!>")}
@@ -477,7 +477,7 @@ class mogi(commands.Cog):
             ):
                 for i in range(0, len(self.children)):
                     mogi["input_points"].append(int(self.children[i].value))
-                    self.mogi["point_count"] += 1
+                    mogi["point_count"] += 1
                         
                 if mogi["format"] == "ffa":
                     for i in range(0, len(self.children)):
