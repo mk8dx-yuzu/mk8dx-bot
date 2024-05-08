@@ -35,7 +35,7 @@ class mogi(commands.Cog):
         await ctx.respond(f"New mogi locking state: {self.bot.mogi['locked']}")
         
 
-    @slash_command(name="l", description="List all players in the current mogi", guild_only=True)
+    @slash_command(name="l", description="List all players in the current mogi")
     async def l(self, ctx: ApplicationContext, 
                 table = Option(
                     name="table", 
@@ -224,7 +224,7 @@ class mogi(commands.Cog):
 
         await ctx.respond(lineup_str)
 
-    @slash_command(name="stop", description="Revert to the state before a vote was started")
+    @slash_command(name="stop", description="Revert to the state before a vote was started", guild_only=True)
     async def stop(self, ctx: ApplicationContext):
         if not self.bot.mogi["running"]:
             return await ctx.respond("No running mogi yet. if vote is still in process, it needs to end or be force started before it can be stopped")
@@ -362,7 +362,7 @@ class mogi(commands.Cog):
         else:
             return await ctx.respond("Already got all calcs")
         
-    @slash_command(name="points_reset", description="Messed up points input? Reset them")
+    @slash_command(name="points_reset", description="Messed up points input? Reset them", guild_only=True)
     async def points_reset(self, ctx: ApplicationContext):
         self.bot.mogi["point_count"] = 0
         self.bot.mogi["input_points"] = []
