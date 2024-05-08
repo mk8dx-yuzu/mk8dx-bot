@@ -30,90 +30,12 @@ class mogi(commands.Cog):
         self.db = self.client["lounge"]
         self.players = self.db["players"]
 
-
         self.join_sem = asyncio.Semaphore(1)
-
-    @slash_command(name="debug")
-    async def debug(self, ctx: ApplicationContext):
-        await ctx.respond(self.bot.mogi, ephemeral = True)
-
-    tags = SlashCommandGroup(name = "tags", description = "Edit Team tags and apply/remove respective roles")
-
-    @tags.command(name = "set", description = "set a tag for a team")
-    async def set(
-        self, 
-        ctx: ApplicationContext, 
-        teamnumber = Option(int, name = "teamnumber", description = "which team's tag to set"), 
-        tag = Option(str, name = "tag", description = "which tag to set")
-        ):
-        self.bot.mogi["team_tags"][int(teamnumber)-1] = tag
-        await ctx.respond(f"Updated Team {teamnumber}'s tag to {tag}")
-
-    @tags.command(name = "apply_roles", description = "assign team roles", guild_only=True)
-    async def apply_roles(self, ctx: ApplicationContext):
-        await ctx.response.defer()
-        if not self.bot.mogi["format"]:
-            return ctx.respond("No format chosen yet")
-        if self.bot.mogi["format"] != "ffa":
-            for i, team in enumerate(self.bot.mogi["teams"]):
-                for player in team:
-                    await get(ctx.guild.members, id=int(player.strip("<@!>"))).add_roles(
-                        get(ctx.guild.roles, name=f"Team {i+1}")
-                    )
-            return await ctx.respond("Assigned team roles")
-        await ctx.respond("format is ffa, not team roles assigned")
-
-    @tags.command(name="unapply_roles", guild_only=True)
-    async def unapply_roles(self, ctx: ApplicationContext):
-        await ctx.response.defer()
-        for i in [1, 2, 3, 4, 5]:
-            role = get(ctx.guild.roles, name=f"Team {i}")
-            for member in role.members:
-                await member.remove_roles(role)
-        await ctx.respond("Removed team roles")
-
-    @slash_command(name="open", description="Start a new mogi", guild_only=True)
-    async def open(self, ctx: ApplicationContext):
-        if self.bot.mogi["status"]:
-            return await ctx.respond("A mogi is already open")
-        self.bot.mogi["status"] = 1
-        await ctx.respond("# Started a new mogi! Use /join to participate!")
 
     @slash_command(name="lock", description="Lock the current mogi from being closed", guild_only=True)
     async def lock(self, ctx: ApplicationContext):
         self.bot.mogi["locked"] = (not self.bot.mogi["locked"])
         await ctx.respond(f"New mogi locking state: {self.bot.mogi['locked']}")
-
-    @slash_command(name="join", description="Join the current mogi", guild_only=True)
-    async def join(self, ctx: ApplicationContext):
-        async with self.join_sem:
-            if not self.bot.mogi["status"]:
-                return await ctx.respond("Currently no mogi open")
-            if self.bot.mogi["locked"]:
-                return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
-            if ctx.author.mention in self.bot.mogi["players"]:
-                return await ctx.respond("You are already in the mogi")
-            if len(self.bot.mogi["players"]) >= 12:
-                return await ctx.respond("The mogi is already full")
-            if ctx.author.mention not in self.bot.mogi["players"]:
-                self.bot.mogi["players"].append(ctx.author.mention)
-            if get(ctx.guild.roles, name="InMogi") not in ctx.author.roles:
-                await ctx.user.add_roles(get(ctx.guild.roles, name="InMogi"))
-            await ctx.respond(
-                f"{ctx.author.name} joined the mogi!\n{len(self.bot.mogi['players'])} players are in!"
-            )
-
-    @slash_command(name="leave", description="Leave the current mogi", guild_only=True)
-    async def leave(self, ctx: ApplicationContext):
-        if ctx.author.mention not in self.bot.mogi["players"]:
-            return await ctx.respond("You are not in the mogi")
-        if self.bot.mogi["locked"]:
-            return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
-        self.bot.mogi["players"].remove(ctx.author.mention)
-        await ctx.user.remove_roles(get(ctx.guild.roles, name="InMogi"))
-        await ctx.respond(
-            f"{ctx.author.mention} left the mogi!\n{len(self.bot.mogi['players'])} players are in!"
-        )
 
     @slash_command(name="l", description="List all players in the current mogi", guild_only=True)
     async def l(self, ctx: ApplicationContext, 
@@ -147,67 +69,6 @@ class mogi(commands.Cog):
             else:
                 list += f"*{index+1}.* {name}\n"
         await ctx.respond(list, allowed_mentions=discord.AllowedMentions(users=False))
-
-    @slash_command(name="close", description="Stop the current Mogi if running", guild_only=True)
-    async def close(self, ctx: ApplicationContext):
-        await ctx.response.defer()
-        if self.bot.mogi["locked"]:
-            return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
-
-        message = await ctx.send(
-            f"""
-        Closing the mogi discards all teams and points.
-        Only do this after the results have been posted.
-        Are you sure, {ctx.author.mention} ?
-        """
-        )
-
-        await message.add_reaction("✅")
-        await message.add_reaction("❌")
-
-        def check(reaction, user):
-            return user == ctx.user and str(reaction.emoji) in ("✅", "❌")
-
-        try:
-            reaction, user = await self.bot.wait_for(
-                "reaction_add", timeout=60, check=check
-            )
-        except asyncio.TimeoutError:
-            await message.edit(content="Confirmation timed out.")
-            return await ctx.respond("Timeout")
-
-        if str(reaction.emoji) == "✅":
-            await message.edit(content="Closing...")
-            self.bot.mogi = deepcopy(default_mogi_state)
-            mogi_members = get(ctx.guild.roles, name="InMogi").members
-            for member in mogi_members:
-                await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
-
-            for i in [1, 2, 3, 4, 5]:
-                role = get(ctx.guild.roles, name=f"Team {i}")
-                for member in role.members:
-                    await member.remove_roles(role)
-            final_message = "# The mogi has been closed"
-        else:
-            await message.edit(content="Action canceled.")
-            final_message = "‎ "
-
-        await ctx.followup.send(final_message)
-
-    """ @slash_command(
-        name="pswd", description="view or change the server password (to send to mogi players)", guild_only=True
-    )
-    async def pswd(self, ctx: ApplicationContext, new=Option(str, required=False)):
-        if not new:
-            return await ctx.respond(f"Current password: ```{self.mogi['password']}```")
-        self.mogi["password"] = new
-        await ctx.respond("Updated password") """
-
-    @slash_command(name="status", description="See current state of mogi")
-    async def status(self, ctx: ApplicationContext):
-        if not self.bot.mogi["status"]:
-            return await ctx.respond("No running mogi")
-        await ctx.respond(f"Currently open mogi: {len(self.bot.mogi['players'])} players")
 
     @slash_command(
         name="start", description="Randomize teams, vote format and start playing", guild_only=True
@@ -321,8 +182,6 @@ class mogi(commands.Cog):
 
         await ctx.send(self.bot.mogi['votes'])
 
-    
-
     @slash_command(
         name="force_start",
         description="When voting did not work - force start the mogi with a given format",
@@ -383,7 +242,6 @@ class mogi(commands.Cog):
         
         await ctx.respond("The mogi has been stopped, use /start to start it again")
         await ctx.send(f"Debug:\nVotes:{self.bot.mogi['votes']}")
-
 
     @slash_command(name="teams", description="Show teams")
     async def teams(self, ctx: ApplicationContext):
