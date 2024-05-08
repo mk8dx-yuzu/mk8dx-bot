@@ -35,7 +35,6 @@ class mogi(commands.Cog):
 
     @slash_command(name="debug")
     async def debug(self, ctx: ApplicationContext):
-        print(self.bot.globalvar)
         await ctx.respond(self.bot.mogi, ephemeral = True)
 
     tags = SlashCommandGroup(name = "tags", description = "Edit Team tags and apply/remove respective roles")
