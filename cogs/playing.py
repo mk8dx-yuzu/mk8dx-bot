@@ -1,11 +1,14 @@
-import discord
+import discord, asyncio
 from discord import ApplicationContext, slash_command
 from discord.ext import commands
 from discord.utils import get
 
 class playing(commands.Cog):
     def __init__(self, bot):
-            self.bot: commands.Bot = bot
+        self.bot: commands.Bot = bot
+
+        self.join_sem = asyncio.Semaphore(1)
+
 
     @slash_command(name="join", description="Join the current mogi", guild_only=True)
     async def join(self, ctx: ApplicationContext):

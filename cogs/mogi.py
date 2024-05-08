@@ -30,7 +30,6 @@ class mogi(commands.Cog):
         self.db = self.client["lounge"]
         self.players = self.db["players"]
 
-        self.join_sem = asyncio.Semaphore(1)
 
     @slash_command(name="lock", description="Lock the current mogi from being closed", guild_only=True)
     async def lock(self, ctx: ApplicationContext):
