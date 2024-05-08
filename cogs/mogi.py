@@ -457,7 +457,6 @@ class mogi(commands.Cog):
         class MogiModal(discord.ui.Modal):
             def __init__(self, mogi, db, *args, **kwargs):
                 super().__init__(*args, **kwargs)
-                self.mogi = mogi
                 self.db = db
 
                 count = 0
