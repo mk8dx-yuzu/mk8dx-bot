@@ -508,10 +508,11 @@ class mogi(commands.Cog):
         
     @slash_command(name="points_reset", description="Messed up points input? Reset them")
     async def points_reset(self, ctx: ApplicationContext):
+        self.mogi["point_count"] = 0
         self.mogi["input_points"] = []
         self.mogi["points"] = []
         self.mogi["calc"] = []
-        await ctx.respond("Clear all points")
+        await ctx.respond("Cleared all points", ephemeral = True)
 
     @slash_command(
         name="calc", description="Use after using /points to calculate new mmr", guild_only=True
