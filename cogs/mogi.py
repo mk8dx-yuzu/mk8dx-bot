@@ -219,15 +219,15 @@ class mogi(commands.Cog):
             return await ctx.respond(
                 "You can't start a mogi you aren't in", ephemeral=True
             )
-        if len(self.mogi["players"]) < 3:
+        if len(self.bot.mogi["players"]) < 3:
             return await ctx.respond("Can't start a mogi with less than 3 players")
-        if self.mogi["running"]:
+        if self.bot.mogi["running"]:
             return await ctx.respond("Mogi is already in play")
 
-        self.mogi["voting"] = 1
-        self.mogi["locked"] = True
+        self.bot.mogi["voting"] = 1
+        self.bot.mogi["locked"] = True
 
-        players_len = len(self.mogi["players"])
+        players_len = len(self.bot.mogi["players"])
         options = []
         options.append(discord.SelectOption(label=f"FFA", value=f"ffa"))
         for size in range(2, players_len // 2 + 1):
