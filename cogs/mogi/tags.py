@@ -5,7 +5,7 @@ from discord.utils import get
 
 class tags(commands.Cog):
     def __init__(self, bot):
-            self.bot: commands.Bot = bot
+        self.bot: commands.Bot = bot
 
     tags = SlashCommandGroup(name = "tags", description = "Edit Team tags and apply/remove respective roles")
 

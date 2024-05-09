@@ -3,7 +3,7 @@ import discord
 
 class ping(commands.Cog):
     def __init__(self, bot):
-            self.bot: commands.Bot = bot
+        self.bot: commands.Bot = bot
 
     @commands.Cog.listener()
     async def on_ready(self):

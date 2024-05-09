@@ -5,7 +5,7 @@ from discord.utils import get
 
 class debug(commands.Cog):
     def __init__(self, bot):
-            self.bot: commands.Bot = bot
+        self.bot: commands.Bot = bot
 
     @slash_command(name="debug")
     async def debug(self, ctx: ApplicationContext):
@@ -40,6 +40,14 @@ class debug(commands.Cog):
             await ctx.respond("No missing votes")
 
         await ctx.send(self.bot.mogi['votes'])
+
+    @slash_command(name="points_reset", description="Messed up points input? Reset them", guild_only=True)
+    async def points_reset(self, ctx: ApplicationContext):
+        self.bot.mogi["point_count"] = 0
+        self.bot.mogi["input_points"] = []
+        self.bot.mogi["points"] = []
+        self.bot.mogi["calc"] = []
+        await ctx.respond("Cleared all points", ephemeral = True)
         
 def setup(bot: commands.Bot):
     bot.add_cog(debug(bot))

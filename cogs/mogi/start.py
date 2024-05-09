@@ -2,11 +2,11 @@ import discord, math, random
 from discord import Option, SlashCommandGroup, ApplicationContext, slash_command
 from discord.ext import commands
 from discord.utils import get
-from discord.ui import View, Modal, InputText
+from discord.ui import View
 
 class start(commands.Cog):
     def __init__(self, bot):
-            self.bot: commands.Bot = bot
+        self.bot: commands.Bot = bot
 
     @slash_command(
         name="start", description="Randomize teams, vote format and start playing", guild_only=True

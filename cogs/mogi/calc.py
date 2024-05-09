@@ -1,11 +1,11 @@
-import os, discord, pymongo, math, random, asyncio
-from copy import deepcopy
-from pymongo import collection, database
-
-from discord import SlashCommandGroup, ApplicationContext, Interaction, Option, slash_command
-from discord.ui import View, Modal, InputText
-from discord.utils import get
+import discord, math
+from discord import Option, ApplicationContext, slash_command, Interaction
 from discord.ext import commands
+from discord.utils import get
+from discord.ui import View, Modal, InputText
+
+import pymongo
+from pymongo import database, collection
 
 import trueskill
 from trueskill import Rating, rate, global_env
@@ -17,34 +17,12 @@ from io import BytesIO
 
 import cogs.extras.mmr_algorithm as mmr_alg
 from cogs.extras.ranks import calcRank
-from cogs.extras.replacement_logic import replace, swap
-import cogs.extras.mogi_config as config
 
-default_mogi_state = config.mogi_config
-
-class mogi(commands.Cog):
+class calc(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.db: database.Database = self.bot.db
         self.players: collection.Collection = self.bot.players
-
-
-    
-        
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 
     @slash_command(name="points", description="Use after a mogi - input player points", guild_only=True)
     async def points(self, ctx: ApplicationContext):
@@ -103,14 +81,6 @@ class mogi(commands.Cog):
         else:
             return await ctx.respond("Already got all calcs")
         
-    @slash_command(name="points_reset", description="Messed up points input? Reset them", guild_only=True)
-    async def points_reset(self, ctx: ApplicationContext):
-        self.bot.mogi["point_count"] = 0
-        self.bot.mogi["input_points"] = []
-        self.bot.mogi["points"] = []
-        self.bot.mogi["calc"] = []
-        await ctx.respond("Cleared all points", ephemeral = True)
-
     @slash_command(
         name="calc", description="Use after using /points to calculate new mmr", guild_only=True
     )
@@ -278,6 +248,7 @@ class mogi(commands.Cog):
 
         await ctx.respond("Applied MMR changes ✅")
 
+
     @slash_command(name="calc_test", guild_only=True)
     async def calc_test(
         self,
@@ -338,7 +309,6 @@ class mogi(commands.Cog):
         buffer.seek(0)
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
-
-    
+        
 def setup(bot: commands.Bot):
-    bot.add_cog(mogi(bot))
+    bot.add_cog(calc(bot))

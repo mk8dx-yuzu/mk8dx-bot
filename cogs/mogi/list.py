@@ -5,7 +5,7 @@ from discord.utils import get
 
 class list(commands.Cog):
     def __init__(self, bot):
-            self.bot: commands.Bot = bot
+        self.bot: commands.Bot = bot
 
     @slash_command(name="l", description="List all players in the current mogi")
     async def l(self, ctx: ApplicationContext, 

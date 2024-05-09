@@ -7,7 +7,7 @@ from cogs.extras.replacement_logic import replace, swap
 
 class sub(commands.Cog):
     def __init__(self, bot):
-            self.bot: commands.Bot = bot
+        self.bot: commands.Bot = bot
 
     replace = SlashCommandGroup(name = "replace", description = "sub or swap players")
 
