@@ -24,8 +24,12 @@ class events(commands.Cog):
         if " election" in message.content.lower() and random.random() < 0.5:
             await message.channel.send(":flag_us:")
 
+        if message.channel.id == 1181312934803144724:
+            if not message.author.guild_permissions.administrator or not message.author.guild_permissions.moderate_members and not message.content.startswith("/register"):
+                await message.delete()
+
         if message.channel.type == discord.ChannelType.private :
-            for hint in ["high", "seas", "see", "yuzu", "download", "link"]:
+            for hint in ["information", "piracy", "high", "seas", "sea", "yuzu", "download", "link"]:
                 if hint in message.content.lower():
                     await message.channel.send(f"{os.getenv('YUZU_URL')}")
                     return await message.channel.send("Please do not share this link with others so that it stays away from big N's eyes. Instead hint others at asking me here in DMs. Thank you")
