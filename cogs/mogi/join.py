@@ -3,7 +3,7 @@ from discord import ApplicationContext, slash_command
 from discord.ext import commands
 from discord.utils import get
 
-class playing(commands.Cog):
+class join(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
@@ -42,4 +42,4 @@ class playing(commands.Cog):
         )
         
 def setup(bot: commands.Bot):
-    bot.add_cog(playing(bot))
+    bot.add_cog(join(bot))
