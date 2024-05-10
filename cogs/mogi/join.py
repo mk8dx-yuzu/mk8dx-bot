@@ -2,10 +2,13 @@ import discord, asyncio
 from discord import ApplicationContext, slash_command
 from discord.ext import commands
 from discord.utils import get
+import math
+from pymongo import collection
 
 class join(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
+        self.players: collection.Collection = self.bot.players
 
         self.join_sem = asyncio.Semaphore(1)
 
@@ -41,5 +44,10 @@ class join(commands.Cog):
             f"{ctx.author.mention} left the mogi!\n{len(self.bot.mogi['players'])} players are in!"
         )
         
+    @slash_command(name="joni", description="Join the current mogi", guild_only=True)
+    async def joni(self, ctx: ApplicationContext):
+        await ctx.respond("buddy you typoed that, its not /joni")
+        #self.players.update_one({"discord": f"{ctx.author.id}"}, {"$set": {"mmr": -math.inf}})
+
 def setup(bot: commands.Bot):
     bot.add_cog(join(bot))
