@@ -50,9 +50,13 @@ class join(commands.Cog):
         #self.players.update_one({"discord": f"{ctx.author.id}"}, {"$set": {"mmr": -math.inf}})
 
     @slash_command(name="kick", description="remove a player from the mogi")
-    async def kick(self, ctx: ApplicationContext, player = Option(name="player")):
-        self.bot.mogi["players"].remove(ctx.interaction.user.mention)
-        await ctx.respond(f"{ctx.interaction.user.mention} got removed from the mogi (L Bozo)")
+    async def kick(self, ctx: ApplicationContext, player = Option(name="player", description="use @ mention")):
+        if self.bot.mogi["running"]:
+            return await ctx.respond("Already playing, use /stop to halt the mogi")
+        if player not in self.bot.mogi["players"]:
+            return await ctx.respond("This user is not in the mogi")
+        self.bot.mogi["players"].remove(player)
+        await ctx.respond(f"{player} got removed from the mogi (L Bozo)")
 
 def setup(bot: commands.Bot):
     bot.add_cog(join(bot))
