@@ -1,5 +1,5 @@
 import discord, asyncio
-from discord import ApplicationContext, slash_command
+from discord import ApplicationContext, slash_command, Option
 from discord.ext import commands
 from discord.utils import get
 import math
@@ -48,6 +48,11 @@ class join(commands.Cog):
     async def joni(self, ctx: ApplicationContext):
         await ctx.respond("buddy you typoed that, its not /joni")
         #self.players.update_one({"discord": f"{ctx.author.id}"}, {"$set": {"mmr": -math.inf}})
+
+    @slash_command(name="kick", description="remove a player from the mogi")
+    async def kick(self, ctx: ApplicationContext, player = Option(name="player")):
+        self.bot.mogi["players"].remove(ctx.interaction.user.mention)
+        await ctx.respond(f"{ctx.interaction.user.mention} got removed from the mogi (L Bozo)")
 
 def setup(bot: commands.Bot):
     bot.add_cog(join(bot))
