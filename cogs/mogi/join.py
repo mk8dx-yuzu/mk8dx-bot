@@ -49,7 +49,7 @@ class join(commands.Cog):
         await ctx.respond("buddy you typoed that, its not /joni")
         #self.players.update_one({"discord": f"{ctx.author.id}"}, {"$set": {"mmr": -math.inf}})
 
-    @slash_command(name="kick", description="remove a player from the mogi")
+    @slash_command(name="kick", description="remove a player from the mogi", guild_only=True)
     async def kick(self, ctx: ApplicationContext, player = Option(name="player", description="use @ mention")):
         if self.bot.mogi["running"]:
             return await ctx.respond("Already playing, use /stop to halt the mogi")
