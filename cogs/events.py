@@ -2,6 +2,7 @@ import os
 import random
 import discord
 from discord.ext import commands
+import re
 
 class events(commands.Cog):
     def __init__(self, bot):
@@ -23,6 +24,9 @@ class events(commands.Cog):
             await message.channel.send(random.choice(["DDDDKKKK SUMIIIIT", "dk summit mentioned", "best track in the game"]))
         if " election" in message.content.lower() and random.random() < 0.5:
             await message.channel.send(":flag_us:")
+
+        if re.match(r"^/\w+$", message.content):
+            return await message.channel.send(f"we don't have {message.content[1:]}")
 
         if message.channel.id == 1181312934803144724:
             if not message.author.guild_permissions.administrator or not message.author.guild_permissions.moderate_members and not message.content.startswith("/register"):
