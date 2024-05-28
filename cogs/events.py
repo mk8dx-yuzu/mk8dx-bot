@@ -25,9 +25,6 @@ class events(commands.Cog):
         if " election" in message.content.lower() and random.random() < 0.5:
             await message.channel.send(":flag_us:")
 
-        if re.match(r"^/\w+$", message.content):
-            return await message.channel.send(random.choice([f"we don't have {message.content[1:]} here", f"{message.content[1:]} is not something we offer here", f"we will not serve {message.content[1:]} here"]))
-
         if message.channel.id == 1181312934803144724:
             if not message.author.guild_permissions.administrator or not message.author.guild_permissions.moderate_members and not message.content.startswith("/register"):
                 await message.delete()
