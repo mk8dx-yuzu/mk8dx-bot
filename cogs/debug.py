@@ -47,6 +47,7 @@ class debug(commands.Cog):
         self.bot.mogi["input_points"] = []
         self.bot.mogi["points"] = []
         self.bot.mogi["calc"] = []
+        self.bot.mogi["results"] = []
         await ctx.respond("Cleared all points", ephemeral = True)
         
 def setup(bot: commands.Bot):
