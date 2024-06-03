@@ -9,6 +9,7 @@ mogi_config = {
     "teams": [],
     "team_tags": [f"Team {i+1}" for i in range(5)],
     "calc": [],
+    "points_user": "",
     "points": [],
     "input_points": [],
     "point_count": 0,

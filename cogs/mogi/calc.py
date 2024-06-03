@@ -28,6 +28,10 @@ class calc(commands.Cog):
     async def points(self, ctx: ApplicationContext):
         if not self.bot.mogi["running"]:
             return await ctx.respond("No running mogi")
+        if self.bot.mogi["points_user"] and self.bot.mogi["points_user"] != ctx.interaction.user.id:
+            return await ctx.respond("Someone is already doing points", ephemeral=True)
+
+        self.bot.mogi["points_user"] = ctx.interaction.user.id
 
         class MogiModal(discord.ui.Modal):
             def __init__(self, mogi, db, *args, **kwargs):
