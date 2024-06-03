@@ -153,11 +153,11 @@ class mk8dx(commands.Cog):
 
         embed.set_author(
             name="Yuzu-Lounge",
-            icon_url="https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/favicon/android-icon-192x192.png",
+            icon_url="https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/public/favicon/android-icon-192x192.png",
         )
         rank.lower()
         embed.set_thumbnail(
-            url=f"https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/images/ranks/{rank.lower()}.webp"
+            url=f"https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/public/images/ranks/{rank.lower()}.webp"
         )
 
         await ctx.respond(f"# {name} - overview", embed=embed)
