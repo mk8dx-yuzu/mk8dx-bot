@@ -185,7 +185,7 @@ class mk8dx(commands.Cog):
             return await ctx.respond("Name already taken or another error occured", ephemeral=True)
         await member.add_roles(get(ctx.guild.roles, name="Lounge Player"))
         await member.add_roles(get(ctx.guild.roles, name="Lounge - Silver"))
-        await ctx.respond(f"{member.mention} is now registered for Lounge as {username}", ephemeral=True)
+        await ctx.respond(f"{member.mention} is now registered for Lounge as {username}\n You can view your profile at https://mk8dx-yuzu.github.io/{username}", ephemeral=True)
 
 def setup(bot: commands.Bot):
     bot.add_cog(mk8dx(bot))
