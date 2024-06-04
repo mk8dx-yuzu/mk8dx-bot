@@ -26,6 +26,7 @@ class customBot(commands.Bot):
         )
         self.db = self.client["lounge"]
         self.players: collection = self.db["players"]
+        self.archived: collection = self.db["archived"]
 
         return super().__init__(*args, **kwargs)
     
