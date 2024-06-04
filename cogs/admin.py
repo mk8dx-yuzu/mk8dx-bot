@@ -11,6 +11,7 @@ class admin(commands.Cog):
         self.bot: commands.Bot = bot
         self.db: database.Database = self.bot.db
         self.players: collection.Collection = self.bot.players
+        self.archived: collection.Collection = self.bot.archived
 
     @slash_command(
         name="edit",
@@ -83,6 +84,30 @@ class admin(commands.Cog):
         await ctx.guild.get_member(user_discord).remove_roles(get(ctx.guild.roles, name="Lounge Player"))
         self.players.delete_one({"name": player})
         await ctx.respond(f"Successfully deleted {player}s player records")
+
+    @slash_command(name="archive", description="archive a player", guild_only=True)
+    async def archive(self, ctx: ApplicationContext, player = Option(
+        str,
+        name="player",
+        description="use @ mention"
+    )):
+        self.players.aggregate([
+            { "$match": {"discord": player.strip("<@!>")} },
+            { "$out": self.archived.name }
+        ])
+        self.players.delete_many({"discord": player.strip("<@!>")})
+
+    @slash_command(name="unarchive", description="unarchive a player", guild_only=True)
+    async def unarchive(self, ctx: ApplicationContext, player = Option(
+        str,
+        name="player",
+        description="use @ mention"
+    )):
+        self.archived.aggregate([
+            { "$match": {"discord": player.strip("<@!>")} },
+            { "$out": self.players.name }
+        ])
+        self.archived.delete_many({"discord": player.strip("<@!>")})
 
 def setup(bot: commands.Bot):
     bot.add_cog(admin(bot))
