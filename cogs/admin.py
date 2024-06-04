@@ -107,7 +107,7 @@ class admin(commands.Cog):
             { "$match": {"discord": player.strip("<@!>")} },
             { "$out": self.players.name }
         ])
-        self.archived.delete_many({"discord": player.strip("<@!>")})
+        self.archived.delete_one({"discord": player.strip("<@!>")})
 
 def setup(bot: commands.Bot):
     bot.add_cog(admin(bot))
