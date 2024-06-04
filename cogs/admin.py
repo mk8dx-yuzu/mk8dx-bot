@@ -93,6 +93,7 @@ class admin(commands.Cog):
     )):
         self.archived.insert_one(self.players.find_one({"discord": player.strip("<@!>")}))
         self.players.delete_one({"discord": player.strip("<@!>")})
+        await ctx.respond(f"{player} has been archived")
 
     @slash_command(name="unarchive", description="unarchive a player", guild_only=True)
     async def unarchive(self, ctx: ApplicationContext, player = Option(
@@ -102,6 +103,7 @@ class admin(commands.Cog):
     )):
         self.players.insert_one(self.archived.find_one({"discord": player.strip("<@!>")}))
         self.archived.delete_one({"discord": player.strip("<@!>")})
+        await ctx.respond(f"{player} has been unarchived")
 
 def setup(bot: commands.Bot):
     bot.add_cog(admin(bot))
