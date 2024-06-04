@@ -91,11 +91,8 @@ class admin(commands.Cog):
         name="player",
         description="use @ mention"
     )):
-        self.players.aggregate([
-            { "$match": {"discord": player.strip("<@!>")} },
-            { "$out": self.archived.name }
-        ])
-        self.players.delete_many({"discord": player.strip("<@!>")})
+        self.archived.insert_one(self.players.find_one({"discord": player.strip("<@!>")}))
+        self.players.delete_one({"discord": player.strip("<@!>")})
 
     @slash_command(name="unarchive", description="unarchive a player", guild_only=True)
     async def unarchive(self, ctx: ApplicationContext, player = Option(
@@ -103,10 +100,7 @@ class admin(commands.Cog):
         name="player",
         description="use @ mention"
     )):
-        self.archived.aggregate([
-            { "$match": {"discord": player.strip("<@!>")} },
-            { "$out": self.players.name }
-        ])
+        self.players.insert_one(self.archived.find_one({"discord": player.strip("<@!>")}))
         self.archived.delete_one({"discord": player.strip("<@!>")})
 
 def setup(bot: commands.Bot):
