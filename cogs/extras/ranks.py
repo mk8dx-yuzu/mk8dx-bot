@@ -2,8 +2,8 @@ import math
 
 def calcRank(mmr):
     ranks = [
-        {"name": "Wood", "range": (-math.inf, 0)},
-        {"name": "Bronze", "range": (1, 1499)},
+        {"name": "Wood", "range": (-math.inf, 1)},
+        {"name": "Bronze", "range": (2, 1499)},
         {"name": "Silver", "range": (1400, 2999)},
         {"name": "Gold", "range": (3000, 5099)},
         {"name": "Platinum", "range": (5100, 6999)},
