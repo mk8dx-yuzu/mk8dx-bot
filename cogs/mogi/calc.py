@@ -219,8 +219,8 @@ class calc(commands.Cog):
                 {"discord": player.strip("<@!>")}, 
                 {"$set": {
                     "mmr": new_mmr[i]
-                      if new_mmr[i] > 0 or get(ctx.guild.roles, name="WoodLover") in get(ctx.guild.members, id=int(player.strip("<@!>"))).roles 
-                      else 0
+                      if new_mmr[i] > 1 or get(ctx.guild.roles, name="WoodLover") in get(ctx.guild.members, id=int(player.strip("<@!>"))).roles 
+                      else 1
                     }
                 }
             )
