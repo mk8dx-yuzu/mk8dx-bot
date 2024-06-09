@@ -22,7 +22,7 @@ class help(commands.Cog):
 
         embed.set_footer(text="Yuzu Online", icon_url="https://images-ext-1.discordapp.net/external/ymL8nMKRGEJwQZNCLRuCAbeHxt3n3HYA0XTD-JUW4m4/https/cdn.discordapp.com/icons/1084911987626094654/a_f51d88cf4421676675437f9cf4fbbff6.gif")
 
-        await ctx.send(embed=embed)
+        await ctx.respond(embed=embed)
         
 def setup(bot: commands.Bot):
     bot.add_cog(help(bot))
