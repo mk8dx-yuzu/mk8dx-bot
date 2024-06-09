@@ -1,5 +1,5 @@
 import discord
-from discord import slash_command, Option
+from discord import slash_command, Option, ApplicationContext
 from discord.ext import commands
 
 class help(commands.Cog):
@@ -7,7 +7,7 @@ class help(commands.Cog):
         self.bot: commands.Bot = bot
 
     @slash_command(name="help", description="A summary of most of the commands to help")
-    async def help(ctx):
+    async def help(self, ctx: ApplicationContext):
         embed=discord.Embed(title="Help", description="Here you can find a brief summary of common commands.", color=discord.Color.blue())
         embed.set_thumbnail(url="https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/public/favicon/ms-icon-310x310.png")
         embed.add_field(name="`/join`", value="Join an open or unlocked mogi", inline=False)
