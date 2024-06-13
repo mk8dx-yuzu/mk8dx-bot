@@ -96,8 +96,11 @@ class start(commands.Cog):
                     pass
 
         view = FormatView(self.bot.mogi)
+
+        players = ', '.join(f'<@{player}>' for player in self.bot.mogi['players'])
+
         await ctx.respond(
-            f"<@&{get(ctx.guild.roles, name='InMogi').id}> \nBeginning Mogi \nVote for a format:",
+            f"|| {players} || \nBeginning Mogi \nVote for a format:",
             view=view,
         )
 
