@@ -97,7 +97,7 @@ class start(commands.Cog):
 
         view = FormatView(self.bot.mogi)
 
-        players = ', '.join(f'<@{player}>' for player in self.bot.mogi['players'])
+        players = ', '.join(f'{player}' for player in self.bot.mogi['players'])
 
         await ctx.respond(
             f"|| {players} || \nBeginning Mogi \nVote for a format:",
