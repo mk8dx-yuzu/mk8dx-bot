@@ -24,6 +24,32 @@ class calc(commands.Cog):
         self.db: database.Database = self.bot.db
         self.players: collection.Collection = self.bot.players
 
+    @slash_command(name="new_algo_test")
+    async def new_algo_test(self, ctx: ApplicationContext):
+        new_algo_players = []
+
+        for team in self.bot.mogi["teams"]:
+            for player in team:
+                mmr = self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
+                new_algo_players.append(mmr)
+        scores = []
+        for team_point_arr in self.bot.mogi["points"]:
+            scores.append([sum(team_point_arr)])
+        
+        ranks_dict = {}
+        placements = []
+        for i, score in enumerate(sorted(scores, reverse=True)):
+            ranks_dict[score[0]] = i + 1
+        for score in scores:
+            placements.append(ranks_dict[score[0]])
+
+        form = self.bot.mogi['format'][0]
+        new_new_ratings = mmr_alg.calculate_mmr(new_algo_players, placements, int(form) if form != "f" else 1 )
+        await ctx.respond(f"""
+            points: {self.bot.mogi['points']} \n
+            result: {new_new_ratings}
+        """, ephemeral=True)
+
     @slash_command(name="points", description="Use after a mogi - input player points", guild_only=True)
     async def points(self, ctx: ApplicationContext):
         if not self.bot.mogi["running"]:
