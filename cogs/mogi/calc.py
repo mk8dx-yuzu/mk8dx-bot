@@ -175,6 +175,7 @@ class calc(commands.Cog):
             f'Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr \n {calc_teams} {placements} \n {debug_string}',
             ephemeral=True,
         )
+        print(self.bot.mogi)
 
     @slash_command(name="table", description="Use after a /calc to view the results", guild_only=True)
     async def table(self, ctx: discord.ApplicationContext):
