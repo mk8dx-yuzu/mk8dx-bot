@@ -24,14 +24,17 @@ class calc(commands.Cog):
         self.db: database.Database = self.bot.db
         self.players: collection.Collection = self.bot.players
 
-    @slash_command(name="new_algo_test")
-    async def new_algo_test(self, ctx: ApplicationContext):
-        new_algo_players = []
+    @slash_command(name="new_calc")
+    async def new_calc(self, ctx: ApplicationContext):
+        debug_string = ""
+        player_mmrs = []
 
         for team in self.bot.mogi["teams"]:
             for player in team:
-                mmr = self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
-                new_algo_players.append(mmr)
+                player_data = self.players.find_one({"discord": player.strip("<@!>")})
+                player_mmrs.append(player_data["mmr"])
+
+                debug_string += f"{player_data['name']}: {player_data['mmr']} MMR\n"
         scores = []
         for team_point_arr in self.bot.mogi["points"]:
             scores.append([sum(team_point_arr)])
@@ -43,12 +46,23 @@ class calc(commands.Cog):
         for score in scores:
             placements.append(ranks_dict[score[0]])
 
+        debug_string += f"{str(placements)}\n"
+
         form = self.bot.mogi['format'][0]
-        new_new_ratings = mmr_alg.calculate_mmr(new_algo_players, placements, int(form) if form != "f" else 1 )
+
+        debug_string += f"{form}\n"
+
+        new_new_ratings = mmr_alg.calculate_mmr(player_mmrs, placements, int(form) if form != "f" else 1 )
+
+        debug_string += f"{new_new_ratings}"
+
         await ctx.respond(f"""
             points: {self.bot.mogi['points']} \n
-            result: {new_new_ratings}
-        """, ephemeral=True)
+            result: {new_new_ratings} \n
+            player list order: {self.bot.mogi['players']} \n
+            debug_string: {debug_string} \n \n
+            full debug: \n {self.bot.mogi}
+        """)
 
     @slash_command(name="points", description="Use after a mogi - input player points", guild_only=True)
     async def points(self, ctx: ApplicationContext):
@@ -156,7 +170,6 @@ class calc(commands.Cog):
         new_ratings = rate(calc_teams, placements)
 
         form = self.bot.mogi['format'][0]
-        new_new_ratings = mmr_alg.calculate_mmr(new_algo_players, placements, int(form) if form != "f" else 1 )
 
         for team in new_ratings:
             self.bot.mogi["results"].append([round(player.mu) for player in team])
@@ -279,67 +292,5 @@ class calc(commands.Cog):
 
         await ctx.respond("Applied MMR changes ✅")
 
-
-    @slash_command(name="calc_test", guild_only=True)
-    async def calc_test(
-        self,
-        ctx: ApplicationContext,
-        format = Option(str, choices = ["1v1", "2v2", "3v3", "4v4", "5v5", "6v6"]),
-        players = Option(str, description = "by lounge username"),
-        placements = Option(str, description = "array"),
-        upscale = Option(str, description = "multiply gains by 1.3x", required = True, choices = ["y", "n"])
-    ):
-        await ctx.response.defer()
-
-        all_players = players.split(", ")
-        player_mmrs = []
-        for player in all_players:
-            player_mmrs.append(self.players.find_one({"name": player})['mmr'])
-
-        deltas = mmr_alg.calculate_mmr(player_mmrs, placements.split(", "), int(format[0]))
-        if upscale == "y":
-            deltas = [math.ceil(1.3 * score) if score > 0 else score for score in deltas]
-
-        await ctx.send(f"{player_mmrs}; {[int(spot) for spot in placements.split(', ')]}; {int(format[0])}")
-        await ctx.send(f"{deltas}")
-
-        deltas = [element for element in deltas for _ in range(int(format[0]))]
-
-        data = {
-            "Player": all_players,
-            "MMR": player_mmrs,
-            "Change": deltas,
-            "New MMR": [player_mmrs[i] + deltas[i] for i in range(0, len(all_players))],
-        }
-        df = pd.DataFrame(data).set_index("Player")
-        df = df.sort_values(by="Change", ascending=False)
-        buffer = BytesIO()
-        dfi.export(
-            df.style.set_table_styles(
-                [
-                    {
-                        "selector": "tr:nth-child(even)",
-                        "props": [("background-color", "#363f4f"), ("color", "white")],
-                    },
-                    {
-                        "selector": "tr:nth-child(odd)",
-                        "props": [("background-color", "#1d2735"), ("color", "white")],
-                    },
-                ]
-            ).background_gradient(
-                cmap=colors.LinearSegmentedColormap.from_list(
-                    "", ["red", "red", "white", "green", "green"]
-                ),
-                low=0.3,
-                high=0.2,
-                subset=["Change"],
-            ),
-            buffer,
-        )
-
-        buffer.seek(0)
-        file = discord.File(buffer, filename="table.png")
-        await ctx.respond(content="Here's the table:", file=file)
-        
 def setup(bot: commands.Bot):
     bot.add_cog(calc(bot))
