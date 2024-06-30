@@ -46,6 +46,8 @@ class calc(commands.Cog):
         for score in scores:
             placements.append(ranks_dict[score[0]])
 
+        placements = placements.reverse()
+
         debug_string += f"{str(placements)}\n"
 
         form = self.bot.mogi['format'][0]
