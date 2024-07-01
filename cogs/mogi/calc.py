@@ -46,7 +46,7 @@ class calc(commands.Cog):
         for score in scores:
             placements.append(ranks_dict[score[0]])
 
-        placements = placements.reverse()
+        placements.reverse()
 
         debug_string += f"placements: {str(placements)}\n"
 
@@ -57,7 +57,7 @@ class calc(commands.Cog):
         await ctx.send(f"\n full debug: \n {self.bot.mogi} \n")
         await ctx.send(f"player_mmrs: {player_mmrs}, placements: {placements}, format: {form}")
 
-        new_new_ratings = mmr_alg.calculate_mmr(player_mmrs, placements, int(form) if form != "f" else 1)
+        new_new_ratings = mmr_alg.calculate_mmr(player_mmrs, placements, (int(form) if form != "f" else 1))
 
         debug_string += f"mmr deltas: {new_new_ratings}"
 
