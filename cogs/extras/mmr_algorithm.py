@@ -14,14 +14,7 @@ def get_mmr_delta_when_tied(team_size, mmr1, mmr2):
     return caps[team_size] / (1 + math.pow(11, -(abs(mmr1 - mmr2) - offsets[team_size]) / scaling_factors[team_size])) - (caps[team_size] / 3)
 
 
-def calculate_mmr(mmrs: list, ranking: list, team_size: int):
-    """
-        perform the mmr calculation with the lounge algorithm\n
-        arguments: 
-            mmrs: array of the players's current mmr\n
-            ranking: array that reflects the position each player in 'mmrs' got\n
-            team_size: int, how many players per team to divide the players into
-    """
+def calculate_mmr(mmrs, ranking, team_size):
     player_count = len(mmrs)
     teams = player_count // team_size
 
@@ -50,9 +43,9 @@ def calculate_mmr(mmrs: list, ranking: list, team_size: int):
             elif i_place == j_place:
                 total += (1 if i_mmr < j_mmr else -1) * \
                     get_mmr_delta_when_tied(team_size, i_mmr, j_mmr)
-            elif i < j:
+            elif i_place < j_place:
                 total += get_mmr_delta_when_won(team_size, i_mmr, j_mmr)
-            elif i > j:
+            elif i_place > j_place:
                 total -= get_mmr_delta_when_won(team_size, j_mmr, i_mmr)
         mmr_deltas.append(round(total))
 
@@ -67,9 +60,8 @@ def calculate_mmr(mmrs: list, ranking: list, team_size: int):
 
     return mmr_deltas
 
-
-#result1 = calculate_mmr([6000, 6000, 6000, 500, 500, 500], [2, 1], 3)
-
-#calculate_mmr([15074, 15155, 15997, 12636, 14305, 14583, 14138, 14169, 13889, 15973, 13060, 13536], [1, 2, 2, 4, 5, 6], 2)
-
-#print(result1)
+""" 
+calculate_mmr([971, 3447, 6798, 9525], [2, 1], 2)
+print('\nNew game\n')
+calculate_mmr([6798, 971, 9525, 3447], [3, 2, 4, 1], 1)
+ """
