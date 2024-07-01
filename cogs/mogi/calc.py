@@ -54,11 +54,13 @@ class calc(commands.Cog):
 
         debug_string += f"format: {form}\n"
 
-        new_new_ratings = mmr_alg.calculate_mmr(player_mmrs, placements, int(form) if form != "f" else 1 )
+        await ctx.send(f"\n full debug: \n {self.bot.mogi} \n")
+        await ctx.send(f"player_mmrs: {player_mmrs}, placements: {placements}, format: {form}")
+
+        new_new_ratings = mmr_alg.calculate_mmr(player_mmrs, placements, int(form) if form != "f" else 1)
 
         debug_string += f"mmr deltas: {new_new_ratings}"
 
-        await ctx.send(f"\n full debug: \n {self.bot.mogi} \n")
 
         await ctx.respond(f"""
             points: {self.bot.mogi['points']} \n
