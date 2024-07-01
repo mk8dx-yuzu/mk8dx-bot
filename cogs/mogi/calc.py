@@ -26,7 +26,7 @@ class calc(commands.Cog):
 
     @slash_command(name="new_calc")
     async def new_calc(self, ctx: ApplicationContext):
-        debug_string = ""
+        debug_string = "# debug \n"
         player_mmrs = []
 
         for team in self.bot.mogi["teams"]:
@@ -34,7 +34,7 @@ class calc(commands.Cog):
                 player_data = self.players.find_one({"discord": player.strip("<@!>")})
                 player_mmrs.append(player_data["mmr"])
 
-                debug_string += f"{player_data['name']}: {player_data['mmr']} MMR\n"
+                debug_string += f"\n {player_data['name']}: {player_data['mmr']} MMR\n"
         scores = []
         for team_point_arr in self.bot.mogi["points"]:
             scores.append([sum(team_point_arr)])
@@ -48,22 +48,22 @@ class calc(commands.Cog):
 
         placements = placements.reverse()
 
-        debug_string += f"{str(placements)}\n"
+        debug_string += f"placements: {str(placements)}\n"
 
         form = self.bot.mogi['format'][0]
 
-        debug_string += f"{form}\n"
+        debug_string += f"format: {form}\n"
 
         new_new_ratings = mmr_alg.calculate_mmr(player_mmrs, placements, int(form) if form != "f" else 1 )
 
-        debug_string += f"{new_new_ratings}"
+        debug_string += f"mmr deltas: {new_new_ratings}"
+
+        await ctx.send(f"\n full debug: \n {self.bot.mogi} \n")
 
         await ctx.respond(f"""
             points: {self.bot.mogi['points']} \n
-            result: {new_new_ratings} \n
             player list order: {self.bot.mogi['players']} \n
-            debug_string: {debug_string} \n \n
-            full debug: \n {self.bot.mogi}
+            debug_string: {debug_string} \n
         """)
 
     @slash_command(name="points", description="Use after a mogi - input player points", guild_only=True)
