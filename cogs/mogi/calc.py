@@ -26,7 +26,7 @@ class calc(commands.Cog):
 
     @slash_command(name="new_calc")
     async def new_calc(self, ctx: ApplicationContext):
-        debug_string = "# debug \n"
+        debug_string = "Debug: \n"
         player_mmrs = []
 
         for team in self.bot.mogi["teams"]:
@@ -46,8 +46,6 @@ class calc(commands.Cog):
         for score in scores:
             placements.append(ranks_dict[score[0]])
 
-        placements.reverse()
-
         debug_string += f"placements: {str(placements)}\n"
 
         form = self.bot.mogi['format'][0]
@@ -62,7 +60,7 @@ class calc(commands.Cog):
         debug_string += f"mmr deltas: {new_new_ratings}"
 
         for team_delta in new_new_ratings:
-            self.bot.mogi["results"].extend([team_delta] * (int(form) if form != "f" else 1))
+            self.bot.mogi["results"].extend([[team_delta] * (int(form) if form != "f" else 1)])
 
         await ctx.respond(f"""
             points: {self.bot.mogi['points']} \n
