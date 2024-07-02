@@ -60,8 +60,7 @@ def calculate_mmr(mmrs, ranking, team_size):
 
     return mmr_deltas
 
-""" 
-calculate_mmr([971, 3447, 6798, 9525], [2, 1], 2)
-print('\nNew game\n')
-calculate_mmr([6798, 971, 9525, 3447], [3, 2, 4, 1], 1)
- """
+
+#print( calculate_mmr([0, 777, 3447, 971], [4, 3, 1, 2], 1) )
+
+#print( calculate_mmr([971, 0, 3447, 777], [2, 4, 1, 3], 1) )

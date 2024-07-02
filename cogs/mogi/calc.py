@@ -61,11 +61,14 @@ class calc(commands.Cog):
 
         debug_string += f"mmr deltas: {new_new_ratings}"
 
+        for team_delta in new_new_ratings:
+            self.bot.mogi["results"].extend([team_delta] * (int(form) if form != "f" else 1))
 
         await ctx.respond(f"""
             points: {self.bot.mogi['points']} \n
             player list order: {self.bot.mogi['players']} \n
             debug_string: {debug_string} \n
+            data got added to results. try /table to view if theyre correct
         """)
 
     @slash_command(name="points", description="Use after a mogi - input player points", guild_only=True)
