@@ -205,7 +205,8 @@ class calc(commands.Cog):
             round(self.players.find_one({"discord": player.strip("<@!>")})["mmr"])
             for player in self.bot.mogi["players"]
         ]
-        #new_mmr = [val for sublist in self.bot.mogi["results"] for val in sublist]
+        new_mmr = [val for sublist in self.bot.mogi["results"] for val in sublist]
+        new_mmr = self.bot.mogi["results"]
 
         data = {
             "Player": players,
