@@ -60,7 +60,7 @@ class calc(commands.Cog):
         debug_string += f"mmr deltas: {new_new_ratings}"
 
         for team_delta in new_new_ratings:
-            self.bot.mogi["results"].extend([[team_delta] * (int(form) if form != "f" else 1)])
+            self.bot.mogi["results"].extend([team_delta] * (int(form) if form != "f" else 1))
 
         await ctx.respond(f"""
             points: {self.bot.mogi['points']} \n
@@ -205,7 +205,7 @@ class calc(commands.Cog):
             round(self.players.find_one({"discord": player.strip("<@!>")})["mmr"])
             for player in self.bot.mogi["players"]
         ]
-        new_mmr = [val for sublist in self.bot.mogi["results"] for val in sublist]
+        #new_mmr = [val for sublist in self.bot.mogi["results"] for val in sublist]
 
         data = {
             "Player": players,
