@@ -205,16 +205,15 @@ class calc(commands.Cog):
             round(self.players.find_one({"discord": player.strip("<@!>")})["mmr"])
             for player in self.bot.mogi["players"]
         ]
-        new_mmr = [val for sublist in self.bot.mogi["results"] for val in sublist]
-        new_mmr = self.bot.mogi["results"]
+        #new_mmr = [val for sublist in self.bot.mogi["results"] for val in sublist]
 
         data = {
             "Player": players,
             "MMR": current_mmr,
             "Change": [
-                round(new_mmr[i] - current_mmr[i]) for i in range(0, len(players))
+                round(self.bot.mogi["results"][i] - current_mmr[i]) for i in range(0, len(players))
             ],
-            "New MMR": new_mmr,
+            "New MMR": self.bot.mogi["results"],
         }
         df = pd.DataFrame(data).set_index("Player")
         df = df.sort_values(by="Change", ascending=False)
