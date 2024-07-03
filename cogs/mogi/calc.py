@@ -130,6 +130,56 @@ class calc(commands.Cog):
         else:
             return await ctx.respond("Already got all calcs")
         
+    @slash_command(name="new_table")
+    async def new_table(self, ctx: ApplicationContext):
+        players = [
+            self.players.find_one({"discord": player.strip("<@!>")})["name"]
+            for player in self.bot.mogi["players"]
+        ]
+        current_mmrs = [
+            round(self.players.find_one({"discord": player.strip("<@!>")})["mmr"])
+            for player in self.bot.mogi["players"]
+        ]
+        new_mmrs = [current_mmrs[i] + self.bot.mogi["results"][i] for i in players]
+
+        data = {
+            "Player": players,
+            "MMR": current_mmrs,
+            "Change": [
+                round(self.bot.mogi["results"][i]) for i in range(0, len(players))
+            ],
+            "New MMR": new_mmrs,
+        }
+        df = pd.DataFrame(data).set_index("Player")
+        df = df.sort_values(by="Change", ascending=False)
+        buffer = BytesIO()
+        dfi.export(
+            df.style.set_table_styles(
+                [
+                    {
+                        "selector": "tr:nth-child(even)",
+                        "props": [("background-color", "#363f4f"), ("color", "white")],
+                    },
+                    {
+                        "selector": "tr:nth-child(odd)",
+                        "props": [("background-color", "#1d2735"), ("color", "white")],
+                    },
+                ]
+            ).background_gradient(
+                cmap=colors.LinearSegmentedColormap.from_list(
+                    "", ["red", "red", "white", "green", "green"]
+                ),
+                low=0.3,
+                high=0.2,
+                subset=["Change"],
+            ),
+            buffer,
+        )
+
+        buffer.seek(0)
+        file = discord.File(buffer, filename="table.png")
+        await ctx.respond(content="Here's the table:", file=file)
+        
     @slash_command(
         name="calc", description="Use after using /points to calculate new mmr", guild_only=True
     )
@@ -194,6 +244,7 @@ class calc(commands.Cog):
             ephemeral=True,
         )
         print(self.bot.mogi)
+
 
     @slash_command(name="table", description="Use after a /calc to view the results", guild_only=True)
     async def table(self, ctx: discord.ApplicationContext):
