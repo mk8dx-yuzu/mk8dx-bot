@@ -141,7 +141,7 @@ class calc(commands.Cog):
             for player in self.bot.mogi["players"]
         ]
         await ctx.send(f"players: {players}, current_mmrs: {current_mmrs}, results: {self.bot.mogi['results']}")
-        new_mmrs = [current_mmrs[i] + self.bot.mogi["results"][i] for i in players]
+        new_mmrs = [current_mmrs[i] + self.bot.mogi["results"][i] for i in range(0, len(players))]
 
         data = {
             "Player": players,
