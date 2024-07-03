@@ -56,6 +56,7 @@ class calc(commands.Cog):
         await ctx.send(f"player_mmrs: {player_mmrs}, placements: {placements}, format: {form}")
 
         new_new_ratings = mmr_alg.calculate_mmr(player_mmrs, placements, (int(form) if form != "f" else 1))
+        new_new_ratings = [round(rating * 1.2) if rating > 0 else rating for rating in new_new_ratings]
 
         debug_string += f"mmr deltas: {new_new_ratings}"
 
