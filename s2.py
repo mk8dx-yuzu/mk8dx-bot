@@ -9,7 +9,7 @@ load_dotenv()
 client = pymongo.MongoClient(f"mongodb://{os.getenv('MONGODB_HOST')}:27017/")
 
 db = client["lounge"]
-players: collection = db["players"]
+players: collection.Collection = db["players"]
 
 def NewSeasonMMR(mmr):
   if (mmr <= 1):
@@ -24,7 +24,9 @@ def NewSeasonMMR(mmr):
 all_players = players.find()
 for player in all_players:
   new_mmr = NewSeasonMMR(player["mmr"])
-  players.updateOne({"discord": player["discord"]}, {"$set": {"mmr": new_mmr}})
-  players.updateOne({"discord": player["discord"]}, {"$set": {"wins": 0}})
-  players.updateOne({"discord": player["discord"]}, {"$set": {"losses": 0}})
-  players.updateOne({"discord": player["discord"]}, {"$set": {"history": []}})
+  players.update_one({"discord": player["discord"]}, {"$set": {
+    "mmr": new_mmr,
+    "wins": 0,
+    "losses": 0,
+    "history": []
+    }})
