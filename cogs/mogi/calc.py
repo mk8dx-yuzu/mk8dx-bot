@@ -181,6 +181,58 @@ class calc(commands.Cog):
         buffer.seek(0)
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
+
+    @slash_command(name="new_apply", description="Use after a /new_calc to apply new mmr", guild_only=True)
+    async def new_apply(self, ctx: ApplicationContext):
+        await ctx.response.defer()
+        players = self.bot.mogi["players"]
+        current_mmrs = [
+            self.players.find_one({"discord": player.strip("<@!>")})["mmr"]
+            for player in self.bot.mogi["players"]
+        ]
+        new_mmrs = [current_mmrs[i] + self.bot.mogi["results"][i] for i in range(0, len(players))]
+        deltas = self.bot.mogi["results"]
+
+        for i, player in enumerate(players):
+            if player in self.bot.mogi["subs"] and deltas[i] < 0:
+                await ctx.send(f"Excluded {self.bot.get_user(int(player.strip('<@!>'))).mention} because they subbed")
+                continue
+            self.players.update_one(
+                {"discord": player.strip("<@!>")}, 
+                {"$set": {
+                    "mmr": new_mmrs[i]
+                      if new_mmrs[i] > 1 or get(ctx.guild.roles, name="WoodLover") in get(ctx.guild.members, id=int(player.strip("<@!>"))).roles 
+                      else 1
+                    }
+                }
+            )
+            self.players.update_one(
+                {"discord": player.strip("<@!>")},
+                {"$push": {"history": deltas[i]}},
+                False,
+            )
+            self.players.update_one(
+                {"discord": player.strip("<@!>")},
+                {
+                    "$set": {
+                        "history": self.players.find_one(
+                            {"discord": player.strip("<@!>")}
+                        )["history"][-30:]
+                    }
+                },
+            )
+            self.players.update_one(
+                {"discord": player.strip("<@!>")},
+                {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}},
+            )
+            current_rank = calcRank(current_mmrs[i])
+            new_rank = calcRank(new_mmrs[i])
+            if current_rank != new_rank:
+                await ctx.send(f"{self.bot.get_user(int(player.strip('<@!>'))).mention} is now in {new_rank}")
+
+        self.bot.mogi["locked"] = False
+
+        await ctx.respond("Applied MMR changes ✅")
         
     @slash_command(
         name="calc", description="Use after using /points to calculate new mmr", guild_only=True
