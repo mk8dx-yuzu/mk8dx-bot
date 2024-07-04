@@ -51,7 +51,7 @@ def calculate_mmr(mmrs, ranking, team_size):
 
     for i in range(player_count):
         delta = mmr_deltas[i // team_size]
-        new_mmr = max(0, mmrs[i] + delta)
+        new_mmr = max(1, mmrs[i] + delta)
         delta = new_mmr - mmrs[i]
 
         delta_str = str(delta) if delta < 0 else "+" + str(delta)
