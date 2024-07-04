@@ -125,10 +125,7 @@ class calc(commands.Cog):
             self.bot.mogi["results"].extend([team_delta] * (int(form) if form != "f" else 1))
 
         await ctx.respond(f"""
-            points: {self.bot.mogi['points']} \n
-            player list order: {self.bot.mogi['players']} \n
-            debug_string: {debug_string} \n
-            data got added to results. try /table to view if theyre correct
+            Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr
         """)
 
     @slash_command(name="table")
@@ -141,7 +138,6 @@ class calc(commands.Cog):
             round(self.players.find_one({"discord": player.strip("<@!>")})["mmr"])
             for player in self.bot.mogi["players"]
         ]
-        await ctx.send(f"players: {players}, current_mmrs: {current_mmrs}, results: {self.bot.mogi['results']}")
         new_mmrs = [current_mmrs[i] + self.bot.mogi["results"][i] for i in range(0, len(players))]
 
         data = {
