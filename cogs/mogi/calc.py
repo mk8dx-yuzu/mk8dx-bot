@@ -24,52 +24,6 @@ class calc(commands.Cog):
         self.db: database.Database = self.bot.db
         self.players: collection.Collection = self.bot.players
 
-    @slash_command(name="new_calc")
-    async def new_calc(self, ctx: ApplicationContext):
-        debug_string = "Debug: \n"
-        player_mmrs = []
-
-        for team in self.bot.mogi["teams"]:
-            for player in team:
-                player_data = self.players.find_one({"discord": player.strip("<@!>")})
-                player_mmrs.append(player_data["mmr"])
-
-                debug_string += f"\n {player_data['name']}: {player_data['mmr']} MMR\n"
-        scores = []
-        for team_point_arr in self.bot.mogi["points"]:
-            scores.append([sum(team_point_arr)])
-        
-        ranks_dict = {}
-        placements = []
-        for i, score in enumerate(sorted(scores, reverse=True)):
-            ranks_dict[score[0]] = i + 1
-        for score in scores:
-            placements.append(ranks_dict[score[0]])
-
-        debug_string += f"placements: {str(placements)}\n"
-
-        form = self.bot.mogi['format'][0]
-
-        debug_string += f"format: {form}\n"
-
-        await ctx.send(f"\n full debug: \n {self.bot.mogi} \n")
-        await ctx.send(f"player_mmrs: {player_mmrs}, placements: {placements}, format: {form}")
-
-        new_new_ratings = mmr_alg.calculate_mmr(player_mmrs, placements, (int(form) if form != "f" else 1))
-        new_new_ratings = [math.ceil(rating * 1.2) if rating > 0 else rating for rating in new_new_ratings]
-
-        debug_string += f"mmr deltas: {new_new_ratings}"
-
-        for team_delta in new_new_ratings:
-            self.bot.mogi["results"].extend([team_delta] * (int(form) if form != "f" else 1))
-
-        await ctx.respond(f"""
-            points: {self.bot.mogi['points']} \n
-            player list order: {self.bot.mogi['players']} \n
-            debug_string: {debug_string} \n
-            data got added to results. try /table to view if theyre correct
-        """)
-
     @slash_command(name="points", description="Use after a mogi - input player points", guild_only=True)
     async def points(self, ctx: ApplicationContext):
         if not self.bot.mogi["running"]:
@@ -131,8 +85,54 @@ class calc(commands.Cog):
         else:
             return await ctx.respond("Already got all calcs")
         
-    @slash_command(name="new_table")
-    async def new_table(self, ctx: ApplicationContext):
+    @slash_command(name="calc")
+    async def calc(self, ctx: ApplicationContext):
+        debug_string = "Debug: \n"
+        player_mmrs = []
+
+        for team in self.bot.mogi["teams"]:
+            for player in team:
+                player_data = self.players.find_one({"discord": player.strip("<@!>")})
+                player_mmrs.append(player_data["mmr"])
+
+                debug_string += f"\n {player_data['name']}: {player_data['mmr']} MMR\n"
+        scores = []
+        for team_point_arr in self.bot.mogi["points"]:
+            scores.append([sum(team_point_arr)])
+        
+        ranks_dict = {}
+        placements = []
+        for i, score in enumerate(sorted(scores, reverse=True)):
+            ranks_dict[score[0]] = i + 1
+        for score in scores:
+            placements.append(ranks_dict[score[0]])
+
+        debug_string += f"placements: {str(placements)}\n"
+
+        form = self.bot.mogi['format'][0]
+
+        debug_string += f"format: {form}\n"
+
+        await ctx.send(f"\n full debug: \n {self.bot.mogi} \n")
+        await ctx.send(f"player_mmrs: {player_mmrs}, placements: {placements}, format: {form}")
+
+        new_new_ratings = mmr_alg.calculate_mmr(player_mmrs, placements, (int(form) if form != "f" else 1))
+        new_new_ratings = [math.ceil(rating * 1.2) if rating > 0 else rating for rating in new_new_ratings]
+
+        debug_string += f"mmr deltas: {new_new_ratings}"
+
+        for team_delta in new_new_ratings:
+            self.bot.mogi["results"].extend([team_delta] * (int(form) if form != "f" else 1))
+
+        await ctx.respond(f"""
+            points: {self.bot.mogi['points']} \n
+            player list order: {self.bot.mogi['players']} \n
+            debug_string: {debug_string} \n
+            data got added to results. try /table to view if theyre correct
+        """)
+
+    @slash_command(name="table")
+    async def table(self, ctx: ApplicationContext):
         players = [
             self.players.find_one({"discord": player.strip("<@!>")})["name"]
             for player in self.bot.mogi["players"]
@@ -182,8 +182,8 @@ class calc(commands.Cog):
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
 
-    @slash_command(name="new_apply", description="Use after a /new_calc to apply new mmr", guild_only=True)
-    async def new_apply(self, ctx: ApplicationContext):
+    @slash_command(name="apply", description="Use after a /calc to apply new mmr", guild_only=True)
+    async def apply(self, ctx: ApplicationContext):
         await ctx.response.defer()
         players = self.bot.mogi["players"]
         current_mmrs = [
@@ -201,8 +201,7 @@ class calc(commands.Cog):
                 {"discord": player.strip("<@!>")}, 
                 {"$set": {
                     "mmr": new_mmrs[i]
-                      if new_mmrs[i] > 1 or get(ctx.guild.roles, name="WoodLover") in get(ctx.guild.members, id=int(player.strip("<@!>"))).roles 
-                      else 1
+                      if new_mmrs[i] > 1 else 1
                     }
                 }
             )
@@ -235,9 +234,9 @@ class calc(commands.Cog):
         await ctx.respond("Applied MMR changes ✅")
         
     @slash_command(
-        name="calc", description="Use after using /points to calculate new mmr", guild_only=True
+        name="old_calc", description="Use after using /points to calculate new mmr", guild_only=True
     )
-    async def calc(self, ctx: discord.ApplicationContext):
+    async def old_calc(self, ctx: discord.ApplicationContext):
         if not len(self.bot.mogi["calc"]):
             return ctx.respond(
                 "There doesn't seem to be data to make calculations with"
@@ -300,8 +299,8 @@ class calc(commands.Cog):
         print(self.bot.mogi)
 
 
-    @slash_command(name="table", description="Use after a /calc to view the results", guild_only=True)
-    async def table(self, ctx: discord.ApplicationContext):
+    @slash_command(name="old_table", description="Use after a /old_calc to view the results", guild_only=True)
+    async def old_table(self, ctx: discord.ApplicationContext):
         players = [
             self.players.find_one({"discord": player.strip("<@!>")})["name"]
             for player in self.bot.mogi["players"]
@@ -350,8 +349,8 @@ class calc(commands.Cog):
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
 
-    @slash_command(name="apply", description="Use after a /calc to apply new mmr", guild_only=True)
-    async def apply(self, ctx: ApplicationContext):
+    @slash_command(name="old_apply", description="Use after a /calc to apply new mmr", guild_only=True)
+    async def old_apply(self, ctx: ApplicationContext):
         await ctx.response.defer()
         players = self.bot.mogi["players"]
         current_mmr = [
