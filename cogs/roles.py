@@ -12,10 +12,15 @@ class roles(commands.Cog):
     async def give_s1_roles(self, ctx: ApplicationContext):
         guild = self.bot.get_guild(1084911987626094654)
         data = []
+        not_found = ""
         with open("./cogs/extras/season_1_end_leaderboard-2024-07-04.json") as file:
             data = json.loads(file.read())
         for player in data:
-            guild.get_member(int(player["discord"])).add_roles(get(ctx.guild.roles, name="Season 1 Player"))
+            user =  guild.get_member(int(player["discord"]))
+            if user:
+                user.add_roles(get(ctx.guild.roles, name="Season 1 Player"))
+            else: not_found += f"{player['discord']}\n"
+        await ctx.respond(f"Could'nt find these players: \n {not_found}")
 
 def setup(bot: commands.Bot):
     bot.add_cog(roles(bot))
