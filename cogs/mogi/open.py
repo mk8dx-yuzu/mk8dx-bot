@@ -18,13 +18,13 @@ class manage(commands.Cog):
         if self.bot.mogi["status"]:
             return await ctx.respond("A mogi is already open")
         self.bot.mogi["status"] = 1
-        await ctx.respond("# Started a new mogi! Use /join to participate!")
+        await ctx.respond("# Started a new mogi! \n Use /join to participate!")
 
     @slash_command(name="close", description="Stop the current Mogi if running", guild_only=True)
     async def close(self, ctx: ApplicationContext):
         await ctx.response.defer()
         if self.bot.mogi["locked"]:
-            return await ctx.respond("The mogi is locked, no joining, leaving or closing until it is unlocked")
+            return await ctx.respond(self.bot.locked_mogi)
 
         message = await ctx.send(
             f"""
@@ -55,16 +55,16 @@ class manage(commands.Cog):
             for member in mogi_members:
                 await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
 
-            for i in [1, 2, 3, 4, 5]:
-                role = get(ctx.guild.roles, name=f"Team {i}")
+            for i in range(5):
+                role = get(ctx.guild.roles, name=f"Team {i+1}")
                 for member in role.members:
                     await member.remove_roles(role)
             final_message = "# The mogi has been closed"
         else:
             await message.edit(content="Action canceled.")
-            final_message = "‎ "
 
-        await ctx.followup.send(final_message)
+        if final_message:
+            await ctx.followup.send(final_message)
         
 def setup(bot: commands.Bot):
     bot.add_cog(manage(bot))

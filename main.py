@@ -28,6 +28,10 @@ class customBot(commands.Bot):
         self.players: collection = self.db["players"]
         self.archived: collection = self.db["archived"]
 
+        # common messages
+        self.no_mogi = "Currently no mogi open"
+        self.locked_mogi = "The Mogi is already running. Players can't join, leave or close it before it finished."
+
         return super().__init__(*args, **kwargs)
     
 
