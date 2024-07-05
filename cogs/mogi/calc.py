@@ -87,7 +87,6 @@ class calc(commands.Cog):
         
     @slash_command(name="calc")
     async def calc(self, ctx: ApplicationContext):
-        debug_string = "Debug: \n"
         player_mmrs = []
 
         for team in self.bot.mogi["teams"]:
@@ -95,7 +94,6 @@ class calc(commands.Cog):
                 player_data = self.players.find_one({"discord": player.strip("<@!>")})
                 player_mmrs.append(player_data["mmr"])
 
-                debug_string += f"\n {player_data['name']}: {player_data['mmr']} MMR\n"
         scores = []
         for team_point_arr in self.bot.mogi["points"]:
             scores.append([sum(team_point_arr)])
@@ -107,19 +105,10 @@ class calc(commands.Cog):
         for score in scores:
             placements.append(ranks_dict[score[0]])
 
-        debug_string += f"placements: {str(placements)}\n"
-
         form = self.bot.mogi['format'][0]
-
-        debug_string += f"format: {form}\n"
-
-        await ctx.send(f"\n full debug: \n {self.bot.mogi} \n")
-        await ctx.send(f"player_mmrs: {player_mmrs}, placements: {placements}, format: {form}")
 
         new_new_ratings = mmr_alg.calculate_mmr(player_mmrs, placements, (int(form) if form != "f" else 1))
         new_new_ratings = [math.ceil(rating * 1.2) if rating > 0 else rating for rating in new_new_ratings]
-
-        debug_string += f"mmr deltas: {new_new_ratings}"
 
         for team_delta in new_new_ratings:
             self.bot.mogi["results"].extend([team_delta] * (int(form) if form != "f" else 1))
@@ -278,18 +267,8 @@ class calc(commands.Cog):
         for team in new_ratings:
             self.bot.mogi["results"].append([round(player.mu) for player in team])
 
-        debug_string = "# Debug:\n Points:\n"
-        for scoring in self.bot.mogi['points']:
-            debug_string += f"{scoring}\n"
-        debug_string += "\n Current MMR:"
-        for team in calc_teams:
-            debug_string += f"{team}\n"
-        debug_string += "\n New MMR:"
-        for new in self.bot.mogi["results"]:
-            debug_string+= f"{new}\n"
-
         await ctx.respond(
-            f'Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr \n {calc_teams} {placements} \n {debug_string}',
+            "Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr",
             ephemeral=True,
         )
         print(self.bot.mogi)
