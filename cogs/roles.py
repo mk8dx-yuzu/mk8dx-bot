@@ -18,7 +18,7 @@ class roles(commands.Cog):
         for player in data:
             user =  guild.get_member(int(player["discord"]))
             if user:
-                user.add_roles(get(ctx.guild.roles, name="Season 1 Player"))
+                await user.add_roles(get(ctx.guild.roles, name="Season 1 Player"))
             else: not_found += f"{player['discord']}\n"
         await ctx.respond(f"Could'nt find these players: \n {not_found}")
 
