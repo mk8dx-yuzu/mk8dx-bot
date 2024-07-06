@@ -25,16 +25,13 @@ class debug(commands.Cog):
     @slash_command(name="votes", guild_only=True)
     async def votes(self, ctx: ApplicationContext):
         missing = []
-        players = []
         for player in self.bot.mogi['players']:
-            players.append(int(player.strip("<@!>")))
-        for player in players:
             if player not in self.bot.mogi["voters"]:
                 missing.append(player)
         if missing:
             string = f"**{len(missing)} player(s) haven't voted yet** \n"
             for missing_player in missing:
-                string += f"{get(ctx.guild.members, id=missing_player).mention}\n"
+                string += f"{get(ctx.guild.members, id=int(missing_player.strip('<@>'))).mention}\n"
             await ctx.respond(string)
         else: 
             await ctx.respond("No missing votes")
