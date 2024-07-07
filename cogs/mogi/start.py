@@ -85,6 +85,7 @@ class Menu(discord.ui.View):
             if self.count % 6 == 0 and self.count > 6
             else discord.ButtonStyle.gray
         )
+        print(self.children)
 
     @discord.ui.button(label="FFA", style=discord.ButtonStyle.blurple)
     async def btnffa(self, button: discord.ui.Button, interaction: Interaction):
