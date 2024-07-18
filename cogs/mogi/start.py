@@ -147,7 +147,7 @@ class start(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
-    @slash_command(name="new_start")
+    @slash_command(name="start")
     async def new_start(self, ctx: ApplicationContext):
         if self.bot.mogi["voting"]:
             return await ctx.respond("Already started a vote", ephemeral=True)
@@ -170,7 +170,7 @@ class start(commands.Cog):
         await ctx.respond("Voting", view=view)
 
     @slash_command(
-        name="start",
+        name="old_start",
         description="Randomize teams, vote format and start playing",
         guild_only=True,
     )
