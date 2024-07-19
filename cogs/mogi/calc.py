@@ -129,7 +129,9 @@ class calc(commands.Cog):
         ]
         new_mmrs = [current_mmrs[i] + self.bot.mogi["results"][i] for i in range(0, len(players))]
 
-        data = {
+        if self.bot.mogi["format"] == "ffa":
+            data = {
+            "Placement": self.bot.mogi["placements"],
             "Player": players,
             "MMR": current_mmrs,
             "Change": [
@@ -137,8 +139,21 @@ class calc(commands.Cog):
             ],
             "New MMR": new_mmrs,
         }
+        else:
+            data = {
+                "Player": players,
+                "MMR": current_mmrs,
+                "Change": [
+                    round(self.bot.mogi["results"][i]) for i in range(0, len(players))
+                ],
+                "New MMR": new_mmrs,
+            }
         df = pd.DataFrame(data).set_index("Player")
         df = df.sort_values(by="Change", ascending=False)
+
+        if self.bot.mogi["format"] == "ffa":
+            df = df.sort_values(by="Placement", ascending=True)
+
         buffer = BytesIO()
         dfi.export(
             df.style.set_table_styles(
