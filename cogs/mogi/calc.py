@@ -104,6 +104,7 @@ class calc(commands.Cog):
             ranks_dict[score[0]] = i + 1
         for score in scores:
             placements.append(ranks_dict[score[0]])
+        self.bot.mogi["placements"] = placements
 
         form = self.bot.mogi['format'][0]
 
