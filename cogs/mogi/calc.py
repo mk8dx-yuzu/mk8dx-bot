@@ -132,7 +132,7 @@ class calc(commands.Cog):
 
         if self.bot.mogi["format"] == "ffa":
             data = {
-            "Placement": self.bot.mogi["placements"],
+            "Pos.": self.bot.mogi["placements"],
             "Player": players,
             "MMR": current_mmrs,
             "Change": [
@@ -153,7 +153,7 @@ class calc(commands.Cog):
         df = df.sort_values(by="Change", ascending=False)
 
         if self.bot.mogi["format"] == "ffa":
-            df = df.sort_values(by="Placement", ascending=True)
+            df = df.sort_values(by="Pos.", ascending=True)
 
         buffer = BytesIO()
         dfi.export(
