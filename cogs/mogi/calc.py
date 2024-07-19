@@ -149,7 +149,6 @@ class calc(commands.Cog):
                 ],
                 "New MMR": new_mmrs,
             }
-        await ctx.send(data)
         df = pd.DataFrame(data).set_index("Player")
         df = df.sort_values(by="Change", ascending=False)
 
