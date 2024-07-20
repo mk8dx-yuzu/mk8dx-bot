@@ -114,6 +114,11 @@ class calc(commands.Cog):
         for team_delta in new_new_ratings:
             self.bot.mogi["results"].extend([team_delta] * (int(form) if form != "f" else 1))
 
+        if form != "f":
+            self.bot.mogi['placements'] = []
+            for i in placements:
+                self.bot.mogi['placements'].extend([i] * (int(form)))
+
         await ctx.respond(f"""
             Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr
         """)
@@ -130,17 +135,17 @@ class calc(commands.Cog):
         ]
         new_mmrs = [current_mmrs[i] + self.bot.mogi["results"][i] for i in range(0, len(players))]
 
-        if self.bot.mogi["format"] == "ffa":
+        try:
             data = {
-            "Pos.": self.bot.mogi["placements"],
-            "Player": players,
-            "MMR": current_mmrs,
-            "Change": [
-                round(self.bot.mogi["results"][i]) for i in range(0, len(players))
-            ],
-            "New MMR": new_mmrs,
-        }
-        else:
+                "Pos.": self.bot.mogi["placements"],
+                "Player": players,
+                "MMR": current_mmrs,
+                "Change": [
+                    round(self.bot.mogi["results"][i]) for i in range(0, len(players))
+                ],
+                "New MMR": new_mmrs,
+            }
+        except:
             data = {
                 "Player": players,
                 "MMR": current_mmrs,
