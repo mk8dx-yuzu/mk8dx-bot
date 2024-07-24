@@ -7,9 +7,6 @@ from discord.ui import View, Modal, InputText
 import pymongo
 from pymongo import database, collection
 
-import trueskill
-from trueskill import Rating, rate, global_env
-
 import pandas as pd
 import dataframe_image as dfi
 from matplotlib import colors

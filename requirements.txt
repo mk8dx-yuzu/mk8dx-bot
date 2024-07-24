@@ -3,7 +3,6 @@ aiohttp
 python-dotenv
 
 pymongo
-trueskill
 
 matplotlib
 dataframe_image
