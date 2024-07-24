@@ -15,6 +15,10 @@ class debug(commands.Cog):
     async def status(self, ctx: ApplicationContext):
         if not self.bot.mogi["status"]:
             return await ctx.respond("No running mogi")
+        if self.bot.mogi["voting"]:
+            return await ctx.respond("Currently voting")
+        if self.bot.mogi["running"]:
+            return await ctx.respond(f"Mogi currently playing: {len(self.bot.mogi['players'])} players")
         await ctx.respond(f"Currently open mogi: {len(self.bot.mogi['players'])} players")
 
     @slash_command(name="lock", description="Lock the current mogi from being closed", guild_only=True)
