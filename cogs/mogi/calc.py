@@ -85,7 +85,7 @@ class calc(commands.Cog):
         else:
             return await ctx.respond("Already got all calcs")
         
-    @slash_command(name="calc")
+    @slash_command(name="calc", guild_only=True)
     async def calc(self, ctx: ApplicationContext):
         player_mmrs = []
 
@@ -123,7 +123,7 @@ class calc(commands.Cog):
             Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr
         """)
 
-    @slash_command(name="table")
+    @slash_command(name="table", guild_only=True)
     async def table(self, ctx: ApplicationContext):
         players = [
             self.players.find_one({"discord": player.strip("<@!>")})["name"]

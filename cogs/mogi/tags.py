@@ -9,7 +9,7 @@ class tags(commands.Cog):
 
     tags = SlashCommandGroup(name = "tags", description = "Edit Team tags and apply/remove respective roles")
 
-    @tags.command(name = "set", description = "set a tag for a team")
+    @tags.command(name = "set", description = "set a tag for a team", guild_only=True)
     async def set(
         self, 
         ctx: ApplicationContext, 
