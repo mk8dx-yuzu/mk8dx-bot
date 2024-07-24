@@ -6,9 +6,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import cogs.extras.mogi_config as config
+import config as custom_config
 
 default_mogi_state = deepcopy(config.mogi_config)
-
+for key in custom_config.custom_config.keys():
+    default_mogi_state[key] = custom_config.custom_config[key]
 
 intents = discord.Intents.default()
 intents |= discord.Intents.guilds
