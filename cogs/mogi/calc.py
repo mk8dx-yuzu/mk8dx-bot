@@ -234,6 +234,8 @@ class calc(commands.Cog):
             new_rank = calcRank(new_mmrs[i])
             if current_rank != new_rank:
                 await ctx.send(f"{self.bot.get_user(int(player.strip('<@!>'))).mention} is now in {new_rank}")
+                ctx.guild.get_member(int(player.strip('<@!>'))).remove_roles(get(ctx.guild.roles, name=f"Lounge - {current_rank}"))
+                ctx.guild.get_member(int(player.strip('<@!>'))).add_roles(get(ctx.guild.roles, name=f"Lounge - {new_rank}"))
 
         self.bot.mogi["locked"] = False
 
