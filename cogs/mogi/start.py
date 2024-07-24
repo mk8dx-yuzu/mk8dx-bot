@@ -147,8 +147,8 @@ class start(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
-    @slash_command(name="start")
-    async def new_start(self, ctx: ApplicationContext):
+    @slash_command(name="start", guild_only=True)
+    async def start(self, ctx: ApplicationContext):
         if self.bot.mogi["voting"]:
             return await ctx.respond("Already started a vote", ephemeral=True)
         if not ctx.author.mention in self.bot.mogi["players"]:
@@ -168,115 +168,6 @@ class start(commands.Cog):
         view = Menu(self.bot, player_count)
         view.update_styles()
         await ctx.respond("Voting", view=view)
-
-    @slash_command(
-        name="old_start",
-        description="Randomize teams, vote format and start playing",
-        guild_only=True,
-    )
-    async def start(self, ctx: ApplicationContext):
-        if self.bot.mogi["voting"]:
-            return await ctx.respond("Already started a vote", ephemeral=True)
-        if not ctx.author.mention in self.bot.mogi["players"]:
-            return await ctx.respond(
-                "You can't start a mogi you aren't in", ephemeral=True
-            )
-        if len(self.bot.mogi["players"]) < 3:
-            return await ctx.respond("Can't start a mogi with less than 3 players")
-        if self.bot.mogi["running"]:
-            return await ctx.respond("Mogi is already in play")
-
-        self.bot.mogi["voting"] = 1
-        self.bot.mogi["locked"] = True
-
-        players_len = len(self.bot.mogi["players"])
-        options = []
-        options.append(discord.SelectOption(label=f"FFA", value=f"ffa"))
-        for size in range(2, players_len // 2 + 1):
-            if players_len % size == 0:
-                options.append(
-                    discord.SelectOption(label=f"{size}v{size}", value=f"{size}v{size}")
-                )
-
-        class FormatView(View):
-            def __init__(self, mogi):
-                super().__init__()
-                self.mogi = mogi
-
-            @discord.ui.select(options=options)
-            async def select_callback(
-                self, select: discord.ui.Select, interaction: discord.Interaction
-            ):
-                if (
-                    interaction.response.is_done()
-                    or interaction.user.id in self.mogi["voters"]
-                ):
-                    return await interaction.followup.send(
-                        "You already voted", ephemeral=True
-                    )
-                await interaction.response.defer()
-                if interaction.user.mention not in self.mogi["players"]:
-                    return
-                if self.mogi["running"]:
-                    return await interaction.respond(
-                        "Mogi already decided, voting is closed", ephemeral=True
-                    )
-                selected_option = select.values[0]
-                self.mogi["voters"].append(interaction.user.id)
-                self.mogi["votes"][selected_option] += 1
-                await interaction.followup.send(
-                    f"+1 vote for *{selected_option}*", ephemeral=True
-                )
-
-                len_players = len(self.mogi["players"])
-                max_voted = max(self.mogi["votes"], key=self.mogi["votes"].get)
-                if (len(self.mogi["voters"]) >= len_players) or (
-                    self.mogi["votes"][max_voted] >= math.floor(len_players / 2) + 1
-                ):
-                    self.mogi["format"] = max_voted
-                    lineup_str = ""
-                    if max_voted == "ffa":
-                        for i, player in enumerate(self.mogi["players"]):
-                            lineup_str += f"`{i+1}:` {player}\n"
-                            self.mogi["teams"].append([player])
-                    else:
-                        random.shuffle(self.mogi["players"])
-                        teams = []
-                        for i in range(0, len(self.mogi["players"]), int(max_voted[0])):
-                            teams.append(
-                                self.mogi["players"][i : i + int(max_voted[0])]
-                            )
-                        self.mogi["teams"] = teams
-                        for i, item in enumerate(teams):
-                            lineup_str += f"\n `{i+1}`. {', '.join(item)}"
-
-                    votes = "## Vote results:\n"
-                    for item in self.mogi["votes"].keys():
-                        votes += f"{item}: {self.mogi['votes'][item]}\n"
-                    await ctx.send(votes)
-                    await ctx.send(
-                        f"""
-                        # Mogi starting!
-                        ## Format: {max_voted}
-                        ### Lineup:
-                        \n{lineup_str}
-                    """
-                    )
-                    self.mogi["votes"] = {key: 0 for key in self.mogi["votes"]}
-                    self.mogi["voting"] = 0
-                    self.mogi["running"] = 1
-
-                else:
-                    pass
-
-        view = FormatView(self.bot.mogi)
-
-        players = ", ".join(f"{player}" for player in self.bot.mogi["players"])
-
-        await ctx.respond(
-            f"|| {players} || \nBeginning Mogi \nVote for a format:",
-            view=view,
-        )
 
     @slash_command(
         name="force_start",
