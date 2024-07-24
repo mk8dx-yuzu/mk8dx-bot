@@ -58,6 +58,7 @@ class admin(commands.Cog):
             new_value = int(new_value)
         if stat in ["name", "discord"]:
             new_value = str(new_value)
+            await ctx.respond(f"Updated {name}s {stat} to {new_value}")
             
         if stat == "mmr":
             new_value = int(new_value)
