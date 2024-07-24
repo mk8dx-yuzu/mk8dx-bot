@@ -110,5 +110,10 @@ class admin(commands.Cog):
         self.archived.delete_one({"discord": player.strip("<@!>")})
         await ctx.respond(f"{player} has been unarchived")
 
+    @slash_command(name="add", guild_only=True)
+    async def add(self, ctx: ApplicationContext, player = Option(name="player", description="@ mention")):
+        self.bot.mogi["players"].append(player)
+        await ctx.respond(f"{player} joined the mogi! (they had no choice)\n {len(self.bot.mogi['players'])} players are in!")
+
 def setup(bot: commands.Bot):
     bot.add_cog(admin(bot))
