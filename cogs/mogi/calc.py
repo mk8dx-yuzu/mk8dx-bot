@@ -122,6 +122,7 @@ class calc(commands.Cog):
 
     @slash_command(name="table", guild_only=True)
     async def table(self, ctx: ApplicationContext):
+        await ctx.response.defer()
         players = [
             self.players.find_one({"discord": player.strip("<@!>")})["name"]
             for player in self.bot.mogi["players"]
