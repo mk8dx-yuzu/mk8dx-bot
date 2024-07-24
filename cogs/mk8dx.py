@@ -14,6 +14,7 @@ class mk8dx(commands.Cog):
         self.bot: commands.Bot = bot
         self.db: database.Database = self.bot.db
         self.players: collection.Collection = self.bot.players
+        self.archived: collection.Collection = self.bot.archived
 
     def cog_unload(self):
         self.client.close()
@@ -165,14 +166,20 @@ class mk8dx(commands.Cog):
     @slash_command(name="register", description="Register for playing in the Lounge", guild_only=True)
     async def register(
         self,
-        ctx: discord.ApplicationContext,
-        username = Option(
-            str,
-            description="Your username to show up on the leaderboard",
-            required=True,
-        ),
+        ctx: discord.ApplicationContext
     ):
-        username = username.lower().replace(" ", "")
+        tmp = self.players.find_one({"discord": f"{ctx.interaction.user.id}"})
+        if tmp:
+            return await ctx.respond("An entry for your discord account already exists.")
+        
+        tmp = self.archived.find_one({"discord": f"{ctx.interaction.user.id}"})
+        if tmp:
+            return await ctx.respond("An entry for your discord account already exists but is archived. Ask a moderator to unarchive it.")
+
+        username = ctx.interaction.user.display_name.lower().replace(" ", "")
+        if username == "":
+            username = ctx.interaction.user.name.lower()
+        
         role = get(ctx.guild.roles, name="Lounge Player")
         member = ctx.user
         if role in member.roles:
