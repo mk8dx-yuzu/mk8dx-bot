@@ -81,8 +81,10 @@ class admin(commands.Cog):
     ):
         user = self.players.find_one({"name": player})
         user_discord = user['discord']
-        await ctx.guild.get_member(user_discord).remove_roles(get(ctx.guild.roles, name="Lounge Player"))
         self.players.delete_one({"name": player})
+        member = ctx.guild.get_member(int(user_discord))
+        if member:
+            await member.remove_roles(get(ctx.guild.roles, name="Lounge Player"))
         await ctx.respond(f"Successfully deleted {player}s player records")
 
     @slash_command(name="archive", description="archive a player", guild_only=True)
