@@ -16,6 +16,9 @@ class join(commands.Cog):
     @slash_command(name="join", description="Join the current mogi", guild_only=True)
     async def join(self, ctx: ApplicationContext):
         async with self.join_sem:
+            player = self.players.find_one({"discord": str(ctx.interaction.user.id)})
+            if not player:
+                return await ctx.respond("You are not properly registered for Lounge. Your Profile might not exist or be archived.")
 
             if not self.bot.mogi["status"]:
                 return await ctx.respond(self.bot.no_mogi)
