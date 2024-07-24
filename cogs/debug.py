@@ -52,5 +52,9 @@ class debug(commands.Cog):
         self.bot.mogi["points_user"] = ""
         await ctx.respond("Cleared all points", ephemeral = True)
         
+    @slash_command(name="unsub")
+    async def unsub(self, ctx: ApplicationContext):
+        pass
+
 def setup(bot: commands.Bot):
     bot.add_cog(debug(bot))

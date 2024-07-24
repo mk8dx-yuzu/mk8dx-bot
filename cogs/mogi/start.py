@@ -195,6 +195,7 @@ class start(commands.Cog):
         self.bot.mogi["voting"] = 0
         self.bot.mogi["votes"] = {key: 0 for key in self.bot.mogi["votes"]}
         self.bot.mogi["voters"] = []
+        self.bot.mogi["subs"] = []
 
         if format == "ffa":
             for i, player in enumerate(self.bot.mogi["players"]):
@@ -234,6 +235,7 @@ class start(commands.Cog):
         self.bot.mogi["votes"] = {key: 0 for key in self.bot.mogi["votes"]}
         self.bot.mogi["voters"] = []
         self.bot.mogi["voting"] = 0
+        self.bot.mogi["subs"] = []
 
         await ctx.respond("The mogi has been stopped, use /start to start it again")
         await ctx.send(f"Debug:\nVotes:{self.bot.mogi['votes']}")
