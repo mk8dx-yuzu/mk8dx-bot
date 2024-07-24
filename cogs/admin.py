@@ -81,6 +81,8 @@ class admin(commands.Cog):
         player=Option(str, description="Name of the player"),
     ):
         user = self.players.find_one({"name": player})
+        if not user:
+            return await ctx.respond("Couldn't find that player")
         user_discord = user['discord']
         self.players.delete_one({"name": player})
         member = ctx.guild.get_member(int(user_discord))
