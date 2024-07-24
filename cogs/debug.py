@@ -52,7 +52,7 @@ class debug(commands.Cog):
         self.bot.mogi["points_user"] = ""
         await ctx.respond("Cleared all points", ephemeral = True)
         
-    @slash_command(name="unsub")
+    @slash_command(name="unsub", guild_only=True)
     async def unsub(self, ctx: ApplicationContext, player = discord.Option(name="player", description="@ mention")):
         if player not in self.bot.mogi["subs"]:
             return await ctx.respond("Player is not in subs")
