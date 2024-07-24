@@ -1,5 +1,5 @@
 .env
-.config
+config.json
 __pycache__
 cogs/__pycache__/
 *test*
