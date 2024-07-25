@@ -176,7 +176,7 @@ class mk8dx(commands.Cog):
         if tmp:
             return await ctx.respond("An entry for your discord account already exists but is archived. Ask a moderator to unarchive it.")
 
-        username = ctx.interaction.user.display_name.lower().replace(" ", "")
+        username = ''.join(e for e in ctx.interaction.user.display_name.lower() if e.isalnum())
         if username == "":
             username = ctx.interaction.user.name.lower()
         
