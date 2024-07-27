@@ -1,5 +1,6 @@
 mogi_config = {
     "status": 0,
+    "player_cap": 12,
     "voting": 0,
     "running": 0,
     "password": None,

@@ -149,6 +149,8 @@ class start(commands.Cog):
 
     @slash_command(name="start", guild_only=True)
     async def start(self, ctx: ApplicationContext):
+        if len(self.bot.mogi["players"]) > 12:
+            return await ctx.respond("Cant start with more than 12 players")
         if self.bot.mogi["voting"]:
             return await ctx.respond("Already started a vote", ephemeral=True)
         if not ctx.author.mention in self.bot.mogi["players"]:

@@ -29,7 +29,7 @@ class join(commands.Cog):
             if ctx.author.mention in self.bot.mogi["players"]:
                 return await ctx.respond("You are already in the mogi")
             
-            if len(self.bot.mogi["players"]) >= 12:
+            if len(self.bot.mogi["players"]) >= self.bot.mogi["player_cap"]:
                 return await ctx.respond("The mogi is already full")
             
             if ctx.author.mention not in self.bot.mogi["players"]:

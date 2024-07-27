@@ -115,5 +115,13 @@ class admin(commands.Cog):
         self.bot.mogi["players"].append(player)
         await ctx.respond(f"{player} joined the mogi! (they had no choice)\n {len(self.bot.mogi['players'])} players are in!")
 
+    @slash_command(name="player_cap", guild_only=True)
+    async def player_cap(self, ctx: ApplicationContext, number = Option(int, name="number", required=True)):
+        if isinstance(number, int):
+            self.bot.mogi["player_cap"] = number
+            await ctx.respond(f"Max. Player amount is now {number}")
+        else:
+            await ctx.respond("Input not a valid integer")
+
 def setup(bot: commands.Bot):
     bot.add_cog(admin(bot))
