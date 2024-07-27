@@ -74,6 +74,20 @@ class admin(commands.Cog):
             return await ctx.respond(f"Sucessfully edited {name}s MMR to {new_value}")
         self.players.update_one({"name": name}, {"$set": {stat: new_value}})
 
+    @slash_command(name="edit_mmr")
+    async def edit_mmr(
+        self, ctx: ApplicationContext, 
+        player = Option(str, name="player", description="username of the player"), 
+        change = Option(int, name="change", description="mmr delta (integer)")
+    ):
+        if not isinstance(change, int):
+            return await ctx.respond("Change is not a valid integer")
+        current_mmr = self.players.find_one({"name": player})["mmr"]
+        if not current_mmr:
+            return await ctx.respond("Couldn't find that player")
+        self.players.update_one({"name": player}, {"$set": {"mmr": current_mmr + change}})
+        await ctx.respond(f"{player}: {change}MMR, updated to {current_mmr + change}MMR")
+
     @slash_command(name="remove", description="Remove a player from the leaderboard", guild_only=True)
     async def remove(
         self,
