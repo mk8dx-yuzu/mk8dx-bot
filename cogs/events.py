@@ -25,6 +25,8 @@ class events(commands.Cog):
             await message.channel.send(random.choice(["DDDDKKKK SUMIIIIT", "dk summit mentioned", "mitsiku summit"]))
         if " election" in message.content.lower() and random.random() < 0.5:
             await message.channel.send(":flag_us:")
+        if self.bot.user.mention in message.content.lower() and random.random() < 0.4:
+            await message.channel.send("Grr stop pinging me")
 
         # delete any unwanted messages in #lounge-information
         if message.channel.id == 1181312934803144724:
