@@ -170,7 +170,7 @@ class mk8dx(commands.Cog):
     ):
         tmp = self.players.find_one({"discord": f"{ctx.interaction.user.id}"})
         if tmp:
-            return await ctx.respond("An entry for your discord account already exists.")
+            return await ctx.respond("An entry for your discord account already exists. If you rejoined the server, ask an admin to give you the Lounge Roles back.")
         
         tmp = self.archived.find_one({"discord": f"{ctx.interaction.user.id}"})
         if tmp:
