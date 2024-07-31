@@ -59,20 +59,24 @@ class debug(commands.Cog):
         self.bot.mogi["subs"].remove(player)
         await ctx.respond(f"Removed {player} from subs.")
 
-    config = SlashCommandGroup(name = "config", description = "concerns self.bot.mogi and saving it as json")
+    state = SlashCommandGroup(name = "state", description = "concerns self.bot.mogi and saving it as json")
 
-    @config.command(name="save", guild_only=True)
+    @state.command(name="save", guild_only=True)
     async def save(self, ctx: ApplicationContext):
-        with open("cogs/extras/config.json", "w") as f:
+        with open("cogs/extras/state.json", "w") as f:
             json.dump(self.bot.mogi, f)
+        await f.close()
+        await ctx.respond("saved state")
 
-    @config.command(name="load", guild_only=True)
+    @state.command(name="load", guild_only=True)
     async def load(self, ctx: ApplicationContext):
         try:
-            with open("cogs/extras/config.json", "r") as f:
+            with open("cogs/extras/state.json", "r") as f:
                 self.bot.mogi = json.load(f)
+                await f.close()
+                await ctx.respond("loaded state")
         except:
-            return await ctx.respond("Couldn't load config")
+            return await ctx.respond("Couldn't load state")
 
 def setup(bot: commands.Bot):
     bot.add_cog(debug(bot))
