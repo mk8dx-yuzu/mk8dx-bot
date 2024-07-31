@@ -169,7 +169,7 @@ class start(commands.Cog):
         player_count = len(self.bot.mogi["players"])
         view = Menu(self.bot, player_count)
         view.update_styles()
-        await ctx.respond(f"Voting start!\n ||{''.join(self.bot.mogi["players"])}||", view=view)
+        await ctx.respond(f"Voting start!\n ||{''.join(self.bot.mogi['players'])}||", view=view)
 
     @slash_command(
         name="force_start",
