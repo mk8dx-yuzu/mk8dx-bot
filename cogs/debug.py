@@ -1,5 +1,5 @@
-import discord
-from discord import ApplicationContext, slash_command
+import discord, json
+from discord import ApplicationContext, slash_command, SlashCommandGroup
 from discord.ext import commands
 from discord.utils import get
 
@@ -58,6 +58,21 @@ class debug(commands.Cog):
             return await ctx.respond("Player is not in subs")
         self.bot.mogi["subs"].remove(player)
         await ctx.respond(f"Removed {player} from subs.")
+
+    config = SlashCommandGroup(name = "config", description = "concerns self.bot.mogi and saving it as json")
+
+    @config.command(name="save", guild_only=True)
+    async def save(self, ctx: ApplicationContext):
+        with open("cogs/extras/config.json", "w") as f:
+            json.dump(self.bot.mogi, f)
+
+    @config.command(name="load", guild_only=True)
+    async def load(self, ctx: ApplicationContext):
+        try:
+            with open("cogs/extras/config.json", "r") as f:
+                self.bot.mogi = json.load(f)
+        except:
+            return await ctx.respond("Couldn't load config")
 
 def setup(bot: commands.Bot):
     bot.add_cog(debug(bot))
