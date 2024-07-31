@@ -65,7 +65,7 @@ class debug(commands.Cog):
     async def save(self, ctx: ApplicationContext):
         with open("cogs/extras/state.json", "w") as f:
             json.dump(self.bot.mogi, f)
-        await f.close()
+            f.close()
         await ctx.respond("saved state")
 
     @state.command(name="load", guild_only=True)
@@ -73,7 +73,7 @@ class debug(commands.Cog):
         try:
             with open("cogs/extras/state.json", "r") as f:
                 self.bot.mogi = json.load(f)
-                await f.close()
+                f.close()
                 await ctx.respond("loaded state")
         except:
             return await ctx.respond("Couldn't load state")
