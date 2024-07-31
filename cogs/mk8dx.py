@@ -170,11 +170,11 @@ class mk8dx(commands.Cog):
     ):
         tmp = self.players.find_one({"discord": f"{ctx.interaction.user.id}"})
         if tmp:
-            return await ctx.respond("An entry for your discord account already exists. If you rejoined the server, ask an admin to give you the Lounge Roles back.")
+            return await ctx.respond("An entry for your discord account already exists. If you rejoined the server, ask an admin to give you the Lounge Roles back.", ephemeral=True)
         
         tmp = self.archived.find_one({"discord": f"{ctx.interaction.user.id}"})
         if tmp:
-            return await ctx.respond("An entry for your discord account already exists but is archived. Ask a moderator to unarchive it.")
+            return await ctx.respond("An entry for your discord account already exists but is archived. Ask a moderator to unarchive it.", ephemeral=True)
 
         username = ''.join(e for e in ctx.interaction.user.display_name.lower() if e.isalnum())
         if username == "":
