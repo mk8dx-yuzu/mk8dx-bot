@@ -1,5 +1,5 @@
 import discord, json
-from discord import ApplicationContext, slash_command, SlashCommandGroup
+from discord import ApplicationContext, slash_command, SlashCommandGroup, Option
 from discord.ext import commands
 from discord.utils import get
 
@@ -8,8 +8,8 @@ class debug(commands.Cog):
         self.bot: commands.Bot = bot
 
     @slash_command(name="debug")
-    async def debug(self, ctx: ApplicationContext):
-        await ctx.respond(self.bot.mogi, ephemeral = True)
+    async def debug(self, ctx: ApplicationContext, ephemeral = Option(str, required = False, choices=["y"], default = False)):
+        await ctx.respond(self.bot.mogi, ephemeral = True if ephemeral else False)
 
     @slash_command(name="status", description="See current state of mogi")
     async def status(self, ctx: ApplicationContext):
