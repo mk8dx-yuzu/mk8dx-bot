@@ -63,7 +63,7 @@ class debug(commands.Cog):
 
     @state.command(name="save", guild_only=True)
     async def save(self, ctx: ApplicationContext):
-        with open("persistent/extras/state.json", "w") as f:
+        with open("persistent/state.json", "w") as f:
             json.dump(self.bot.mogi, f)
             f.close()
         await ctx.respond("saved state")
