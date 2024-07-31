@@ -63,7 +63,7 @@ class debug(commands.Cog):
 
     @state.command(name="save", guild_only=True)
     async def save(self, ctx: ApplicationContext):
-        with open("cogs/extras/state.json", "w") as f:
+        with open("persistent/extras/state.json", "w") as f:
             json.dump(self.bot.mogi, f)
             f.close()
         await ctx.respond("saved state")
@@ -71,7 +71,7 @@ class debug(commands.Cog):
     @state.command(name="load", guild_only=True)
     async def load(self, ctx: ApplicationContext):
         try:
-            with open("cogs/extras/state.json", "r") as f:
+            with open("persistent/state.json", "r") as f:
                 self.bot.mogi = json.load(f)
                 f.close()
                 await ctx.respond("loaded state")
