@@ -29,9 +29,11 @@ class events(commands.Cog):
             await message.channel.send(":flag_us:")
         if self.bot.user.mention in message.content.lower() and random.random() < 0.4:
             await message.channel.send("Grr stop pinging me")
-        funnylist = ["is mogi over", "you might lose mmr", "if I sub will I lose mmr", "we don't need a sub", "what are your pc specs", "wanna 1v1"]
+        funnylist = ["is mogi over", "you might lose mmr", "if I sub will I lose mmr", "we don't need a sub", "what are your pc specs", "wanna 1v1", "having fun", "get banned loser"]
         if any(word in message.content.lower() for word in funnylist):
             await message.channel.send(random.choice(funnylist))
+        if "my dream" in message.content.lower():
+            await message.channel.send("eyo bro, sorry that im writing u directly, U seem to have the File to Zelda totk. i want to play it on my pc but im too dumb to get it running and i dont seem to have the right game files. can u help me out? maybe by a link to the gamefile and a little guide to set that shit up. would be my dream bro")
 
         # delete any unwanted messages in #lounge-information
         if message.channel.id == 1181312934803144724:
