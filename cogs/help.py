@@ -24,7 +24,7 @@ class help(commands.Cog):
 
         await ctx.respond(embed=embed)
 
-    @commands.command(name="change-name")
+    @commands.command(name="changename")
     async def changename(self, ctx: commands.Context):
         with open("files/howtochangename.gif", "rb") as f:
             media = discord.File(f)
