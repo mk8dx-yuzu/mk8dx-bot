@@ -22,6 +22,8 @@ class manage(commands.Cog):
 
     @slash_command(name="close", description="Stop the current Mogi if running", guild_only=True)
     async def close(self, ctx: ApplicationContext):
+        if not self.bot.mogi["status"]:
+            return await ctx.respond("No open mogi")
         await ctx.response.defer()
         if self.bot.mogi["locked"]:
             return await ctx.respond(self.bot.locked_mogi)
