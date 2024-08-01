@@ -32,6 +32,8 @@ class debug(commands.Cog):
 
     @slash_command(name="votes")
     async def votes(self, ctx: ApplicationContext):
+        if not self.bot.mogi["voting"]:
+            return await ctx.respond("No vote going on")
         missing = []
         for player in self.bot.mogi['players']:
             if player not in self.bot.mogi["voters"]:
@@ -44,7 +46,10 @@ class debug(commands.Cog):
         else: 
             await ctx.respond("No missing votes")
 
-        await ctx.send(self.bot.mogi['votes'])
+        votes = ""
+        for key in self.bot.mogi['votes'].keys()
+            votes += f"{key}: {self.bot.mogi['votes'][key]}\n"
+        await ctx.send(votes)
 
     @slash_command(name="points_reset", description="Messed up points input? Reset them")
     @is_mogi_manager()
