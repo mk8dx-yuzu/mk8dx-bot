@@ -162,7 +162,7 @@ class start(commands.Cog):
         if self.bot.mogi["running"]:
             return await ctx.respond("Mogi is already in play")
 
-        self.bot.mogi["voting"] = 1
+        self.bot.mogi["voting"] = True
         self.bot.mogi["locked"] = True
 
         global player_count
@@ -192,9 +192,9 @@ class start(commands.Cog):
         lineup_str = "# Lineup \n"
 
         self.bot.mogi["format"] = format
-        self.bot.mogi["running"] = 1
+        self.bot.mogi["running"] = True
         self.bot.mogi["locked"] = True
-        self.bot.mogi["voting"] = 0
+        self.bot.mogi["voting"] = False
         self.bot.mogi["votes"] = {key: 0 for key in self.bot.mogi["votes"]}
         self.bot.mogi["voters"] = []
         self.bot.mogi["subs"] = []
@@ -203,7 +203,7 @@ class start(commands.Cog):
             for i, player in enumerate(self.bot.mogi["players"]):
                 lineup_str += f"`{i+1}:` {player}\n"
                 self.bot.mogi["teams"].append([player])
-                self.bot.mogi["running"] = 1
+                self.bot.mogi["running"] = True
             return await ctx.respond(lineup_str)
 
         random.shuffle(self.bot.mogi["players"])
@@ -230,13 +230,13 @@ class start(commands.Cog):
             return await ctx.respond(
                 "The mogi is already in the process of MMR calculation"
             )
-        self.bot.mogi["running"] = 0
+        self.bot.mogi["running"] = False
         self.bot.mogi["teams"] = []
         self.bot.mogi["format"] = ""
         self.bot.mogi["locked"] = False
         self.bot.mogi["votes"] = {key: 0 for key in self.bot.mogi["votes"]}
         self.bot.mogi["voters"] = []
-        self.bot.mogi["voting"] = 0
+        self.bot.mogi["voting"] = False
         self.bot.mogi["subs"] = []
 
         await ctx.respond("The mogi has been stopped, use /start to start it again")
