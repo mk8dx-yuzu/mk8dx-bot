@@ -47,7 +47,7 @@ class debug(commands.Cog):
             await ctx.respond("No missing votes")
 
         votes = ""
-        for key in self.bot.mogi['votes'].keys()
+        for key in self.bot.mogi['votes'].keys():
             votes += f"{key}: {self.bot.mogi['votes'][key]}\n"
         await ctx.send(votes)
 
