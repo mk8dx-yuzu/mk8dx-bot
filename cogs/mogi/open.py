@@ -17,7 +17,7 @@ class manage(commands.Cog):
     async def open(self, ctx: ApplicationContext):
         if self.bot.mogi["status"]:
             return await ctx.respond("A mogi is already open")
-        self.bot.mogi["status"] = 1
+        self.bot.mogi["status"] = True
         await ctx.respond("# Started a new mogi! \n Use /join to participate!")
 
     @slash_command(name="close", description="Stop the current Mogi if running", guild_only=True)

@@ -52,8 +52,8 @@ def startMogi(bot: commands.Bot):
     for item in bot.mogi["votes"].keys():
         votes += f"{item}: {bot.mogi['votes'][item]}\n"
     bot.mogi["votes"] = {key: 0 for key in bot.mogi["votes"]}
-    bot.mogi["voting"] = 0
-    bot.mogi["running"] = 1
+    bot.mogi["voting"] = False
+    bot.mogi["running"] = True
 
     return f"{votes}\n# Mogi starting!\n## Format: {max_voted}\n### Lineup:\n{lineup_str}"
 
