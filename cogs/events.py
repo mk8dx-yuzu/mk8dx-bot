@@ -29,7 +29,10 @@ class events(commands.Cog):
             await message.channel.send(":flag_us:")
         if self.bot.user.mention in message.content.lower() and random.random() < 0.4:
             await message.channel.send("Grr stop pinging me")
-        funnylist = ["is mogi over", "you might lose mmr", "if I sub will I lose mmr", "we don't need a sub", "what are your pc specs", "wanna 1v1", "having fun", "get banned loser"]
+        funnylist = ["is mogi over", "you might lose mmr", "if I sub will I lose mmr", "we don't need a sub", "what are your pc specs", "wanna 1v1"]
+        if any(word in message.content.lower() for word in funnylist):
+            await message.channel.send(random.choice(funnylist))
+        funnylist = ["having fun", "get banned loser"]
         if any(word in message.content.lower() for word in funnylist):
             await message.channel.send(random.choice(funnylist))
         if "my dream" in message.content.lower():
