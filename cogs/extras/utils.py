@@ -8,7 +8,7 @@ def is_allowed_server(server_id: int):
 
 def is_mogi_manager():
     async def predicate(ctx: ApplicationContext):
-        if is_allowed_server(ctx.guild_id) and (ctx.user.guild_permissions.administrator or get(ctx.guild.roles, name="Mogi Manager")):
+        if is_allowed_server(ctx.guild_id) and (ctx.user.guild_permissions.administrator or get(ctx.guild.roles, name="Mogi Manager") in ctx.user.roles):
             return True
         else:
             await ctx.respond("You're not allowed to use this command.")

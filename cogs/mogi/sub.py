@@ -4,6 +4,7 @@ from discord.ext import commands
 from discord.utils import get
 
 from cogs.extras.replacement_logic import replace, swap
+from cogs.extras.utils import is_mogi_manager
 
 class sub(commands.Cog):
     def __init__(self, bot):
@@ -11,13 +12,15 @@ class sub(commands.Cog):
 
     replace = SlashCommandGroup(name = "replace", description = "sub or swap players")
 
-    @replace.command(name="swap", description="Swap 2 players with each other", guild_only=True)
+    @replace.command(name="swap", description="Swap 2 players with each other")
+    @is_mogi_manager()
     async def swap(self, ctx: ApplicationContext, player1 = Option(str, name = "player1", description = "use @ mention"), player2 = Option(str, name = "player2", description = "use @ mention")):
         self.bot.mogi["players"] = swap(self.bot.mogi["players"], player1, player2)
         self.bot.mogi["teams"] = swap(self.bot.mogi["teams"], player1, player2)
         await ctx.respond(f"Swapped {player1} and {player2}")
 
-    @replace.command(name="sub", description="Replace a player in the mogi, dismissing mmr loss for the subbing player", guild_only=True)
+    @replace.command(name="sub", description="Replace a player in the mogi, dismissing mmr loss for the subbing player")
+    @is_mogi_manager()
     async def sub(
         self,
         ctx: ApplicationContext,
@@ -52,6 +55,15 @@ class sub(commands.Cog):
         self.bot.mogi["subs"].append(sub)
 
         await ctx.respond(f"Subbed {player} with {sub} if applicable")
+
+    @replace.command(name="unsub")
+    @is_mogi_manager()
+    async def unsub(self, ctx: ApplicationContext, player = discord.Option(name="player", description="@ mention")):
+        if player not in self.bot.mogi["subs"]:
+            return await ctx.respond("Player is not in subs")
+        self.bot.mogi["subs"].remove(player)
+        await ctx.respond(f"Removed {player} from subs.")
+
         
 def setup(bot: commands.Bot):
     bot.add_cog(sub(bot))

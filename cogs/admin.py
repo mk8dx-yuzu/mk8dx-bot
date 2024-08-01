@@ -6,7 +6,7 @@ from discord import slash_command, Option, ApplicationContext
 from discord.ext import commands
 from discord.utils import get
 
-from cogs.extras.utils import is_admin, is_mogi_manager
+from cogs.extras.utils import is_admin
 
 class admin(commands.Cog):
     def __init__(self, bot):

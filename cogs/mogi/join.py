@@ -5,6 +5,8 @@ from discord.utils import get
 import math
 from pymongo import collection
 
+from cogs.extras.utils import is_mogi_manager
+
 class join(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -57,14 +59,14 @@ class join(commands.Cog):
             f"{ctx.author.mention} left the mogi!\n{len(self.bot.mogi['players'])} players are in!"
         )
         
-    @slash_command(name="joni", description="Join the current mogi", guild_only=True)
+    @slash_command(name="joni", description="Join the current mogi")
     async def joni(self, ctx: ApplicationContext):
         await ctx.respond("buddy you typoed that, its not /joni")
         #self.players.update_one({"discord": f"{ctx.author.id}"}, {"$set": {"mmr": -math.inf}})
 
-    @slash_command(name="kick", description="remove a player from the mogi", guild_only=True)
+    @slash_command(name="kick", description="remove a player from the mogi")
+    @is_mogi_manager()
     async def kick(self, ctx: ApplicationContext, player = Option(name="player", description="use @ mention")):
-        
         if self.bot.mogi["running"]:
             return await ctx.respond("Already playing, use /stop to halt the mogi")
         

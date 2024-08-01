@@ -14,6 +14,7 @@ from io import BytesIO
 
 import cogs.extras.mmr_algorithm as mmr_alg
 from cogs.extras.ranks import calcRank
+from cogs.extras.utils import is_mogi_manager
 
 class calc(commands.Cog):
     def __init__(self, bot):
@@ -21,7 +22,8 @@ class calc(commands.Cog):
         self.db: database.Database = self.bot.db
         self.players: collection.Collection = self.bot.players
 
-    @slash_command(name="points", description="Use after a mogi - input player points", guild_only=True)
+    @slash_command(name="points", description="Use after a mogi - input player points")
+    @is_mogi_manager()
     async def points(self, ctx: ApplicationContext):
         if not self.bot.mogi["running"]:
             return await ctx.respond("No running mogi")
@@ -82,7 +84,8 @@ class calc(commands.Cog):
         else:
             return await ctx.respond("Already got all calcs")
         
-    @slash_command(name="calc", guild_only=True)
+    @slash_command(name="calc")
+    @is_mogi_manager()
     async def calc(self, ctx: ApplicationContext):
         player_mmrs = []
 
@@ -120,7 +123,8 @@ class calc(commands.Cog):
             Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr
         """)
 
-    @slash_command(name="table", guild_only=True)
+    @slash_command(name="table")
+    @is_mogi_manager()
     async def table(self, ctx: ApplicationContext):
         await ctx.response.defer()
         players = [
@@ -186,7 +190,8 @@ class calc(commands.Cog):
         file = discord.File(buffer, filename="table.png")
         await ctx.respond(content="Here's the table:", file=file)
 
-    @slash_command(name="apply", description="Use after a /calc to apply new mmr", guild_only=True)
+    @slash_command(name="apply", description="Use after a /calc to apply new mmr")
+    @is_mogi_manager()
     async def apply(self, ctx: ApplicationContext):
         await ctx.response.defer()
         players = self.bot.mogi["players"]

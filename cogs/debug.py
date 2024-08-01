@@ -3,13 +3,11 @@ from discord import ApplicationContext, slash_command, SlashCommandGroup, Option
 from discord.ext import commands
 from discord.utils import get
 
+from cogs.extras.utils import is_admin, is_mogi_manager
+
 class debug(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-
-    @slash_command(name="debug")
-    async def debug(self, ctx: ApplicationContext, ephemeral = Option(str, required = False, choices=["y"], default = False)):
-        await ctx.respond(self.bot.mogi, ephemeral = True if ephemeral else False)
 
     @slash_command(name="status", description="See current state of mogi")
     async def status(self, ctx: ApplicationContext):
@@ -20,13 +18,19 @@ class debug(commands.Cog):
         if self.bot.mogi["running"]:
             return await ctx.respond(f"Mogi currently playing: {len(self.bot.mogi['players'])} players")
         await ctx.respond(f"Currently open mogi: {len(self.bot.mogi['players'])} players")
+    
+    @slash_command(name="debug")
+    @is_mogi_manager()
+    async def debug(self, ctx: ApplicationContext, ephemeral = Option(str, required = False, choices=["y"], default = False)):
+        await ctx.respond(self.bot.mogi, ephemeral = True if ephemeral else False)
 
-    @slash_command(name="lock", description="Lock the current mogi from being closed", guild_only=True)
+    @slash_command(name="lock", description="Lock the current mogi from being closed")
+    @is_admin()
     async def lock(self, ctx: ApplicationContext):
         self.bot.mogi["locked"] = (not self.bot.mogi["locked"])
         await ctx.respond(f"New mogi locking state: {self.bot.mogi['locked']}")
 
-    @slash_command(name="votes", guild_only=True)
+    @slash_command(name="votes")
     async def votes(self, ctx: ApplicationContext):
         missing = []
         for player in self.bot.mogi['players']:
@@ -35,14 +39,15 @@ class debug(commands.Cog):
         if missing:
             string = f"**{len(missing)} player(s) haven't voted yet** \n"
             for missing_player in missing:
-                string += f"{get(ctx.guild.members, id=int(missing_player.strip('<@>'))).mention}\n"
+                string += f"{self.bot.get_user(int(missing_player.strip('<@>'))).mention}\n"
             await ctx.respond(string)
         else: 
             await ctx.respond("No missing votes")
 
         await ctx.send(self.bot.mogi['votes'])
 
-    @slash_command(name="points_reset", description="Messed up points input? Reset them", guild_only=True)
+    @slash_command(name="points_reset", description="Messed up points input? Reset them")
+    @is_mogi_manager()
     async def points_reset(self, ctx: ApplicationContext):
         self.bot.mogi["point_count"] = 0
         self.bot.mogi["input_points"] = []
@@ -52,23 +57,18 @@ class debug(commands.Cog):
         self.bot.mogi["points_user"] = ""
         await ctx.respond("Cleared all points", ephemeral = True)
         
-    @slash_command(name="unsub", guild_only=True)
-    async def unsub(self, ctx: ApplicationContext, player = discord.Option(name="player", description="@ mention")):
-        if player not in self.bot.mogi["subs"]:
-            return await ctx.respond("Player is not in subs")
-        self.bot.mogi["subs"].remove(player)
-        await ctx.respond(f"Removed {player} from subs.")
-
     state = SlashCommandGroup(name = "state", description = "concerns self.bot.mogi and saving it as json")
 
-    @state.command(name="save", guild_only=True)
+    @state.command(name="save")
+    @is_mogi_manager()
     async def save(self, ctx: ApplicationContext):
         with open("persistent/state.json", "w") as f:
             json.dump(self.bot.mogi, f)
             f.close()
         await ctx.respond("saved state")
 
-    @state.command(name="load", guild_only=True)
+    @state.command(name="load")
+    @is_mogi_manager()
     async def load(self, ctx: ApplicationContext):
         try:
             with open("persistent/state.json", "r") as f:
