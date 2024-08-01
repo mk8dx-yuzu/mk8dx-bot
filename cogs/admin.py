@@ -18,8 +18,8 @@ class admin(commands.Cog):
     @slash_command(
         name="edit",
         description="Edit a player's MMR. Wins/Losses and MMR History can be updated accordingly.",
-        guild_only=True
     )
+    @is_admin()
     async def edit(
         self,
         ctx: ApplicationContext,
@@ -77,6 +77,7 @@ class admin(commands.Cog):
         self.players.update_one({"name": name}, {"$set": {stat: new_value}})
 
     @slash_command(name="edit_mmr")
+    @is_admin()
     async def edit_mmr(
         self, ctx: ApplicationContext, 
         player = Option(str, name="player", description="username of the player"), 
@@ -90,7 +91,8 @@ class admin(commands.Cog):
         self.players.update_one({"name": player}, {"$set": {"mmr": current_mmr + change}})
         await ctx.respond(f"{player}: {change}MMR, updated to {current_mmr + change}MMR")
 
-    @slash_command(name="remove", description="Remove a player from the leaderboard", guild_only=True)
+    @slash_command(name="remove", description="Remove a player from the leaderboard")
+    @is_admin()
     async def remove(
         self,
         ctx: ApplicationContext,
@@ -106,7 +108,8 @@ class admin(commands.Cog):
             await member.remove_roles(get(ctx.guild.roles, name="Lounge Player"))
         await ctx.respond(f"Successfully deleted {player}s player records")
 
-    @slash_command(name="archive", description="archive a player", guild_only=True)
+    @slash_command(name="archive", description="archive a player")
+    @is_admin()
     async def archive(self, ctx: ApplicationContext, player = Option(
         str,
         name="player",
@@ -116,7 +119,8 @@ class admin(commands.Cog):
         self.players.delete_one({"discord": player.strip("<@!>")})
         await ctx.respond(f"{player} has been archived")
 
-    @slash_command(name="unarchive", description="unarchive a player", guild_only=True)
+    @slash_command(name="unarchive", description="unarchive a player")
+    @is_admin()
     async def unarchive(self, ctx: ApplicationContext, player = Option(
         str,
         name="player",
@@ -126,7 +130,8 @@ class admin(commands.Cog):
         self.archived.delete_one({"discord": player.strip("<@!>")})
         await ctx.respond(f"{player} has been unarchived")
 
-    @slash_command(name="add", guild_only=True)
+    @slash_command(name="add")
+    @is_admin()
     async def add(self, ctx: ApplicationContext, player = Option(name="player", description="@ mention")):
         self.bot.mogi["players"].append(player)
         await ctx.respond(f"{player} joined the mogi! (they had no choice)\n {len(self.bot.mogi['players'])} players are in!")
