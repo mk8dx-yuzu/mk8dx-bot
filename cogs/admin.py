@@ -6,6 +6,8 @@ from discord import slash_command, Option, ApplicationContext
 from discord.ext import commands
 from discord.utils import get
 
+from cogs.extras.utils import is_admin, is_mogi_manager
+
 class admin(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -129,7 +131,8 @@ class admin(commands.Cog):
         self.bot.mogi["players"].append(player)
         await ctx.respond(f"{player} joined the mogi! (they had no choice)\n {len(self.bot.mogi['players'])} players are in!")
 
-    @slash_command(name="player_cap", guild_only=True)
+    @slash_command(name="player_cap")
+    @is_admin()
     async def player_cap(self, ctx: ApplicationContext, number = Option(int, name="number", required=True)):
         if isinstance(number, int):
             self.bot.mogi["player_cap"] = number

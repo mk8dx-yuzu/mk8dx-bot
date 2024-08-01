@@ -11,9 +11,11 @@ class events(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error): 
         if isinstance(error, commands.CommandNotFound): 
-            pass
+            return
+        if isinstance(error, discord.errors.CheckFailure):
+            return
         else:
-            print(f"An error occured: \n{error} \n")
+            print(f"An uncaught error occured: \n{error} \n")
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
