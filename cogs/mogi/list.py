@@ -21,19 +21,7 @@ class list(commands.Cog):
             return await ctx.respond("Current mogi: \n No players")
         list = "Current mogi:\n"
         for index, player in enumerate(self.bot.mogi["players"]):
-            try:
-                if get(ctx.guild.members, id=int(player.strip("<@!>"))).nick:
-                    name = get(ctx.guild.members, id=int(player.strip("<@!>"))).nick
-                else:
-                    try:
-                        name = get(ctx.guild.members, id=int(player.strip("<@!>"))).display_name
-                    except:
-                        name = player
-            except:
-                try:
-                    name = get(ctx.guild.members, id=int(player.strip("<@!>"))).display_name
-                except:
-                    name = player
+            name = get(ctx.guild.members, id=int(player.strip("<@!>"))).display_name
             if table:
                 list += f"{name} +\n\n"
             else:
