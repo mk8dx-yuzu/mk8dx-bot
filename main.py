@@ -59,7 +59,7 @@ async def change_activity():
         discord.Activity(type=discord.ActivityType.listening, name="DK Summit OST"),
         discord.Activity(type=discord.ActivityType.listening, name="Mario Kart 8 Menu Music"),
         discord.Activity(type=discord.ActivityType.playing, name="Mario Kart Wii"),
-        discord.Activity(type=discord.ActivityType.playing, name="Mario Kart 7"),
+        discord.Activity(type=discord.ActivityType.playing, name="Retro Rewind"),
         discord.Activity(type=discord.ActivityType.playing, name="on Wii Rainbow Road"),
         discord.Activity(type=discord.ActivityType.watching, name="Shroomless tutorials"),
         discord.Activity(type=discord.ActivityType.watching, name="DK Summit gapcut tutorials"),
