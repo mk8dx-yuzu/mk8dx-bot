@@ -74,7 +74,7 @@ class join(commands.Cog):
             return await ctx.respond("This user is not in the mogi")
         self.bot.mogi["players"].remove(player)
         if get(ctx.guild.roles, name="InMogi") in ctx.guild.get_member(int(player.strip("<@>"))).roles:
-            ctx.guild.get_member(int(player.strip("<@>"))).remove_roles(get(ctx.guild.roles, name="InMogi"))
+            await ctx.guild.get_member(int(player.strip("<@>"))).remove_roles(get(ctx.guild.roles, name="InMogi"))
 
         await ctx.respond(f"{player} got removed from the mogi (L Bozo)")
 
