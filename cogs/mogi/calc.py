@@ -193,6 +193,9 @@ class calc(commands.Cog):
     @slash_command(name="apply", description="Use after a /calc to apply new mmr")
     @is_mogi_manager()
     async def apply(self, ctx: ApplicationContext):
+        if not self.bot.mogi["results"]:
+            return await ctx.respond("No results to apply or already applied")
+
         await ctx.response.defer()
         players = self.bot.mogi["players"]
         current_mmrs = [
@@ -241,6 +244,13 @@ class calc(commands.Cog):
                 await ctx.guild.get_member(int(player.strip('<@!>'))).add_roles(get(ctx.guild.roles, name=f"Lounge - {new_rank}"))
 
         self.bot.mogi["locked"] = False
+
+        self.bot.mogi["point_count"] = 0
+        self.bot.mogi["input_points"] = []
+        self.bot.mogi["points"] = []
+        self.bot.mogi["calc"] = []
+        self.bot.mogi["results"] = []
+        self.bot.mogi["points_user"] = ""
 
         await ctx.respond("Applied MMR changes ✅")
        
