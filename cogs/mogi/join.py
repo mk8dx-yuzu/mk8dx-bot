@@ -66,13 +66,15 @@ class join(commands.Cog):
 
     @slash_command(name="kick", description="remove a player from the mogi")
     @is_mogi_manager()
-    async def kick(self, ctx: ApplicationContext, player = Option(name="player", description="use @ mention")):
+    async def kick(self, ctx: ApplicationContext, player = Option(str, name="player", description="use @ mention")):
         if self.bot.mogi["running"]:
             return await ctx.respond("Already playing, use /stop to halt the mogi")
         
         if player not in self.bot.mogi["players"]:
             return await ctx.respond("This user is not in the mogi")
         self.bot.mogi["players"].remove(player)
+        if get(ctx.guild.roles, name="InMogi") in ctx.guild.get_member(int(player.strip("<@>"))):
+            ctx.guild.get_member(int(player.strip("<@>"))).remove_roles(get(ctx.guild.roles, name="InMogi"))
 
         await ctx.respond(f"{player} got removed from the mogi (L Bozo)")
 
