@@ -40,7 +40,7 @@ class join(commands.Cog):
                 await ctx.user.add_roles(get(ctx.guild.roles, name="InMogi"))
 
             await ctx.respond(
-                f"{ctx.author.name} joined the mogi!\n{len(self.bot.mogi['players'])} players are in!"
+                f"{ctx.author.display_name} joined the mogi!\n{len(self.bot.mogi['players'])} players are in!"
                 )
     
     @slash_command(name="leave", description="Leave the current mogi", guild_only=True)
