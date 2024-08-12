@@ -27,9 +27,9 @@ class list(commands.Cog):
             if context == "table":
                 list += f"{user.global_name if user.global_name else user.display_name} +\n\n"
             elif context == "mmr":
-                list += f"{user.display_name}: {self.players.find_one({'discord': player.strip('<@!>')})['mmr']}MMR\n\n"
+                list += f"*{index+1}.* {user.display_name}: {self.players.find_one({'discord': player.strip('<@!>')})['mmr']}MMR\n"
             elif context == "usernames":
-                list += f"{user.name} \n\n"
+                list += f"*{index+1}.* {user.name} \n"
             else:
                 list += f"*{index+1}.* {user.display_name}\n"
         await ctx.respond(list, allowed_mentions=discord.AllowedMentions(users=False))
