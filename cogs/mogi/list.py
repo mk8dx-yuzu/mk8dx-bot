@@ -2,18 +2,20 @@ import discord
 from discord import Option, ApplicationContext, slash_command
 from discord.ext import commands
 from discord.utils import get
+from pymongo import collection
 
 class list(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
+        self.players: collection.Collection = self.bot.players
 
     @slash_command(name="l", description="List all players in the current mogi")
     async def l(self, ctx: ApplicationContext, 
-                table = Option(
-                    name="table", 
-                    description="Omit numbers to copy and paste into a table maker",
+                context = Option(
+                    name="context", 
+                    description="extra context to give the list",
                     required=False,
-                    choices = ["y"]
+                    choices = ["table", "mmr", "usernames"]
                     )):
         if not self.bot.mogi["status"]:
             return await ctx.respond("Currently no open mogi")
@@ -21,11 +23,15 @@ class list(commands.Cog):
             return await ctx.respond("Current mogi: \n No players")
         list = "Current mogi:\n"
         for index, player in enumerate(self.bot.mogi["players"]):
-            name = get(ctx.guild.members, id=int(player.strip("<@!>"))).display_name
-            if table:
-                list += f"{name} +\n\n"
+            user: discord.Member = get(ctx.guild.members, id=int(player.strip("<@!>")))
+            if context == "table":
+                list += f"{user.global_name if user.global_name else user.display_name} +\n\n"
+            elif context == "mmr":
+                list += f"{user.display_name}: {self.players.find_one({"discord": player.strip("<@!>")})}MMR\n\n"
+            elif context == "usernames":
+                list += f"{user.name} \n\n"
             else:
-                list += f"*{index+1}.* {name}\n"
+                list += f"*{index+1}.* {user.display_name}\n"
         await ctx.respond(list, allowed_mentions=discord.AllowedMentions(users=False))
 
     @slash_command(name="teams", description="Show teams")
