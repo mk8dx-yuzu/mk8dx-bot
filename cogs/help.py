@@ -30,5 +30,11 @@ class help(commands.Cog):
             media = discord.File(f)
             await ctx.send(file=media)
         
+    @commands.command(name="lan")
+    async def changename(self, ctx: commands.Context):
+        with open("media/lan.png", "rb") as f:
+            media = discord.File(f)
+            await ctx.send(file=media)
+        
 def setup(bot: commands.Bot):
     bot.add_cog(help(bot))
