@@ -18,6 +18,7 @@ def vote(bot: commands.Bot, format: str, user: discord.User):
 def canVote(bot: commands.Bot, format: str, user: discord.User.mention):
     size = int(format[0]) if format[0] != "f" else 1
     return (
+        bot.mogi["voting"] and
         (len(bot.mogi["players"]) % size == 0 and len(bot.mogi["players"]) > size)
         and user in bot.mogi["players"]
         and user not in bot.mogi["voters"]
