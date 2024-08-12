@@ -29,12 +29,14 @@ class help(commands.Cog):
         with open("media/howtochangeusername.gif", "rb") as f:
             media = discord.File(f)
             await ctx.send(file=media)
+            f.close()
         
     @commands.command(name="lan")
     async def changename(self, ctx: commands.Context):
         with open("media/lan.png", "rb") as f:
             media = discord.File(f)
             await ctx.send(file=media)
+            f.close()
         
 def setup(bot: commands.Bot):
     bot.add_cog(help(bot))
