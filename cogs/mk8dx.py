@@ -132,6 +132,12 @@ class mk8dx(commands.Cog):
 
         name = player['name']
 
+        class MyView(discord.ui.View):
+            def __init__(self, username):
+                super().__init__(timeout=None)  # Timeout set to None to keep the view persistent
+                self.add_item(discord.ui.Button(label="Visit Website", style=discord.ButtonStyle.link, url=f"https://mk8dx-yuzu.github.io/{username}"))
+
+
         embed = discord.Embed(
             title=f"{name}",
             description="",
@@ -163,7 +169,7 @@ class mk8dx(commands.Cog):
             url=f"https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/public/images/ranks/{rank.lower()}.webp"
         )
 
-        await ctx.respond(f"# {name} - overview", embed=embed)
+        await ctx.respond(f"# {name} - overview", embed=embed, view=MyView(name))
 
     @slash_command(name="register", description="Register for playing in the Lounge")
     @is_lounge_information_channel()
