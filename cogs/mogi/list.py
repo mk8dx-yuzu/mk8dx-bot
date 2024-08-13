@@ -37,7 +37,7 @@ class list(commands.Cog):
                     high_mmr = max(mmrs, key=lambda x: x['mmr'])
                     low_mmr = min(mmrs, key=lambda x: x['mmr'])
                     avg_mmr = sum(item['mmr'] for item in mmrs) // len(mmrs)
-                    list += f"\nhighest mmr: {high_mmr}\nlowest mmr: {low_mmr}\naverage mmr: {avg_mmr}\n"
+                    list += f"\nhighest mmr: {high_mmr['name']}: {high_mmr[mmr]}\nlowest mmr: {low_mmr['name']}: {low_mmr[mmr]}\naverage mmr: {avg_mmr}\n"
             
             elif context == "usernames":
                 list += f"*{index+1}.* {user.name} \n"
