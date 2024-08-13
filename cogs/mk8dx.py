@@ -187,7 +187,7 @@ class mk8dx(commands.Cog):
             return await ctx.respond("This username is already taken. Try changing your server-nickname or ask a moderator.", ephemeral=True)
         
         role = get(ctx.guild.roles, name="Lounge Player")
-        member = ctx.user
+        member: discord.Member = ctx.user
         if role in member.roles:
             return await ctx.respond("You already have the Lounge Player role even though you don't have a player role. Please ask a moderator.", ephemeral=True)
         try:
