@@ -23,20 +23,20 @@ class help(commands.Cog):
         embed.set_footer(text="Yuzu Online", icon_url="https://images-ext-1.discordapp.net/external/ymL8nMKRGEJwQZNCLRuCAbeHxt3n3HYA0XTD-JUW4m4/https/cdn.discordapp.com/icons/1084911987626094654/a_f51d88cf4421676675437f9cf4fbbff6.gif")
 
         await ctx.respond(embed=embed)
+        
+    @commands.command(name="lan")
+    async def lan(self, ctx: commands.Context):
+        with open("media/lan.png", "rb") as f:
+            media = discord.File(f)
+            await ctx.send(file=media)
+        f.close()
 
     @commands.command(name="changename")
     async def changename(self, ctx: commands.Context):
         with open("media/howtochangeusername.gif", "rb") as f:
             media = discord.File(f)
             await ctx.send(file=media)
-            f.close()
-        
-    @commands.command(name="lan")
-    async def changename(self, ctx: commands.Context):
-        with open("media/lan.png", "rb") as f:
-            media = discord.File(f)
-            await ctx.send(file=media)
-            f.close()
+        f.close()
         
 def setup(bot: commands.Bot):
     bot.add_cog(help(bot))
