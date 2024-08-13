@@ -22,12 +22,23 @@ class list(commands.Cog):
         if not self.bot.mogi["players"]:
             return await ctx.respond("Current mogi: \n No players")
         list = "Current mogi:\n"
+        mmrs = []
         for index, player in enumerate(self.bot.mogi["players"]):
             user: discord.Member = get(ctx.guild.members, id=int(player.strip("<@!>")))
             if context == "table":
                 list += f"{user.global_name if user.global_name else user.display_name} +\n\n"
+
             elif context == "mmr":
-                list += f"*{index+1}.* {user.display_name}: {self.players.find_one({'discord': player.strip('<@!>')})['mmr']}MMR\n"
+                mmr = int(self.players.find_one({'discord': player.strip('<@!>')})['mmr'])
+                list += f"*{index+1}.* {user.display_name}: {mmr}MMR\n"
+                mmrs.append({"name": user.display_name, "mmr": mmr})
+
+                if index+1 == len(self.bot.mogi["players"]):
+                    high_mmr = max(mmrs, key=lambda x: x['mmr'])
+                    low_mmr = min(mmrs, key=lambda x: x['mmr'])
+                    avg_mmr = sum(item['mmr'] for item in mmrs) // len(mmrs)
+                    list += f"\nhighest mmr: {high_mmr}\nlowest mmr: {low_mmr}\naverage mmr: {avg_mmr}\n"
+            
             elif context == "usernames":
                 list += f"*{index+1}.* {user.name} \n"
             else:
