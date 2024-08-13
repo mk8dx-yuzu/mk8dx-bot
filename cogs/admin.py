@@ -108,7 +108,7 @@ class admin(commands.Cog):
         if member:
             await member.remove_roles(get(ctx.guild.roles, name="Lounge Player"))
             for item in ranks:
-                role = get(ctx.guild.roles, name=f"Lounge {item["name"]}")
+                role = get(ctx.guild.roles, name=f"Lounge {item['name']}")
                 if role in member.roles:
                     await member.remove_roles(role)
         await ctx.respond(f"Successfully deleted {player}s player records")
