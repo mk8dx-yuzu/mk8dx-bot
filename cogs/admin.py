@@ -7,6 +7,7 @@ from discord.ext import commands
 from discord.utils import get
 
 from cogs.extras.utils import is_admin
+from cogs.extras.ranks import ranks
 
 class admin(commands.Cog):
     def __init__(self, bot):
@@ -103,9 +104,13 @@ class admin(commands.Cog):
             return await ctx.respond("Couldn't find that player")
         user_discord = user['discord']
         self.players.delete_one({"name": player})
-        member = ctx.guild.get_member(int(user_discord))
+        member: discord.Member = ctx.guild.get_member(int(user_discord))
         if member:
             await member.remove_roles(get(ctx.guild.roles, name="Lounge Player"))
+            for item in ranks:
+                role = get(ctx.guild.roles, name=f"Lounge {item["name"]}")
+                if role in member.roles:
+                    await member.remove_roles(role)
         await ctx.respond(f"Successfully deleted {player}s player records")
 
     @slash_command(name="archive", description="archive a player")
