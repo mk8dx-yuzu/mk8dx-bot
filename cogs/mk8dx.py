@@ -9,6 +9,8 @@ from discord import slash_command, Option
 
 from cogs.extras.ranks import calcRank
 
+from cogs.extras.utils import is_lounge_information_channel
+
 class mk8dx(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -163,7 +165,8 @@ class mk8dx(commands.Cog):
 
         await ctx.respond(f"# {name} - overview", embed=embed)
 
-    @slash_command(name="register", description="Register for playing in the Lounge", guild_only=True)
+    @slash_command(name="register", description="Register for playing in the Lounge")
+    @is_lounge_information_channel()
     async def register(
         self,
         ctx: discord.ApplicationContext
@@ -179,17 +182,20 @@ class mk8dx(commands.Cog):
         username = ''.join(e for e in ctx.interaction.user.display_name.lower() if e.isalnum())
         if username == "":
             username = ctx.interaction.user.name.lower()
+
+        if self.players.find_one({"name": username}):
+            return await ctx.respond("This username is already taken. Try changing your server-nickname or ask a moderator.", ephemeral=True)
         
         role = get(ctx.guild.roles, name="Lounge Player")
         member = ctx.user
         if role in member.roles:
-            return await ctx.respond("You already have the Lounge Player role", ephemeral=True)
+            return await ctx.respond("You already have the Lounge Player role even though you don't have a player role. Please ask a moderator.", ephemeral=True)
         try:
             self.players.insert_one(
                 {"name": username, "mmr": 2000, "wins": 0, "losses": 0, "discord": str(member.id), "history": []},
             )
         except:
-            return await ctx.respond("Name already taken or another error occured", ephemeral=True)
+            return await ctx.respond("Some error occured creating your player record. Please ask a moderator.", ephemeral=True)
         await member.add_roles(get(ctx.guild.roles, name="Lounge Player"))
         await member.add_roles(get(ctx.guild.roles, name="Lounge - Silver"))
         await ctx.respond(f"{member.mention} is now registered for Lounge as {username}\n You can view your profile at https://mk8dx-yuzu.github.io/{username}", ephemeral=True)
