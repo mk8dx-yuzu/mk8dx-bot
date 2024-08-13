@@ -1,4 +1,4 @@
-import os, discord, pymongo, random
+import os, json, discord, pymongo, random
 from pymongo import collection
 from copy import deepcopy
 from discord.ext import commands, tasks
@@ -67,10 +67,20 @@ async def change_activity():
     ]
     await bot.change_presence(activity = random.choice(activities))
 
+@tasks.loop(seconds=5)
+async def backup_state():
+    with open("persistent/backup.json", "w") as f:
+            json.dump(bot.mogi, f)
+            f.close()
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})")
     change_activity.start()
+    with open("persistent/backup.json", "r") as f:
+        bot.mogi = json.load(f)
+        f.close()
+    backup_state.start()
 
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
