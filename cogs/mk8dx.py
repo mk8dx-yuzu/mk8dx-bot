@@ -1,5 +1,5 @@
 import os
-import time
+import time, datetime
 import math
 import discord
 import pymongo
@@ -144,15 +144,19 @@ class mk8dx(commands.Cog):
             color=discord.Colour.blurple(),
         )
         embed.add_field(name="Discord", value=f"<@{player['discord']}>")
+
+        if player["joined"]:
+            embed.add_field(name="Joined", value=f"{datetime.datetime.fromtimestamp(player['joined']).strftime('%B %d %Y')}")
+
+        rank = calcRank(player["mmr"])
+        embed.add_field(name="Rank", value=f"{rank}")
+        
         embed.add_field(name="Wins", value=f"{str(player['wins'])}")
         embed.add_field(name="Losses", value=f"{player['losses']}")
 
-        rank = calcRank(player["mmr"])
-
-        embed.add_field(name="Rank", value=f"{rank}")
         embed.add_field(
             name="Winrate",
-            value=f"{round(((player['wins']/(player['wins']+player['losses']) if (player['wins']+player['losses']) else 0)*100), 2)}%",
+            value=f"{round(((player['wins']/(player['wins']+player['losses']) if (player['wins']+player['losses']) else 0)*100))}%",
         )
 
         embed.set_author(
