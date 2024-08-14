@@ -143,14 +143,9 @@ class mk8dx(commands.Cog):
             description="",
             color=discord.Colour.blurple(),
         )
-        for item in list(player.keys())[2:]:
-            if item == "discord":
-                embed.add_field(name=f"{item}", value=f"<@{player[item]}>")
-                continue
-            if item == "history":
-                embed.add_field(name=f"{item}", value=f"{str(player[item])}")
-                continue
-            embed.add_field(name=f"{item}", value=f"{player[item]}")
+        embed.add_field(name="Discord", value=f"<@{player['discord']}>")
+        embed.add_field(name="Wins", value=f"{str(player['wins'])}")
+        embed.add_field(name="Losses", value=f"{player['losses']}")
 
         rank = calcRank(player["mmr"])
 
