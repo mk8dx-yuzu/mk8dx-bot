@@ -159,6 +159,9 @@ class mk8dx(commands.Cog):
             value=f"{round(((player['wins']/(player['wins']+player['losses']) if (player['wins']+player['losses']) else 0)*100))}%",
         )
 
+        embed.add_field(name="MMR", value=f"{player['mmr']}")
+        embed.add_field(name="History (last 5)", value=f"{player['history'][len(player['history']-5):]}")
+
         embed.set_author(
             name="Yuzu-Lounge",
             icon_url="https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/public/favicon/android-icon-192x192.png",
