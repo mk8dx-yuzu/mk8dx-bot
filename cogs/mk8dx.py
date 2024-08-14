@@ -145,8 +145,8 @@ class mk8dx(commands.Cog):
         )
         embed.add_field(name="Discord", value=f"<@{player['discord']}>")
 
-        if player["joined"]:
-            embed.add_field(name="Joined", value=f"{datetime.datetime.fromtimestamp(player['joined']).strftime('%B %d %Y')}")
+        #if player["joined"]:
+        #    embed.add_field(name="Joined", value=f"{datetime.datetime.fromtimestamp(player['joined']).strftime('%B %d %Y')}")
 
         rank = calcRank(player["mmr"])
         embed.add_field(name="Rank", value=f"{rank}")
@@ -160,7 +160,7 @@ class mk8dx(commands.Cog):
         )
 
         embed.add_field(name="MMR", value=f"{player['mmr']}")
-        embed.add_field(name="History (last 5)", value=f"{', '.join( map(str, player['history'][len(player['history'])-5:]))}")
+        embed.add_field(name="History (last 5)", value=f"{', '.join(map(str, player['history'][len(player['history'])-5:]))}")
 
         embed.set_author(
             name="Yuzu-Lounge",
