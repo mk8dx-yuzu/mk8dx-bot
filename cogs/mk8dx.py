@@ -146,7 +146,7 @@ class mk8dx(commands.Cog):
         embed.add_field(name="Discord", value=f"<@{player['discord']}>")
 
         if player.get("joined"):
-            embed.add_field(name="Joined", value=f"{datetime.datetime.fromtimestamp(player['joined']).strftime('%B %d %Y')}")
+            embed.add_field(name="Joined", value=f"{datetime.datetime.fromtimestamp(player['joined']).strftime('%b %d %Y')}")
 
         rank = calcRank(player["mmr"])
         embed.add_field(name="Rank", value=f"{rank}")
