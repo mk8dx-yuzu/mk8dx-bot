@@ -160,7 +160,7 @@ class mk8dx(commands.Cog):
         )
 
         embed.add_field(name="MMR", value=f"{player['mmr']}")
-        embed.add_field(name="History (last 5)", value=f"{', '.join(player['history'][len(player['history'])-5:])}")
+        embed.add_field(name="History (last 5)", value=f"{', '.join( map(str, player['history'][len(player['history'])-5:]))}")
 
         embed.set_author(
             name="Yuzu-Lounge",
