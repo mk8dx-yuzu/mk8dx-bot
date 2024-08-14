@@ -1,4 +1,6 @@
 import os
+import time
+import datetime
 import math
 import discord
 import pymongo
@@ -143,22 +145,21 @@ class mk8dx(commands.Cog):
             description="",
             color=discord.Colour.blurple(),
         )
-        for item in list(player.keys())[2:]:
-            if item == "discord":
-                embed.add_field(name=f"{item}", value=f"<@{player[item]}>")
-                continue
-            if item == "history":
-                embed.add_field(name=f"{item}", value=f"{str(player[item])}")
-                continue
-            embed.add_field(name=f"{item}", value=f"{player[item]}")
+        embed.add_field(name="Discord", value=f"<@{player['discord']}>")
 
+        if player["joined"]:
+            embed.add_field(name="joined", value=f"{datetime.datetime.fromtimestamp(player['joined']).strftime("%B %d %Y")}")
+        
         rank = calcRank(player["mmr"])
 
         embed.add_field(name="Rank", value=f"{rank}")
+        embed.add_field(name="Wins", value=f"{player['wins']}")
+        embed.add_field(name="Losses", value=f"{player['losses']}")
         embed.add_field(
             name="Winrate",
-            value=f"{round(((player['wins']/(player['wins']+player['losses']) if (player['wins']+player['losses']) else 0)*100), 2)}%",
+            value=f"{round(((player['wins']/(player['wins']+player['losses']) if (player['wins']+player['losses']) else 0)*100))}%",
         )
+        embed.add_field(name="History (Last 5)", value=f"{', '.join(player['history'][player['history']-5:])}")
 
         embed.set_author(
             name="Yuzu-Lounge",
@@ -198,7 +199,7 @@ class mk8dx(commands.Cog):
             return await ctx.respond("You already have the Lounge Player role even though you don't have a player role. Please ask a moderator.", ephemeral=True)
         try:
             self.players.insert_one(
-                {"name": username, "mmr": 2000, "wins": 0, "losses": 0, "discord": str(member.id), "history": []},
+                {"name": username, "mmr": 2000, "wins": 0, "losses": 0, "discord": str(member.id), "joined": round(time.time()), "history": []},
             )
         except:
             return await ctx.respond("Some error occured creating your player record. Please ask a moderator.", ephemeral=True)
