@@ -1,6 +1,5 @@
 import os
 import time
-import datetime
 import math
 import discord
 import pymongo
@@ -139,27 +138,27 @@ class mk8dx(commands.Cog):
                 super().__init__(timeout=None)  # Timeout set to None to keep the view persistent
                 self.add_item(discord.ui.Button(label="Visit Website", style=discord.ButtonStyle.link, url=f"https://mk8dx-yuzu.github.io/{username}"))
 
-
         embed = discord.Embed(
             title=f"{name}",
             description="",
             color=discord.Colour.blurple(),
         )
-        embed.add_field(name="Discord", value=f"<@{player['discord']}>")
+        for item in list(player.keys())[2:]:
+            if item == "discord":
+                embed.add_field(name=f"{item}", value=f"<@{player[item]}>")
+                continue
+            if item == "history":
+                embed.add_field(name=f"{item}", value=f"{str(player[item])}")
+                continue
+            embed.add_field(name=f"{item}", value=f"{player[item]}")
 
-        #if player["joined"]:
-        #    embed.add_field(name="joined", value=f"{datetime.datetime.fromtimestamp(player['joined']).strftime('%B %d %Y')}")
-        
         rank = calcRank(player["mmr"])
 
         embed.add_field(name="Rank", value=f"{rank}")
-        embed.add_field(name="Wins", value=f"{player['wins']}")
-        embed.add_field(name="Losses", value=f"{player['losses']}")
         embed.add_field(
             name="Winrate",
-            value=f"{round(((player['wins']/(player['wins']+player['losses']) if (player['wins']+player['losses']) else 0)*100))}%",
+            value=f"{round(((player['wins']/(player['wins']+player['losses']) if (player['wins']+player['losses']) else 0)*100), 2)}%",
         )
-        embed.add_field(name="History (Last 5)", value=f"{', '.join(player['history'][player['history']-5:])}")
 
         embed.set_author(
             name="Yuzu-Lounge",
