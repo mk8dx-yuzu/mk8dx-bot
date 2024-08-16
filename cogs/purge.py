@@ -18,7 +18,7 @@ class purge(commands.Cog):
         await ctx.interaction.response.defer()
 
         players_with_no_mogis = list(self.players.find({"mmr": 2000, "wins": 0, "losses": 0, "history": []}))
-        self.players.update_many({"mmr": 2000, "wins": 0, "losses": 0, "history": []}, {"$set": {"inactive": True}})
+        self.players.update_many({"mmr": 8458}, {"$set": {"inactive": True}})
 
         for player in players_with_no_mogis:
             user = await self.bot.fetch_user(int(player["discord"]))
