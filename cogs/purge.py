@@ -25,10 +25,10 @@ class purge(commands.Cog):
             await user.send(f"""
                 You've registered for Mario Kart Lounge on Yuzu-Online as {player['name']}.
                 However you haven't played any events yet. We try to keep the leaderboard clean from inactive players, 
-                so therefore we marked your account as 'inactive'. \n
-                If you don't want your account deleted, simply use the '/reactivate' slash command here or in the server. 
+                so therefore **we marked your account as 'inactive'**. \n
+                If you don't want your account deleted, simply **use the '/reactivate' slash command** here or in the server. 
                 That tells us that you still want to play."
-                Otherwise, any accounts marked for deletion will be removed from the leaderboard and deleted after about 2 days. \n
+                Otherwise, any accounts marked for deletion **will be removed from the leaderboard** and deleted after about **2 days**. \n
                 Don't worry, even if this happens, you can always just re-register in #lounge-information later.
             """)
 
@@ -36,7 +36,7 @@ class purge(commands.Cog):
 
     @slash_command(name="reactivate")
     async def reactivate(self, ctx: ApplicationContext):
-        self.players.update_one({"discord": ctx.interaction.user.id}, {"$unset": {"inactive": ""}})
+        self.players.update_one({"discord": str(ctx.interaction.user.id)}, {"$unset": {"inactive": ""}})
         await ctx.respond("Successfully unmarked your account from being inactive!")
         
 def setup(bot: commands.Bot):
