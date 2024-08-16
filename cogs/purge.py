@@ -17,7 +17,7 @@ class purge(commands.Cog):
     async def purge_leaderboard(self, ctx: ApplicationContext):
         await ctx.interaction.response.defer()
 
-        players_with_no_mogis = list(self.players.find({"mmr": 2000, "wins": 0, "losses": 0, "history": []}))
+        players_with_no_mogis = list(self.players.find({"mmr": 8458}))
         self.players.update_many({"mmr": 8458}, {"$set": {"inactive": True}})
 
         for player in players_with_no_mogis:
