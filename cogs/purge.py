@@ -16,7 +16,7 @@ class purge(commands.Cog):
     @is_admin()
     async def purge_leaderboard(self, ctx: ApplicationContext):
         players_with_no_mogis = self.players.find({"mmr": 2000, "wins": 0, "losses": 0, "history": []})
-        await ctx.respond(list(players_with_no_mogis))
+        await ctx.respond(player['name'] for player in list(players_with_no_mogis))
         
 def setup(bot: commands.Bot):
     bot.add_cog(purge(bot))
