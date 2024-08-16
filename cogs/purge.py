@@ -17,8 +17,8 @@ class purge(commands.Cog):
     async def purge_leaderboard(self, ctx: ApplicationContext):
         await ctx.interaction.response.defer()
 
-        players_with_no_mogis = list(self.players.find({"mmr": 2000, "wins": 0, "losses": 0, "history": []}))
-        self.players.update_many({"mmr": 2000, "wins": 0, "losses": 0, "history": []}, {"$set": {"inactive": True}})
+        players_with_no_mogis = list(self.players.find({"mmr": 2000, "wins": 0, "losses": 0, "history": [], "inactive": { "$exists": False }}))
+        self.players.update_many({"mmr": 2000, "wins": 0, "losses": 0, "history": [], "inactive": { "$exists": False }}, {"$set": {"inactive": True}})
 
         for player in players_with_no_mogis:
             user = await self.bot.fetch_user(int(player["discord"]))
