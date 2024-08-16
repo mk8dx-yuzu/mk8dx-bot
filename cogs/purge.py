@@ -17,8 +17,8 @@ class purge(commands.Cog):
     async def purge_leaderboard(self, ctx: ApplicationContext):
         await ctx.interaction.response.defer()
 
-        players_with_no_mogis = list(self.players.find({"mmr": 8458}))
-        self.players.update_many({"mmr": 8458}, {"$set": {"inactive": True}})
+        players_with_no_mogis = list(self.players.find({"mmr": 2000, "wins": 0, "losses": 0, "history": []}))
+        self.players.update_many({"mmr": 2000, "wins": 0, "losses": 0, "history": []}, {"$set": {"inactive": True}})
 
         for player in players_with_no_mogis:
             user = await self.bot.fetch_user(int(player["discord"]))
@@ -34,7 +34,7 @@ class purge(commands.Cog):
 
         await ctx.respond(f"Marked {len(players_with_no_mogis)} accounts as inactive and DMed users.")
 
-    @slash_command(name="reactivate")
+    @slash_command(name="reactivate", description="use this to unmark your account from being inactive if you have not played any events")
     async def reactivate(self, ctx: ApplicationContext):
         self.players.update_one({"discord": str(ctx.interaction.user.id)}, {"$unset": {"inactive": ""}})
         await ctx.respond("Successfully unmarked your account from being inactive!")
