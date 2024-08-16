@@ -19,7 +19,7 @@ class purge(commands.Cog):
         names = ""
         for player in list(players_with_no_mogis):
             names += f"{player['name']}, "
-        await ctx.respond(names)
+        await ctx.respond(f"{names[:1990]}...")
         
 def setup(bot: commands.Bot):
     bot.add_cog(purge(bot))
