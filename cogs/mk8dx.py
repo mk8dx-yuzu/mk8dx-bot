@@ -163,6 +163,9 @@ class mk8dx(commands.Cog):
         if player['history']:
             embed.add_field(name="History (last 5)", value=f"{', '.join(map(str, player['history'][len(player['history'])-5:]))}")
 
+        if player.get("inactive"):
+            embed.add_field(name="Inactive", value="Account marked for inactivity")
+
         embed.set_author(
             name="Yuzu-Lounge",
             icon_url="https://raw.githubusercontent.com/mk8dx-yuzu/mk8dx-yuzu.github.io/main/public/favicon/android-icon-192x192.png",
