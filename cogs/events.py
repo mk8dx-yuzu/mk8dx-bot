@@ -43,7 +43,7 @@ class events(commands.Cog):
             if "my dream" in message.content.lower():
                 await message.channel.send("eyo bro, sorry that im writing u directly, U seem to have the File to Zelda totk. i want to play it on my pc but im too dumb to get it running and i dont seem to have the right game files. can u help me out? maybe by a link to the gamefile and a little guide to set that shit up. would be my dream bro")
             
-            if "where password" in message.content.lower():
+            if "where" in message.content.lower() and "password" in message.content.lower():
                 await message.channel.send("plz password mario kart 8 Eu main ? :3 Use Google Translate. I have a hard time understanding English, there is a server that asks me for a password and it goes to this discord, I thought I would find it here. I am from Chile (Spanish)")
             
         if message.content == "dc":
