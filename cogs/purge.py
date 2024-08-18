@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 from discord import ApplicationContext, slash_command, Option
 from discord.ext import commands
@@ -42,6 +44,58 @@ class purge(commands.Cog):
     async def reactivate(self, ctx: ApplicationContext):
         self.players.update_one({"discord": str(ctx.interaction.user.id)}, {"$unset": {"inactive": ""}})
         await ctx.respond("Successfully unmarked your account from being inactive!")
+
+    @slash_command(name="delete_inactive_players", description="Delete inactive-marked players from the leaderboard")
+    @is_admin()
+    async def delete_inactive_players(self, ctx: ApplicationContext):
+        await ctx.response.defer()
+
+        inactive_players = list(self.players.find({"inactive": True, "history": []}))
+        if not inactive_players:
+            return await ctx.respond("Found no inactive players")
+
+        message = await ctx.send(
+            f"""
+            Found {len(inactive_players)} users that are marked as inactive and haven't played a mogi.
+            Are you sure you want to delete their profiles and remove their Lounge Player roles?
+        """
+        )
+
+        await message.add_reaction("✅")
+        await message.add_reaction("❌")
+
+        def check(reaction: discord.Reaction, user):
+            return user == ctx.user and str(reaction.emoji) in ("✅", "❌")
+
+        try:
+            reaction, user = await self.bot.wait_for(
+                "reaction_add", timeout=60, check=check
+            )
+        except asyncio.TimeoutError:
+            await message.edit(content="Confirmation timed out.")
+            return await ctx.respond("Timeout")
+
+        if str(reaction.emoji) == "✅":
+            await message.edit(content="DMing users...")
+
+            for player in inactive_players:
+                cant_dm = 0
+                try:
+                    discord_user = await self.bot.fetch_user(int(player["discord"]))
+                    discord_user.send(f"Your Lounge-Profile as {player['name']} has been deleted.\n To participate in Lounge again, re-register in https://discord.com/channels/1084911987626094654/1181312934803144724")
+                except:
+                    cant_dm += 1
+                
+            await message.edit(content="Deleting...")
+            self.players.delete_many({"inactive": True, "history": []})
+
+            final_message = f"Deleted all {len(inactive_players)} profiles and managed to inform {len(inactive_players)-cant_dm} users."
+        else:
+            await message.edit(content="Action canceled.")
+
+        if final_message:
+            await ctx.followup.send(final_message)
+        
         
 def setup(bot: commands.Bot):
     bot.add_cog(purge(bot))
