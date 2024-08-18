@@ -42,53 +42,6 @@ class purge(commands.Cog):
     async def reactivate(self, ctx: ApplicationContext):
         self.players.update_one({"discord": str(ctx.interaction.user.id)}, {"$unset": {"inactive": ""}})
         await ctx.respond("Successfully unmarked your account from being inactive!")
-
-    @slash_command(name="delete_inactive_players", description="Delete inactive-marked players from the leaderboard")
-    @is_admin()
-    async def delete_inactive_players(self, ctx: ApplicationContext):
-        
-        await ctx.response.defer()
-        if self.bot.mogi["locked"]:
-            return await ctx.respond(self.bot.locked_mogi)
-
-        message = await ctx.send(
-            f"""
-        
-        """
-        )
-
-        await message.add_reaction("✅")
-        await message.add_reaction("❌")
-
-        def check(reaction, user):
-            return user == ctx.user and str(reaction.emoji) in ("✅", "❌")
-
-        try:
-            reaction, user = await self.bot.wait_for(
-                "reaction_add", timeout=60, check=check
-            )
-        except asyncio.TimeoutError:
-            await message.edit(content="Confirmation timed out.")
-            return await ctx.respond("Timeout")
-
-        if str(reaction.emoji) == "✅":
-            await message.edit(content="Closing...")
-            self.bot.mogi = deepcopy(default_mogi_state)
-            mogi_members = get(ctx.guild.roles, name="InMogi").members
-            for member in mogi_members:
-                await member.remove_roles(get(ctx.guild.roles, name="InMogi"))
-
-            for i in range(5):
-                role = get(ctx.guild.roles, name=f"Team {i+1}")
-                for member in role.members:
-                    await member.remove_roles(role)
-            final_message = "# The mogi has been closed"
-        else:
-            await message.edit(content="Action canceled.")
-
-        if final_message:
-            await ctx.followup.send(final_message)
-        
         
 def setup(bot: commands.Bot):
     bot.add_cog(purge(bot))
