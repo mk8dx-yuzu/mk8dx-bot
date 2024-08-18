@@ -82,7 +82,7 @@ class purge(commands.Cog):
                 cant_dm = 0
                 try:
                     discord_user = await self.bot.fetch_user(int(player["discord"]))
-                    discord_user.send(f"Your Lounge-Profile as {player['name']} has been deleted.\n To participate in Lounge again, re-register in https://discord.com/channels/1084911987626094654/1181312934803144724")
+                    await discord_user.send(f"Your Lounge-Profile as {player['name']} has been deleted.\n To participate in Lounge again, re-register in https://discord.com/channels/1084911987626094654/1181312934803144724")
                 except:
                     cant_dm += 1
                 
