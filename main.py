@@ -82,7 +82,7 @@ async def update_lounge_pass():
     if match:
         if new_password != match.group(1):
             await channel.purge()
-            await channel.send(f"# Current password: `{new_password}` \nPlease do not distribute the password in other channels, instead refer to https://discord.com/channels/1084911987626094654/1222294894962540704 \nThis message will change for future password changes!")
+            await channel.send(f"# Current password: `{new_password.strip()}`\nPlease do not distribute the password in other channels, instead refer to https://discord.com/channels/1084911987626094654/1222294894962540704 \nThis message will change for future password changes!")
 
 @tasks.loop(seconds=5)
 async def backup_state():
