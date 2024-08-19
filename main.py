@@ -1,4 +1,5 @@
 import os, json, discord, pymongo, random
+import re
 from pymongo import collection
 from copy import deepcopy
 from discord.ext import commands, tasks
@@ -66,6 +67,22 @@ async def change_activity():
         discord.Streaming(name="ones and zeroes", url="https://www.youtube.com/watch?v=xvFZjo5PgG0&autoplay=1")
     ]
     await bot.change_presence(activity = random.choice(activities))
+
+@tasks.loop(minutes=5)
+async def update_lounge_pass():
+    new_password = ""
+    with open("persistent/password.txt", "r") as f:
+        new_password = f.read()
+        f.close()
+        
+    channel = bot.get_channel(1222294894962540704)
+    last_message = await channel.history(limit=1).flatten()
+    
+    match = re.search(r"`([^`]+)`", last_message[0].content)
+    if match:
+        if new_password == match.group(1):
+            await channel.purge()
+            await channel.send(f"# Current password: `{new_password}` \nPlease do not distribute the password in other channels, instead refer to https://discord.com/channels/1084911987626094654/1222294894962540704 \nThis message will change for future password changes!")
 
 @tasks.loop(seconds=5)
 async def backup_state():
