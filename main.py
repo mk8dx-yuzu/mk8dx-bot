@@ -68,7 +68,7 @@ async def change_activity():
     ]
     await bot.change_presence(activity = random.choice(activities))
 
-@tasks.loop(minutes=5)
+@tasks.loop(seconds=30)
 async def update_lounge_pass():
     new_password = ""
     with open("persistent/password.txt", "r") as f:
@@ -77,10 +77,10 @@ async def update_lounge_pass():
         
     channel = bot.get_channel(1222294894962540704)
     last_message = await channel.history(limit=1).flatten()
-    
+
     match = re.search(r"`([^`]+)`", last_message[0].content)
     if match:
-        if new_password == match.group(1):
+        if new_password != match.group(1):
             await channel.purge()
             await channel.send(f"# Current password: `{new_password}` \nPlease do not distribute the password in other channels, instead refer to https://discord.com/channels/1084911987626094654/1222294894962540704 \nThis message will change for future password changes!")
 
@@ -98,6 +98,7 @@ async def on_ready():
         bot.mogi = json.load(f)
         f.close()
     backup_state.start()
+    update_lounge_pass.start()
 
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
