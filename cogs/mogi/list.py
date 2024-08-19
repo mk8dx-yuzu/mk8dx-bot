@@ -22,7 +22,7 @@ class list(commands.Cog):
         if not self.bot.mogi["players"]:
             return await ctx.respond("Current mogi: \n No players")
         
-        if self.bot.mogi["format"] == "ffa":
+        if self.bot.mogi["format"] in ["ffa", ""]:
             list = "Current mogi:\n"
             mmrs = []
             for index, player in enumerate(self.bot.mogi["players"]):
