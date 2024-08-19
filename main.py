@@ -68,7 +68,7 @@ async def change_activity():
     ]
     await bot.change_presence(activity = random.choice(activities))
 
-@tasks.loop(seconds=30)
+@tasks.loop(minutes=5)
 async def update_lounge_pass():
     new_password = ""
     with open("persistent/password.txt", "r") as f:
