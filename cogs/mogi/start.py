@@ -248,7 +248,7 @@ class start(commands.Cog):
         guild_only=True,
     )
     async def stop(self, ctx: ApplicationContext):
-        if not self.bot.mogi["running"]:
+        if not self.bot.mogi["running"] or (self.bot.mogi["running"] and self.bot.mogi["voting"]):
             return await ctx.respond(
                 "No running mogi yet. if vote is still in process, it needs to end or be force started before it can be stopped"
             )
@@ -266,7 +266,6 @@ class start(commands.Cog):
         self.bot.mogi["subs"] = []
 
         await ctx.respond("The mogi has been stopped, use /start to start it again")
-        await ctx.send(f"Debug:\nVotes:{self.bot.mogi['votes']}")
 
 
 def setup(bot: commands.Bot):
