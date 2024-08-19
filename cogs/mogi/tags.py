@@ -7,7 +7,7 @@ class tags(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
-    team = SlashCommandGroup(name = "tags", description = "Edit Team tags and apply/remove respective roles")
+    team = SlashCommandGroup(name = "team", description = "Edit Team tags and apply/remove respective roles")
 
     @team.command(name="tag", description="set a tag for your own team")
     async def tag(self, ctx: ApplicationContext, tag = Option(str, name="tag", description="what tag to set for your team", required=True)):
