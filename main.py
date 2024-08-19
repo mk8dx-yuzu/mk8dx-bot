@@ -80,7 +80,7 @@ async def update_lounge_pass():
 
     match = re.search(r"`([^`]+)`", last_message[0].content)
     if match:
-        if new_password != match.group(1):
+        if new_password.strip() != match.group(1).strip():
             await channel.purge()
             await channel.send(f"# Current password: `{new_password.strip()}`\nPlease do not distribute the password in other channels, instead refer to https://discord.com/channels/1084911987626094654/1222294894962540704 \nThis message will change for future password changes!")
 
