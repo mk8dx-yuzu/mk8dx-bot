@@ -50,12 +50,21 @@ class list(commands.Cog):
             list = "# Teams \n\n"
             for i, team in enumerate(self.bot.mogi["teams"]):
                 list += f"{'## ' if context != 'table' else ''}{self.bot.mogi['team_tags'][i] or f'Team {i+1}'}\n"
-                team = [get(ctx.guild.members, id=int(player.strip('<@!>'))).display_name for player in team]
+
+                team = [get(ctx.guild.members, id=int(player.strip('<@!>'))) for player in team]
                 for player in team:
                     if context == "table":
-                        list += f"{player} +\n"
+                        list += f"{player.display_name} +\n"
+
+                    elif context == "mmr":
+                        list += f"- {player.display_name}: {int(self.players.find_one({'discord': str(player.id)})['mmr'])}MMR\n"
+                        
+                    elif context == "usernames":
+                        list += f"- {player.name} \n"
+
                     else:
-                        list += f"- {player}\n"
+                        list += f"- {player.display_name}\n"
+
                 list += "\n"
                     
         await ctx.respond(list, allowed_mentions=discord.AllowedMentions(users=False))
