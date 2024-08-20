@@ -9,3 +9,6 @@ services:
 
   chromedriver:
     image: joyzoursky/python-chromedriver:latest
+
+volumes:
+  persistent:
