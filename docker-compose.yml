@@ -1,0 +1,11 @@
+services:
+  bot-mk8dx:
+    build: .
+    depends_on:
+      - chromedriver
+    volumes:
+      - .:/
+      - persistent:/persistent
+
+  chromedriver:
+    image: joyzoursky/python-chromedriver:latest
