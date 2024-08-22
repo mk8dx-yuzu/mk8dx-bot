@@ -17,6 +17,8 @@ class funnies(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        if message.author == self.bot.user:
+            return
 
         if message.channel.id == 1180622895316209664:
             if "dk summit" in message.content.lower() and random.random() < 0.4:
