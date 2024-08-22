@@ -1,11 +1,19 @@
 import random
 
 import discord
+from discord import slash_command, ApplicationContext
 from discord.ext import commands
 
 class funnies(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
+
+    @slash_command(name="fun")
+    async def fun(self, ctx: ApplicationContext):
+        with open("media/havingfun.png", "rb") as f:
+            media = discord.File(f)
+            await ctx.respond(f"{ctx.interaction.user.mention} was caught having fun, they're now banned.", file=media)
+        f.close()
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
