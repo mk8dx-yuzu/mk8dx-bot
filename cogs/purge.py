@@ -100,12 +100,14 @@ class purge(commands.Cog):
             await ctx.followup.send(final_message)
         
     @purge.command(name="clear_lounge_roles")
-    async def clear_lounge_roles(self, ctx: ApplicationContext):
-        lounge_player: discord.Role = get(ctx.guild.roles, name="Lounge Player")
+    async def clear_lounge_roles(self, ctx: ApplicationContext, role = Option(str, choices=["Player", "Bronze", "Silver", "Gold"], required=True)):
+        await ctx.interaction.response.defer()
+
+        lounge_role: discord.Role = get(ctx.guild.roles, name=f"Lounge {role}")
         count=0
-        for user in lounge_player.members:
+        for user in lounge_role.members:
             if not self.players.find_one({"discord": str(user.id)}):
-                await user.remove_roles(lounge_player)
+                await user.remove_roles(lounge_role)
                 count+=1
                 await ctx.send(f"removed lounge player role from {user.name}")
         await ctx.respond(f"sucessfully removed lounge player role from {count} members with no profile")
