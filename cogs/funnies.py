@@ -45,6 +45,11 @@ class funnies(commands.Cog):
             if "where" in message.content.lower() and "password" in message.content.lower():
                 await message.channel.send("plz password mario kart 8 Eu main ? :3 Use Google Translate. I have a hard time understanding English, there is a server that asks me for a password and it goes to this discord, I thought I would find it here. I am from Chile (Spanish)")
 
+            if "coconut" in message.content.lower():
+                with open("media/coconut.png", "rb") as f:
+                    media = discord.File(f)
+                    await message.channel.send(file=media)
+
         if message.content == "dc":
             await message.channel.send("https://autocompressor.net/av1?s=wfinqwL9")
         
