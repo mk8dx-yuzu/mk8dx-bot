@@ -141,6 +141,10 @@ class admin(commands.Cog):
     @is_admin()
     async def add(self, ctx: ApplicationContext, player = Option(name="player", description="@ mention")):
         self.bot.mogi["players"].append(player)
+        
+        if not get(ctx.guild.roles, name="InMogi") in ctx.guild.get_member(int(player.strip("<@>"))).roles:
+            await ctx.guild.get_member(int(player.strip("<@>"))).add_roles(get(ctx.guild.roles, name="InMogi"))
+
         await ctx.respond(f"{player} joined the mogi! (they had no choice)\n {len(self.bot.mogi['players'])} players are in!")
 
     @slash_command(name="player_cap")
