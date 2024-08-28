@@ -100,7 +100,8 @@ class purge(commands.Cog):
             await ctx.followup.send(final_message)
         
     @purge.command(name="clear_lounge_roles")
-    async def clear_lounge_roles(self, ctx: ApplicationContext, role = Option(str, choices=["Player", "Bronze", "Silver", "Gold"], required=True)):
+    @is_admin()
+    async def clear_lounge_roles(self, ctx: ApplicationContext, role = Option(str, choices=["Player", "- Bronze", "- Silver", "- Gold"], required=True)):
         await ctx.interaction.response.defer()
 
         lounge_role: discord.Role = get(ctx.guild.roles, name=f"Lounge {role}")
