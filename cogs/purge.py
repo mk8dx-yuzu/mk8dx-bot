@@ -109,8 +109,8 @@ class purge(commands.Cog):
             if not self.players.find_one({"discord": str(user.id)}):
                 await user.remove_roles(lounge_role)
                 count+=1
-                await ctx.send(f"removed lounge player role from {user.name}")
-        await ctx.respond(f"sucessfully removed lounge player role from {count} members with no profile")
+                await ctx.send(f"removed lounge {role} role from {user.name}")
+        await ctx.respond(f"sucessfully removed lounge {role} role from {count} members with no profile")
 
 def setup(bot: commands.Bot):
     bot.add_cog(purge(bot))
