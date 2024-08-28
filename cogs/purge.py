@@ -1,7 +1,8 @@
 import asyncio
 
 import discord
-from discord import ApplicationContext, slash_command, Option
+from discord import ApplicationContext, slash_command, SlashCommandGroup, Option
+from discord.utils import get
 from discord.ext import commands
 
 import pymongo
@@ -14,7 +15,9 @@ class purge(commands.Cog):
         self.bot: commands.Bot = bot
         self.players: collection.Collection = self.bot.players
 
-    @slash_command(name="purge_leaderboard", description="flag accounts with no mogis played for deletion, dm them with an option to prevent")
+    purge = SlashCommandGroup(name = "purge", description = "purge inactive players")
+
+    @purge.command(name="leaderboard_flagging", description="flag accounts with no mogis played for deletion, dm them with an option to prevent")
     @is_admin()
     async def purge_leaderboard(self, ctx: ApplicationContext):
         await ctx.interaction.response.defer()
@@ -45,7 +48,7 @@ class purge(commands.Cog):
         self.players.update_one({"discord": str(ctx.interaction.user.id)}, {"$unset": {"inactive": ""}})
         await ctx.respond("Successfully unmarked your account from being inactive!")
 
-    @slash_command(name="delete_inactive_players", description="Delete inactive-marked players from the leaderboard")
+    @purge.command(name="delete_inactive_players", description="Delete inactive-marked players from the leaderboard")
     @is_admin()
     async def delete_inactive_players(self, ctx: ApplicationContext):
         await ctx.response.defer()
@@ -96,6 +99,15 @@ class purge(commands.Cog):
         if final_message:
             await ctx.followup.send(final_message)
         
-        
+    @purge.command(name="clear_lounge_roles")
+    async def clear_lounge_roles(self, ctx: ApplicationContext):
+        lounge_player: discord.Role = get(ctx.guild.roles, name="Lounge Player")
+        debug_count=0
+        for user in lounge_player.members:
+            if not self.players.find_one({"discord": str(user.id)}):
+                if debug_count < 10:
+                    await ctx.send(user.name)
+                    debug_count+=1
+
 def setup(bot: commands.Bot):
     bot.add_cog(purge(bot))
