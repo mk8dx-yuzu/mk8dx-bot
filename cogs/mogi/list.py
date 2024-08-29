@@ -54,7 +54,7 @@ class list(commands.Cog):
                 team = [get(ctx.guild.members, id=int(player.strip('<@!>'))) for player in team]
                 for player in team:
                     if context == "table":
-                        list += f"{player.display_name} +\n"
+                        list += f"{getattr(player, "nick", None) or player.display_name} +\n"
 
                     elif context == "mmr":
                         list += f"- {player.display_name}: {int(self.players.find_one({'discord': str(player.id)})['mmr'])}MMR\n"
