@@ -111,7 +111,12 @@ class mk8dx(commands.Cog):
         table_string += f"Page {page}"
         table_string += "```"
 
-        await ctx.respond(table_string)
+        class MyView(discord.ui.View):
+            def __init__(self):
+                super().__init__(timeout=None)  # Timeout set to None to keep the view persistent
+                self.add_item(discord.ui.Button(label="View on Website", style=discord.ButtonStyle.link, url=f"https://mk8dx-yuzu.github.io"))
+
+        await ctx.respond(table_string, view=MyView(name))
 
     @slash_command(name="player", description="Show a player and their stats")
     @commands.cooldown(2, 120, commands.BucketType.user)
@@ -136,7 +141,7 @@ class mk8dx(commands.Cog):
         class MyView(discord.ui.View):
             def __init__(self, username):
                 super().__init__(timeout=None)  # Timeout set to None to keep the view persistent
-                self.add_item(discord.ui.Button(label="Visit Website", style=discord.ButtonStyle.link, url=f"https://mk8dx-yuzu.github.io/{username}"))
+                self.add_item(discord.ui.Button(label="View on Website", style=discord.ButtonStyle.link, url=f"https://mk8dx-yuzu.github.io/{username}"))
 
         embed = discord.Embed(
             title=f"{name}",
