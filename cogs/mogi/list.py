@@ -28,7 +28,7 @@ class list(commands.Cog):
             for index, player in enumerate(self.bot.mogi["players"]):
                 user: discord.Member = get(ctx.guild.members, id=int(player.strip("<@!>")))
                 if context == "table":
-                    list += f"{user.global_name if user.global_name else user.display_name} +\n\n"
+                    list += f"{getattr(player, 'nick', None) or player.display_name} +\n\n"
 
                 elif context == "mmr":
                     mmr = int(self.players.find_one({'discord': player.strip('<@!>')})['mmr'])
