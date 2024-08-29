@@ -10,10 +10,11 @@ class funnies(commands.Cog):
 
     @slash_command(name="fun")
     async def fun(self, ctx: ApplicationContext):
+        if random.random() > 0.1:
+            return await ctx.respond(f"{ctx.interaction.user.mention} is having fun!")
         with open("media/havingfun.png", "rb") as f:
             media = discord.File(f)
             await ctx.respond(f"{ctx.interaction.user.mention} was caught having fun, they're now banned.", file=media)
-        f.close()
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
