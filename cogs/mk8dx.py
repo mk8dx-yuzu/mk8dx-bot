@@ -116,7 +116,7 @@ class mk8dx(commands.Cog):
                 super().__init__(timeout=None)  # Timeout set to None to keep the view persistent
                 self.add_item(discord.ui.Button(label="View on Website", style=discord.ButtonStyle.link, url=f"https://mk8dx-yuzu.github.io"))
 
-        await ctx.respond(table_string, view=MyView(name))
+        await ctx.respond(table_string, view=MyView())
 
     @slash_command(name="player", description="Show a player and their stats")
     @commands.cooldown(2, 120, commands.BucketType.user)
