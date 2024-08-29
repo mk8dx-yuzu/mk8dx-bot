@@ -8,6 +8,9 @@ class funnies(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
+    
+
+
     @slash_command(name="fun")
     async def fun(self, ctx: ApplicationContext):
         if random.random() > 0.1:
