@@ -45,6 +45,7 @@ class customBot(commands.Bot):
         for name,cog in self.cogs.items():
             cog._eject(self)
             print(f"Ejected {name}")
+        self.client.close()
         await super().close()
 
 
