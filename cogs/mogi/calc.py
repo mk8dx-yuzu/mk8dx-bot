@@ -206,11 +206,25 @@ class calc(commands.Cog):
         new_mmrs = [current_mmrs[i] + self.bot.mogi["results"][i] for i in range(0, len(players))]
         deltas = self.bot.mogi["results"]
 
+        new_players_data = [{"discord": players[i], "new_mmr": new_mmrs[i], "delta": deltas[i]} for i in range(len(self.bot.mogi["players"]))]
+        new_players_data = [player for player in new_players_data if player not in self.bot.mogi["subs"] or player["delta"] > 0]
+
+        self.players.bulk_write([
+            pymongo.UpdateOne({"discord": player["discord"].strip("<@!>")}, {"$set": {"mmr": player["new_mmr"]} }, {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}}, {"$push": {"history": {"$each": [player["delta"]], "$slice": -30}}})
+            for player in new_players_data
+        ])
         for i, player in enumerate(players):
-            if player in self.bot.mogi["subs"] and deltas[i] < 0:
+            if player in self.bot.mogi["subs"] :
                 await ctx.send(f"Excluded {self.bot.get_user(int(player.strip('<@!>'))).mention} because they subbed")
                 continue
-            self.players.update_one(
+            current_rank = calcRank(current_mmrs[i])
+            new_rank = calcRank(new_mmrs[i])
+            if current_rank != new_rank:
+                await ctx.send(f"{self.bot.get_user(int(player.strip('<@!>'))).mention} is now in {new_rank}")
+                await ctx.guild.get_member(int(player.strip('<@!>'))).remove_roles(get(ctx.guild.roles, name=f"Lounge - {current_rank}"))
+                await ctx.guild.get_member(int(player.strip('<@!>'))).add_roles(get(ctx.guild.roles, name=f"Lounge - {new_rank}"))
+                
+            """ self.players.update_one(
                 {"discord": player.strip("<@!>")}, 
                 {"$set": {
                     "mmr": new_mmrs[i]
@@ -235,14 +249,9 @@ class calc(commands.Cog):
             )
             self.players.update_one(
                 {"discord": player.strip("<@!>")},
-                {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}},
-            )
-            current_rank = calcRank(current_mmrs[i])
-            new_rank = calcRank(new_mmrs[i])
-            if current_rank != new_rank:
-                await ctx.send(f"{self.bot.get_user(int(player.strip('<@!>'))).mention} is now in {new_rank}")
-                await ctx.guild.get_member(int(player.strip('<@!>'))).remove_roles(get(ctx.guild.roles, name=f"Lounge - {current_rank}"))
-                await ctx.guild.get_member(int(player.strip('<@!>'))).add_roles(get(ctx.guild.roles, name=f"Lounge - {new_rank}"))
+                ,
+            ) """
+            
 
         self.bot.mogi["locked"] = False
 
