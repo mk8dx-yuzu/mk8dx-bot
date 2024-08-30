@@ -247,7 +247,7 @@ class start(commands.Cog):
         for i, item in enumerate(teams):
             lineup_str += f"\n `{i+1}`. {', '.join(item)}"
 
-        await ctx.respond(lineup_str, ephemeral=True if quiet else False)
+        await ctx.respond(lineup_str, ephemeral=True if quiet == "y" else False)
 
     @slash_command(
         name="stop",
