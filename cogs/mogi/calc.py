@@ -207,14 +207,21 @@ class calc(commands.Cog):
         deltas = self.bot.mogi["results"]
 
         new_players_data = [{"discord": players[i], "new_mmr": new_mmrs[i], "delta": deltas[i]} for i in range(len(self.bot.mogi["players"]))]
-        new_players_data = [player for player in new_players_data if player not in self.bot.mogi["subs"] or player["delta"] > 0]
+        new_players_data = [player for player in new_players_data if player['discord'] not in self.bot.mogi["subs"] or player["delta"] > 0]
 
         self.players.bulk_write([
-            pymongo.UpdateOne({"discord": player["discord"].strip("<@!>")}, {"$set": {"mmr": player["new_mmr"]} }, {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}}, {"$push": {"history": {"$each": [player["delta"]], "$slice": -30}}})
+            pymongo.UpdateOne(
+                {"discord": player["discord"].strip("<@!>")},
+                {
+                    "$set": {"mmr": player["new_mmr"]},
+                    "$inc": {"losses" if player["delta"] < 0 else "wins": 1},
+                    "$push": {"history": {"$each": [player["delta"]], "$slice": -30}},
+                },
+                upsert=False)
             for player in new_players_data
         ])
         for i, player in enumerate(players):
-            if player in self.bot.mogi["subs"] :
+            if player in self.bot.mogi["subs"] and deltas[i] < 0:
                 await ctx.send(f"Excluded {self.bot.get_user(int(player.strip('<@!>'))).mention} because they subbed")
                 continue
             current_rank = calcRank(current_mmrs[i])
@@ -223,35 +230,6 @@ class calc(commands.Cog):
                 await ctx.send(f"{self.bot.get_user(int(player.strip('<@!>'))).mention} is now in {new_rank}")
                 await ctx.guild.get_member(int(player.strip('<@!>'))).remove_roles(get(ctx.guild.roles, name=f"Lounge - {current_rank}"))
                 await ctx.guild.get_member(int(player.strip('<@!>'))).add_roles(get(ctx.guild.roles, name=f"Lounge - {new_rank}"))
-                
-            """ self.players.update_one(
-                {"discord": player.strip("<@!>")}, 
-                {"$set": {
-                    "mmr": new_mmrs[i]
-                      if new_mmrs[i] > 1 else 1
-                    }
-                }
-            )
-            self.players.update_one(
-                {"discord": player.strip("<@!>")},
-                {"$push": {"history": deltas[i]}},
-                False,
-            )
-            self.players.update_one(
-                {"discord": player.strip("<@!>")},
-                {
-                    "$set": {
-                        "history": self.players.find_one(
-                            {"discord": player.strip("<@!>")}
-                        )["history"][-30:]
-                    }
-                },
-            )
-            self.players.update_one(
-                {"discord": player.strip("<@!>")},
-                ,
-            ) """
-            
 
         self.bot.mogi["locked"] = False
 
