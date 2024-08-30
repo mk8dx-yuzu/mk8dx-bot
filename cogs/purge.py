@@ -106,8 +106,9 @@ class purge(commands.Cog):
 
         lounge_role: discord.Role = get(ctx.guild.roles, name=f"Lounge {role}")
         count=0
+        all_players = list(self.players.find())
         for user in lounge_role.members:
-            if not self.players.find_one({"discord": str(user.id)}):
+            if not [x for x in all_players if x.get("discord") == str(user.id)]:
                 await user.remove_roles(lounge_role)
                 count+=1
                 await ctx.send(f"removed lounge {role} role from {user.name}")

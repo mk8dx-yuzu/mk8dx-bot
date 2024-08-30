@@ -89,9 +89,10 @@ class calc(commands.Cog):
     async def calc(self, ctx: ApplicationContext):
         player_mmrs = []
 
+        inmogi_profiles = list(self.players.find({"discord": {"$in": [player.strip("<@!>") for player in self.bot.mogi["players"]]}}))
         for team in self.bot.mogi["teams"]:
             for player in team:
-                player_data = self.players.find_one({"discord": player.strip("<@!>")})
+                player_data = [profile for profile in inmogi_profiles if profile.get("discord") == player.strip("<@!>")]
                 player_mmrs.append(player_data["mmr"])
 
         scores = []
