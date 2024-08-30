@@ -92,7 +92,7 @@ class calc(commands.Cog):
         inmogi_profiles = list(self.players.find({"discord": {"$in": [player.strip("<@!>") for player in self.bot.mogi["players"]]}}))
         for team in self.bot.mogi["teams"]:
             for player in team:
-                player_data = [profile for profile in inmogi_profiles if profile.get("discord") == player.strip("<@!>")]
+                player_data = [profile for profile in inmogi_profiles if profile.get("discord") == player.strip("<@!>")][0]
                 player_mmrs.append(player_data["mmr"])
 
         scores = []
