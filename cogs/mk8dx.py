@@ -105,7 +105,7 @@ class mk8dx(commands.Cog):
     async def player(
         self,
         ctx: discord.ApplicationContext,
-        name = Option(str, description="Name of the player", required=False),
+        name = Option(str, description="Name of the player or @ mention", required=False),
     ):
         if not name:
             player: dict = self.players.find_one({"discord": ctx.author.mention.strip("<@!>")})
