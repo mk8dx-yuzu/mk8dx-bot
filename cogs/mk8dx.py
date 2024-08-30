@@ -32,24 +32,6 @@ class mk8dx(commands.Cog):
                 )
             )
 
-    @slash_command(name="mmr", description="Retrieve the MMR history of a player")
-    @commands.cooldown(2, 120, commands.BucketType.user)
-    async def mmr(self, ctx: discord.ApplicationContext, name: str):
-        player = self.players.find_one({"name": name})
-        history = self.players.find_one({"name": f"{name}"}).get(
-            "history"
-        )
-        if player["mmr"]:
-            await ctx.respond(
-                f"""
-                # {name}
-                current MMR: {player['mmr']}
-                History: {history}
-            """
-            )
-        else:
-            await ctx.respond(f"Couldn't find {name}s MMR")
-
     @slash_command(
         name="leaderboard",
         description="Show the leaderboard; sort options: mmr | wins | losses | name",
