@@ -212,6 +212,13 @@ class start(commands.Cog):
             required=True,
             choices=["ffa", "2v2", "3v3", "4v4", "5v5", "6v6"],
         ),
+        quiet=Option(
+            str,
+            name="quiet",
+            description="make the message ephemeral",
+            required=False,
+            choices=["y"]
+        )
     ):
         self.bot.mogi["teams"] = []
 
@@ -240,7 +247,7 @@ class start(commands.Cog):
         for i, item in enumerate(teams):
             lineup_str += f"\n `{i+1}`. {', '.join(item)}"
 
-        await ctx.respond(lineup_str)
+        await ctx.respond(lineup_str, ephemeral=True if quiet else False)
 
     @slash_command(
         name="stop",
