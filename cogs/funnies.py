@@ -8,12 +8,9 @@ class funnies(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
-    
-
-
     @slash_command(name="fun")
     async def fun(self, ctx: ApplicationContext):
-        if random.random() > 0.1:
+        if random.random() > 0.2:
             return await ctx.respond(f"{ctx.interaction.user.mention} is having fun!")
         with open("media/havingfun.png", "rb") as f:
             media = discord.File(f)
