@@ -60,7 +60,7 @@ class list(commands.Cog):
                         player_list += f"{getattr(player, 'nick', None) or player.display_name} +\n"
 
                     elif context == "mmr":
-                        player_list += f"- {player.display_name}: {[profile["mmr"] for profile in all_inmogi_profiles if profile["discord"] == player.strip("<@!>")][0]}MMR\n"
+                        player_list += f"- {player.display_name}: {[profile['mmr'] for profile in all_inmogi_profiles if profile['discord'] == player.strip('<@!>')][0]}MMR\n"
                         
                     elif context == "usernames":
                         player_list += f"- {player.name} \n"
