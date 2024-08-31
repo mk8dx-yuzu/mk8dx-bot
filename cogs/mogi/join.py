@@ -47,7 +47,7 @@ class join(commands.Cog):
             
     @slash_command(name="joni", description="Join the current mogi")
     async def joni(self, ctx: ApplicationContext):
-        if random.random() > 0.1:
+        if random.random() > 0.1 or (len(self.bot.mogi["players"] % 2 == 0 and random.random() > 0.5)):
             return await ctx.respond("buddy you typoed that, its not /joni")
         await join_player(self=self, ctx=ctx)
 
