@@ -54,7 +54,7 @@ class funnies(commands.Cog):
         if message.content == "dc":
             await message.channel.send("https://autocompressor.net/av1?s=wfinqwL9")
 
-        if self.bot.mogi["status"] and len(self.bot.mogi["players"]) == 9 and "9/11" in message.content.lower():
+        if self.bot.mogi["status"] and len(self.bot.mogi["players"]) == 11 and "9/11" in message.content.lower():
             await message.channel.send("https://www.youtube.com/watch?v=95-KgsbjZ_s")
 
 def setup(bot: commands.Bot):
