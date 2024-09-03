@@ -39,12 +39,12 @@ class calc(commands.Cog):
                 self.mogi = mogi
 
                 count = 0
-                for player in self.mogi["players"]:
+                inmogi_profiles = list(self.players.find({"discord": {"$in": [player.strip("<@!>") for player in self.bot.mogi["players"]]}}))
+                for i, player in enumerate(self.mogi["players"]):
                     if player not in self.mogi["calc"] and count < 4:
-                        mentioned_user = db["players"].find_one(
-                            {"discord": player.strip("<@!>")}
-                        )["name"]
-                        self.add_item(InputText(label = mentioned_user))
+                        profile_name = inmogi_profiles[i]["name"]
+                        server_name = get(ctx.guild.members, int(player.strip("<@!>")))
+                        self.add_item(InputText(label = f"{profile_name} ({server_name})"))
                         self.mogi["calc"].append(player)
                         count += 1
 
