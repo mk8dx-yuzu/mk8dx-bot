@@ -42,7 +42,8 @@ class calc(commands.Cog):
                 inmogi_profiles = list(self.db["players"].find({"discord": {"$in": [player.strip("<@!>") for player in self.mogi["players"]]}}))
                 for i, player in enumerate(self.mogi["players"]):
                     if player not in self.mogi["calc"] and count < 4:
-                        profile_name = inmogi_profiles[i]["name"]
+                        player_profile = [profile for profile in inmogi_profiles if profile["discord"] == player.strip("<@!>")][0]
+                        profile_name = player_profile["name"]
                         server_name = ctx.guild.get_member(int(player.strip("<@!>"))).display_name
                         self.add_item(InputText(label = f"{profile_name} ({server_name})"))
                         self.mogi["calc"].append(player)
