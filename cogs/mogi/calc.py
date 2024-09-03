@@ -43,7 +43,7 @@ class calc(commands.Cog):
                 for i, player in enumerate(self.mogi["players"]):
                     if player not in self.mogi["calc"] and count < 4:
                         profile_name = inmogi_profiles[i]["name"]
-                        server_name = get(ctx.guild.members, int(player.strip("<@!>")))
+                        server_name = ctx.guild.get_member(int(player.strip("<@!>"))).display_name
                         self.add_item(InputText(label = f"{profile_name} ({server_name})"))
                         self.mogi["calc"].append(player)
                         count += 1
