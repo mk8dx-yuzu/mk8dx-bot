@@ -62,6 +62,8 @@ class manage(commands.Cog):
                 for member in role.members:
                     await member.remove_roles(role)
             final_message = "# The mogi has been closed"
+            if random.random() > 0.9:
+                final_message = "# The mogi is kill"
         else:
             await message.edit(content="Action canceled.")
 
