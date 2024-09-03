@@ -39,7 +39,7 @@ class calc(commands.Cog):
                 self.mogi = mogi
 
                 count = 0
-                inmogi_profiles = list(self.db["players"].find({"discord": {"$in": [player.strip("<@!>") for player in self.bot.mogi["players"]]}}))
+                inmogi_profiles = list(self.db["players"].find({"discord": {"$in": [player.strip("<@!>") for player in self.mogi["players"]]}}))
                 for i, player in enumerate(self.mogi["players"]):
                     if player not in self.mogi["calc"] and count < 4:
                         profile_name = inmogi_profiles[i]["name"]
