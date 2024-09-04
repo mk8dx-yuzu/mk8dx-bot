@@ -1,4 +1,4 @@
-import discord, asyncio
+import discord, asyncio, random
 from discord import ApplicationContext, slash_command
 from discord.ext import commands
 from discord.utils import get
