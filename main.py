@@ -28,7 +28,7 @@ class customBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.mogi: object = default_mogi_state
         self.client = pymongo.MongoClient(
-            f"mongodb://{os.getenv('MONGODB_HOST')}:27017/"
+            f"{os.getenv('MONGODB_HOST')}"
         )
         self.db = self.client["lounge"]
         self.players: collection = self.db["players"]
@@ -45,6 +45,7 @@ class customBot(commands.Bot):
         for name,cog in self.cogs.items():
             cog._eject(self)
             print(f"Ejected {name}")
+        self.client.close()
         await super().close()
 
 

@@ -39,12 +39,13 @@ class calc(commands.Cog):
                 self.mogi = mogi
 
                 count = 0
-                for player in self.mogi["players"]:
+                inmogi_profiles = list(self.db["players"].find({"discord": {"$in": [player.strip("<@!>") for player in self.mogi["players"]]}}))
+                for i, player in enumerate(self.mogi["players"]):
                     if player not in self.mogi["calc"] and count < 4:
-                        mentioned_user = db["players"].find_one(
-                            {"discord": player.strip("<@!>")}
-                        )["name"]
-                        self.add_item(InputText(label = mentioned_user))
+                        player_profile = [profile for profile in inmogi_profiles if profile["discord"] == player.strip("<@!>")][0]
+                        profile_name = player_profile["name"]
+                        server_name = ctx.guild.get_member(int(player.strip("<@!>"))).display_name
+                        self.add_item(InputText(label = f"{profile_name} ({server_name})"))
                         self.mogi["calc"].append(player)
                         count += 1
 
@@ -89,9 +90,10 @@ class calc(commands.Cog):
     async def calc(self, ctx: ApplicationContext):
         player_mmrs = []
 
+        inmogi_profiles = list(self.players.find({"discord": {"$in": [player.strip("<@!>") for player in self.bot.mogi["players"]]}}))
         for team in self.bot.mogi["teams"]:
             for player in team:
-                player_data = self.players.find_one({"discord": player.strip("<@!>")})
+                player_data = [profile for profile in inmogi_profiles if profile.get("discord") == player.strip("<@!>")][0]
                 player_mmrs.append(player_data["mmr"])
 
         scores = []
@@ -205,37 +207,24 @@ class calc(commands.Cog):
         new_mmrs = [current_mmrs[i] + self.bot.mogi["results"][i] for i in range(0, len(players))]
         deltas = self.bot.mogi["results"]
 
+        new_players_data = [{"discord": players[i], "new_mmr": new_mmrs[i], "delta": deltas[i]} for i in range(len(self.bot.mogi["players"]))]
+        new_players_data = [player for player in new_players_data if player['discord'] not in self.bot.mogi["subs"] or player["delta"] > 0]
+
+        self.players.bulk_write([
+            pymongo.UpdateOne(
+                {"discord": player["discord"].strip("<@!>")},
+                {
+                    "$set": {"mmr": player["new_mmr"]},
+                    "$inc": {"losses" if player["delta"] < 0 else "wins": 1},
+                    "$push": {"history": {"$each": [player["delta"]], "$slice": -30}},
+                },
+                upsert=False)
+            for player in new_players_data
+        ])
         for i, player in enumerate(players):
             if player in self.bot.mogi["subs"] and deltas[i] < 0:
                 await ctx.send(f"Excluded {self.bot.get_user(int(player.strip('<@!>'))).mention} because they subbed")
                 continue
-            self.players.update_one(
-                {"discord": player.strip("<@!>")}, 
-                {"$set": {
-                    "mmr": new_mmrs[i]
-                      if new_mmrs[i] > 1 else 1
-                    }
-                }
-            )
-            self.players.update_one(
-                {"discord": player.strip("<@!>")},
-                {"$push": {"history": deltas[i]}},
-                False,
-            )
-            self.players.update_one(
-                {"discord": player.strip("<@!>")},
-                {
-                    "$set": {
-                        "history": self.players.find_one(
-                            {"discord": player.strip("<@!>")}
-                        )["history"][-30:]
-                    }
-                },
-            )
-            self.players.update_one(
-                {"discord": player.strip("<@!>")},
-                {"$inc": {"losses" if deltas[i] < 0 else "wins": 1}},
-            )
             current_rank = calcRank(current_mmrs[i])
             new_rank = calcRank(new_mmrs[i])
             if current_rank != new_rank:

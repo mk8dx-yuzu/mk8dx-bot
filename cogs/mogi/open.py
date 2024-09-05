@@ -1,4 +1,4 @@
-import discord, asyncio
+import discord, asyncio, random
 from discord import ApplicationContext, slash_command
 from discord.ext import commands
 from discord.utils import get
@@ -62,6 +62,8 @@ class manage(commands.Cog):
                 for member in role.members:
                     await member.remove_roles(role)
             final_message = "# The mogi has been closed"
+            if random.random() > 0.9:
+                final_message = "# The mogi is kill"
         else:
             await message.edit(content="Action canceled.")
 

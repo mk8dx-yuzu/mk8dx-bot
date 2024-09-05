@@ -32,24 +32,6 @@ class mk8dx(commands.Cog):
                 )
             )
 
-    @slash_command(name="mmr", description="Retrieve the MMR history of a player")
-    @commands.cooldown(2, 120, commands.BucketType.user)
-    async def mmr(self, ctx: discord.ApplicationContext, name: str):
-        player = self.players.find_one({"name": name})
-        history = self.players.find_one({"name": f"{name}"}).get(
-            "history"
-        )
-        if player["mmr"]:
-            await ctx.respond(
-                f"""
-                # {name}
-                current MMR: {player['mmr']}
-                History: {history}
-            """
-            )
-        else:
-            await ctx.respond(f"Couldn't find {name}s MMR")
-
     @slash_command(
         name="leaderboard",
         description="Show the leaderboard; sort options: mmr | wins | losses | name",
@@ -111,14 +93,19 @@ class mk8dx(commands.Cog):
         table_string += f"Page {page}"
         table_string += "```"
 
-        await ctx.respond(table_string)
+        class MyView(discord.ui.View):
+            def __init__(self):
+                super().__init__(timeout=None)  # Timeout set to None to keep the view persistent
+                self.add_item(discord.ui.Button(label="View on Website", style=discord.ButtonStyle.link, url=f"https://mk8dx-yuzu.github.io"))
+
+        await ctx.respond(table_string, view=MyView())
 
     @slash_command(name="player", description="Show a player and their stats")
     @commands.cooldown(2, 120, commands.BucketType.user)
     async def player(
         self,
         ctx: discord.ApplicationContext,
-        name = Option(str, description="Name of the player", required=False),
+        name = Option(str, description="Name of the player or @ mention", required=False),
     ):
         if not name:
             player: dict = self.players.find_one({"discord": ctx.author.mention.strip("<@!>")})
@@ -136,7 +123,7 @@ class mk8dx(commands.Cog):
         class MyView(discord.ui.View):
             def __init__(self, username):
                 super().__init__(timeout=None)  # Timeout set to None to keep the view persistent
-                self.add_item(discord.ui.Button(label="Visit Website", style=discord.ButtonStyle.link, url=f"https://mk8dx-yuzu.github.io/{username}"))
+                self.add_item(discord.ui.Button(label="View on Website", style=discord.ButtonStyle.link, url=f"https://mk8dx-yuzu.github.io/{username}"))
 
         embed = discord.Embed(
             title=f"{name}",

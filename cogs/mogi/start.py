@@ -256,14 +256,14 @@ class start(commands.Cog):
             return await ctx.respond(
                 "The mogi is already in the process of MMR calculation"
             )
+        self.bot.mogi["locked"] = False
         self.bot.mogi["running"] = False
         self.bot.mogi["teams"] = []
+        self.bot.mogi["subs"] = []
         self.bot.mogi["format"] = ""
-        self.bot.mogi["locked"] = False
         self.bot.mogi["votes"] = {key: 0 for key in self.bot.mogi["votes"]}
         self.bot.mogi["voters"] = []
         self.bot.mogi["voting"] = False
-        self.bot.mogi["subs"] = []
 
         await ctx.respond("The mogi has been stopped, use /start to start it again")
 

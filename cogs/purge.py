@@ -1,7 +1,8 @@
 import asyncio
 
 import discord
-from discord import ApplicationContext, slash_command, Option
+from discord import ApplicationContext, slash_command, SlashCommandGroup, Option
+from discord.utils import get
 from discord.ext import commands
 
 import pymongo
@@ -14,7 +15,9 @@ class purge(commands.Cog):
         self.bot: commands.Bot = bot
         self.players: collection.Collection = self.bot.players
 
-    @slash_command(name="purge_leaderboard", description="flag accounts with no mogis played for deletion, dm them with an option to prevent")
+    purge = SlashCommandGroup(name = "purge", description = "purge inactive players")
+
+    @purge.command(name="leaderboard_flagging", description="flag accounts with no mogis played for deletion, dm them with an option to prevent")
     @is_admin()
     async def purge_leaderboard(self, ctx: ApplicationContext):
         await ctx.interaction.response.defer()
@@ -45,7 +48,7 @@ class purge(commands.Cog):
         self.players.update_one({"discord": str(ctx.interaction.user.id)}, {"$unset": {"inactive": ""}})
         await ctx.respond("Successfully unmarked your account from being inactive!")
 
-    @slash_command(name="delete_inactive_players", description="Delete inactive-marked players from the leaderboard")
+    @purge.command(name="delete_inactive_players", description="Delete inactive-marked players from the leaderboard")
     @is_admin()
     async def delete_inactive_players(self, ctx: ApplicationContext):
         await ctx.response.defer()
@@ -96,6 +99,20 @@ class purge(commands.Cog):
         if final_message:
             await ctx.followup.send(final_message)
         
-        
+    @purge.command(name="clear_lounge_roles")
+    @is_admin()
+    async def clear_lounge_roles(self, ctx: ApplicationContext, role = Option(str, choices=["Player", "- Bronze", "- Silver", "- Gold"], required=True)):
+        await ctx.interaction.response.defer()
+
+        lounge_role: discord.Role = get(ctx.guild.roles, name=f"Lounge {role}")
+        count=0
+        all_players = list(self.players.find())
+        for user in lounge_role.members:
+            if not [x for x in all_players if x.get("discord") == str(user.id)]:
+                await user.remove_roles(lounge_role)
+                count+=1
+                await ctx.send(f"removed lounge {role} role from {user.name}")
+        await ctx.respond(f"sucessfully removed lounge {role} role from {count} members with no profile")
+
 def setup(bot: commands.Bot):
     bot.add_cog(purge(bot))

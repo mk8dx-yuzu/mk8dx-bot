@@ -2,7 +2,7 @@ import os
 import discord
 import pymongo
 from pymongo import collection, database
-from discord import slash_command, Option, ApplicationContext
+from discord import slash_command, Option, ApplicationContext, SlashCommandGroup
 from discord.ext import commands
 from discord.utils import get
 
@@ -16,12 +16,14 @@ class admin(commands.Cog):
         self.players: collection.Collection = self.bot.players
         self.archived: collection.Collection = self.bot.archived
 
-    @slash_command(
-        name="edit",
+    edit = SlashCommandGroup(name = "edit", description = "edit player data")
+
+    @edit.command(
+        name="any",
         description="Edit a player's MMR. Wins/Losses and MMR History can be updated accordingly.",
     )
     @is_admin()
-    async def edit(
+    async def any(
         self,
         ctx: ApplicationContext,
         name = Option(
@@ -77,9 +79,9 @@ class admin(commands.Cog):
             return await ctx.respond(f"Sucessfully edited {name}s MMR to {new_value}")
         self.players.update_one({"name": name}, {"$set": {stat: new_value}})
 
-    @slash_command(name="edit_mmr")
+    @edit.command(name="mmr")
     @is_admin()
-    async def edit_mmr(
+    async def mmr(
         self, ctx: ApplicationContext, 
         player = Option(str, name="player", description="username of the player"), 
         change = Option(int, name="change", description="mmr delta (integer)")
@@ -139,6 +141,10 @@ class admin(commands.Cog):
     @is_admin()
     async def add(self, ctx: ApplicationContext, player = Option(name="player", description="@ mention")):
         self.bot.mogi["players"].append(player)
+        
+        if not get(ctx.guild.roles, name="InMogi") in ctx.guild.get_member(int(player.strip("<@>"))).roles:
+            await ctx.guild.get_member(int(player.strip("<@>"))).add_roles(get(ctx.guild.roles, name="InMogi"))
+
         await ctx.respond(f"{player} joined the mogi! (they had no choice)\n {len(self.bot.mogi['players'])} players are in!")
 
     @slash_command(name="player_cap")
