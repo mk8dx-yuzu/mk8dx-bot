@@ -1,4 +1,4 @@
-FROM joyzoursky/python-chromedriver
+FROM rapidfort/python-chromedriver:latest-arm64
 
 COPY requirements.txt .
 
