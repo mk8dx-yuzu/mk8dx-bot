@@ -10,14 +10,15 @@ import random
 class commandos(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        self.httpSession = aiohttp.ClientSession()
+        #self.httpSession = aiohttp.ClientSession()
         print("Created http session")
 
     def cog_unload(self):
-        asyncio.run_coroutine_threadsafe(
-            self.httpSession.close(), self.bot.loop
-        ) 
-        print("Closed http session")
+        pass
+        #asyncio.run_coroutine_threadsafe(
+        #    self.httpSession.close(), self.bot.loop
+        #) 
+        #print("Closed http session")
 
     @commands.command()
     async def hi(self, ctx: commands.Context):
