@@ -75,7 +75,7 @@ async def update_lounge_pass():
     with open("persistent/password.txt", "r") as f:
         new_password = f.read()
         f.close()
-        
+
     channel = bot.get_channel(1222294894962540704)
     last_message = await channel.history(limit=1).flatten()
 

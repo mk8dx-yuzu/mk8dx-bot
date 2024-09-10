@@ -214,7 +214,7 @@ class calc(commands.Cog):
             pymongo.UpdateOne(
                 {"discord": player["discord"].strip("<@!>")},
                 {
-                    "$set": {"mmr": player["new_mmr"]},
+                    "$set": {"mmr": player["new_mmr"] if player["new_mmr"] > 0 else 1},
                     "$inc": {"losses" if player["delta"] < 0 else "wins": 1},
                     "$push": {"history": {"$each": [player["delta"]], "$slice": -30}},
                 },
