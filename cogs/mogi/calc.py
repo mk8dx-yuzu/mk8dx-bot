@@ -129,10 +129,13 @@ class calc(commands.Cog):
     @is_mogi_manager()
     async def table(self, ctx: ApplicationContext):
         await ctx.response.defer()
-        player_profiles = list(self.players.find({"discord": {"$in": [player.strip("<@!>") for player in self.bot.mogi["players"]]}}))
 
-        players = [player["name"] for player in player_profiles]
-        current_mmrs = [player["mmr"] for player in player_profiles]
+        players_and_mmrs = list(zip(self.players.find({
+            "discord": { "$in": [player.strip("<@!>") for player in self.bot.mogi["players"]] }
+        }), self.bot.mogi["players"]))
+
+        players = [player["name"] for player, _ in players_and_mmrs]
+        current_mmrs = [round(player["mmr"]) for player, _ in players_and_mmrs]
         
         new_mmrs = [current_mmrs[i] + self.bot.mogi["results"][i] for i in range(0, len(players))]
 
