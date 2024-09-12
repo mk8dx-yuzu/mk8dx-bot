@@ -131,7 +131,7 @@ class calc(commands.Cog):
         await ctx.response.defer()
 
         player_profiles = list(
-            players.find({
+            self.players.find({
                 "discord": { "$in": [player.strip("<@!>") for player in self.bot.mogi["players"]] }
             })
         )
