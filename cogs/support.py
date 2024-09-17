@@ -9,6 +9,21 @@ class support(commands.Cog):
     async def on_message(self, message: discord.Message):
         if message.author == self.bot.user:
             return
+        
+        # confirmation-replies to the bot msg in support threads
+        if (
+            message.reference 
+            and message.reference.resolved.author == self.bot.user # is a reply to bot
+            and getattr(message.channel, "parent", None) # has parent (is thread)
+            and message.channel.parent.id == 1209934900992679966 # in #support
+            and message.author == message.channel.owner # reply is by thread creator
+        ):
+            unconfirmed_tag = [tag for tag in message.channel.parent.available_tags if tag.name == 'unconfirmed'][0]
+            if unconfirmed_tag in message.channel.applied_tags:
+                await message.channel.edit(applied_tags=[tag for tag in message.channel.applied_tags if tag.name != 'unconfirmed'])
+                await message.channel.send("Ok, you verified that you read all help-channels and threads as well as posting rules before posting.")
+
+        # default reply to new support threads
         if not getattr(message.channel, "parent", None) or message.channel.parent.id != 1209934900992679966:
             return
         if len(await message.channel.history().flatten()) > 1:
