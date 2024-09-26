@@ -133,7 +133,7 @@ class calc(commands.Cog):
         player_profiles = list(
             self.players.find({
                 "discord": { "$in": [player.strip("<@!>") for player in self.bot.mogi["players"]] }
-            })
+            }, projection={"_id": 0, "name": 1, "discord": 1, "mmr": 1})
         )
         sorted_profiles = sorted(player_profiles, key=lambda profile: [player.strip("<@!>") for player in self.bot.mogi["players"]].index(profile["discord"]))
 
@@ -142,25 +142,16 @@ class calc(commands.Cog):
         
         new_mmrs = [current_mmrs[i] + self.bot.mogi["results"][i] for i in range(0, len(players))]
 
-        try:
-            data = {
-                "Pos.": self.bot.mogi["placements"],
-                "Player": players,
-                "MMR": current_mmrs,
-                "Change": [
-                    round(self.bot.mogi["results"][i]) for i in range(0, len(players))
-                ],
-                "New MMR": new_mmrs,
-            }
-        except:
-            data = {
-                "Player": players,
-                "MMR": current_mmrs,
-                "Change": [
-                    round(self.bot.mogi["results"][i]) for i in range(0, len(players))
-                ],
-                "New MMR": new_mmrs,
-            }
+        data = {
+            "Pos.": self.bot.mogi["placements"],
+            "Player": players,
+            "MMR": current_mmrs,
+            "Change": [
+                round(self.bot.mogi["results"][i]) for i in range(0, len(players))
+            ],
+            "New MMR": new_mmrs,
+        }
+        
         df = pd.DataFrame(data).set_index("Player")
         df = df.sort_values(by="Change", ascending=False)
 
