@@ -1,6 +1,7 @@
 import random
 
 import discord
+from discord import VoiceClient
 from discord import slash_command, ApplicationContext
 from discord.ext import commands
 
@@ -56,6 +57,18 @@ class funnies(commands.Cog):
 
         if self.bot.mogi["status"] and len(self.bot.mogi["players"]) == 11 and "9/11" in message.content.lower():
             await message.channel.send("https://www.youtube.com/watch?v=95-KgsbjZ_s")
+
+    @slash_command(name="boom")
+    async def music(self, ctx: ApplicationContext):
+        if not ctx.author.voice:
+            return await ctx.send("You're not in a VC")
+        voice_channel: VoiceClient = ctx.author.voice.channel
+        await voice_channel.connect()
+
+        voice_client: VoiceClient = ctx.voice_client
+        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.mp3"), after=lambda e: print("done"))
+
+        await voice_channel.disconnect()
 
 def setup(bot: commands.Bot):
     bot.add_cog(funnies(bot))
