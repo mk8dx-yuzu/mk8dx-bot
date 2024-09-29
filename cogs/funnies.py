@@ -1,7 +1,8 @@
-import random
+import random, time
 
 import discord
 from discord import VoiceClient
+from discord import FFmpegPCMAudio
 from discord import slash_command, ApplicationContext
 from discord.ext import commands
 
@@ -67,7 +68,7 @@ class funnies(commands.Cog):
 
         voice_client: VoiceClient = ctx.voice_client
         voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.mp3"), after=lambda e: print("done"))
-
+        await time.sleep(3)
         await voice_channel.disconnect()
 
 def setup(bot: commands.Bot):
