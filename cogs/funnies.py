@@ -60,15 +60,14 @@ class funnies(commands.Cog):
             await message.channel.send("https://www.youtube.com/watch?v=95-KgsbjZ_s")
 
     @slash_command(name="boom")
-    async def music(self, ctx: ApplicationContext):
+    async def boom(self, ctx: ApplicationContext):
         if not ctx.author.voice:
             return await ctx.send("You're not in a VC")
         voice_channel: VoiceClient = ctx.author.voice.channel
         await voice_channel.connect()
 
         voice_client: VoiceClient = ctx.voice_client
-        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.mp3"), after=lambda e: print("done"))
-        await time.sleep(3)
+        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.mp3", options=f'-filter:a "volume=0.5"'), after=lambda e: print("done"))
         await voice_channel.disconnect()
 
 def setup(bot: commands.Bot):
