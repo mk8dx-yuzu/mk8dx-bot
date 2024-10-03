@@ -59,16 +59,19 @@ class funnies(commands.Cog):
         if self.bot.mogi["status"] and len(self.bot.mogi["players"]) == 11 and "9/11" in message.content.lower():
             await message.channel.send("https://www.youtube.com/watch?v=95-KgsbjZ_s")
 
-    @slash_command(name="boom")
-    async def boom(self, ctx: ApplicationContext):
+    @slash_command(name="boom2")
+    async def boom2(self, ctx: ApplicationContext):
         await ctx.response.defer()
+
+        async def disconnect_after_play():
+            await ctx.voice_client.disconnect()
+
         if not ctx.author.voice:
             return await ctx.send("You're not in a VC")
         voice_channel: VoiceClient = ctx.author.voice.channel
         await voice_channel.connect()
-
         voice_client: VoiceClient = ctx.voice_client
-        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.ogg", options=f'-filter:a "volume=0.5"'), after=lambda e: asyncio.create_task(ctx.voice_client.disconnect()))
+        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.ogg", options=f'-filter:a "volume=0.5"'), after=lambda e: asyncio.run(await disconnect_after_play()))
         
         await ctx.respond("That was not worth it")
 
