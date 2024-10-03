@@ -2,6 +2,8 @@ git+https://github.com/Pycord-Development/pycord
 aiohttp
 python-dotenv
 
+python-ffmpeg
+
 pymongo
 
 matplotlib
