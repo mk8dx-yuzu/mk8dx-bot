@@ -67,7 +67,9 @@ class funnies(commands.Cog):
         await voice_channel.connect()
 
         voice_client: VoiceClient = ctx.voice_client
-        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.mp3"), after=lambda e: await voice_channel.disconnect())        
+        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.mp3"), after=lambda e: print("done"))
+        await time.sleep(3)
+        await voice_channel.disconnect()
 
 def setup(bot: commands.Bot):
     bot.add_cog(funnies(bot))
