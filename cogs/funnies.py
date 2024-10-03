@@ -61,6 +61,7 @@ class funnies(commands.Cog):
 
     @slash_command(name="boom")
     async def boom(self, ctx: ApplicationContext):
+        await ctx.response.defer()
         if not ctx.author.voice:
             return await ctx.send("You're not in a VC")
         voice_channel: VoiceClient = ctx.author.voice.channel
@@ -69,6 +70,7 @@ class funnies(commands.Cog):
         voice_client: VoiceClient = ctx.voice_client
         voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.mp3", options=f'-filter:a "volume=0.5"'), after=lambda e: print("done"))
         await ctx.voice_client.disconnect()
+        await ctx.respond("That was not worth it")
 
 def setup(bot: commands.Bot):
     bot.add_cog(funnies(bot))
