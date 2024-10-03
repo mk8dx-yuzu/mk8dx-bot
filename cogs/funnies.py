@@ -61,9 +61,6 @@ class funnies(commands.Cog):
 
     @slash_command(name="boom")
     async def boom(self, ctx: ApplicationContext):
-        def dc():
-            asyncio.run_coroutine_threadsafe(ctx.voice_client.disconnect(), asyncio.get_event_loop())
-
         await ctx.response.defer()
         if not ctx.author.voice:
             return await ctx.send("You're not in a VC")
@@ -71,7 +68,7 @@ class funnies(commands.Cog):
         await voice_channel.connect()
 
         voice_client: VoiceClient = ctx.voice_client
-        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.ogg", options=f'-filter:a "volume=0.5"'), after=lambda e: dc())
+        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.ogg", options=f'-filter:a "volume=0.5"'), after=lambda e: asyncio.create_task(ctx.voice_client.disconnect()))
         
         await ctx.respond("That was not worth it")
 
