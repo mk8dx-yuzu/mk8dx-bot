@@ -120,8 +120,13 @@ class admin(commands.Cog):
     async def archive(self, ctx: ApplicationContext, player = Option(
         str,
         name="player",
-        description="use @ mention"
+        description="use username or @ mention"
     )):
+        profile = self.players.find_one({"name": player})
+        if not profile:
+            profile = self.players.find({"discord": player.strip("<@!>")})
+        if not profile: return await ctx.respond("Couldn't find that player")
+
         self.archived.insert_one(self.players.find_one({"discord": player.strip("<@!>")}))
         self.players.delete_one({"discord": player.strip("<@!>")})
         await ctx.respond(f"{player} has been archived")

@@ -59,7 +59,7 @@ class funnies(commands.Cog):
         if self.bot.mogi["status"] and len(self.bot.mogi["players"]) == 11 and "9/11" in message.content.lower():
             await message.channel.send("https://www.youtube.com/watch?v=95-KgsbjZ_s")
 
-    @slash_command(name="boom")
+    @slash_command(name="boom2")
     async def music(self, ctx: ApplicationContext):
         if not ctx.author.voice:
             return await ctx.send("You're not in a VC")
