@@ -142,6 +142,13 @@ class admin(commands.Cog):
         self.archived.delete_one({"discord": player.strip("<@!>")})
         await ctx.respond(f"{player} has been unarchived")
 
+    @slash_command(name="unretire", description="unarchive yourself from the leaderboard")
+    async def unretire(self, ctx: ApplicationContext):
+        player = str(ctx.interaction.user.id)
+        self.players.insert_one(self.archived.find_one({"discord": player}))
+        self.archived.delete_one({"discord": player})
+        await ctx.respond(f"{player} has been unarchived")
+
     @slash_command(name="add")
     @is_admin()
     async def add(self, ctx: ApplicationContext, player = Option(name="player", description="@ mention")):
