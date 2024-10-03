@@ -144,6 +144,7 @@ class admin(commands.Cog):
 
     @slash_command(name="unretire", description="unarchive yourself from the leaderboard")
     async def unretire(self, ctx: ApplicationContext):
+        return await ctx.respond(f"work in progress")
         player = str(ctx.interaction.user.id)
         self.players.insert_one(self.archived.find_one({"discord": player}))
         self.archived.delete_one({"discord": player})
