@@ -1,4 +1,4 @@
-import random, time
+import random, time, asyncio
 
 import discord
 from discord import VoiceClient
@@ -61,6 +61,9 @@ class funnies(commands.Cog):
 
     @slash_command(name="boom")
     async def boom(self, ctx: ApplicationContext):
+        async def dc():
+            await ctx.voice_client.disconnect()
+
         await ctx.response.defer()
         if not ctx.author.voice:
             return await ctx.send("You're not in a VC")
@@ -68,9 +71,8 @@ class funnies(commands.Cog):
         await voice_channel.connect()
 
         voice_client: VoiceClient = ctx.voice_client
-        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.ogg", options=f'-filter:a "volume=0.5"'), after=lambda e: print("done"))
-        time.sleep(3)
-        await ctx.voice_client.disconnect()
+        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.ogg", options=f'-filter:a "volume=0.5"'), after=lambda e: asyncio.create_task(dc()))
+        
         await ctx.respond("That was not worth it")
 
 def setup(bot: commands.Bot):
