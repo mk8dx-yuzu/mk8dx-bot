@@ -68,7 +68,8 @@ class funnies(commands.Cog):
         await voice_channel.connect()
 
         voice_client: VoiceClient = ctx.voice_client
-        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.mp3", options=f'-filter:a "volume=0.5"'), after=lambda e: print("done"))
+        voice_client.play(discord.FFmpegPCMAudio(f"./media/boom.ogg", options=f'-filter:a "volume=0.5"'), after=lambda e: print("done"))
+        time.sleep(3)
         await ctx.voice_client.disconnect()
         await ctx.respond("That was not worth it")
 
