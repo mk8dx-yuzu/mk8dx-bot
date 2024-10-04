@@ -1,4 +1,6 @@
+from discord import slash_command, ApplicationContext
 from discord.ext import commands
+from discord.ui import Modal, InputText, Button, View
 import discord
 
 class support(commands.Cog):
@@ -42,6 +44,51 @@ class support(commands.Cog):
             if unconfirmed_tag in message.channel.applied_tags:
                 await message.channel.edit(applied_tags=[tag for tag in message.channel.applied_tags if tag.name != 'unconfirmed'])
                 await message.channel.send("Ok, you verified that you read all help-channels and threads as well as posting rules before posting.")
+
+    @slash_command(name="wrong")
+    async def wrong(self, ctx: ApplicationContext):
+        class QuizModal(discord.ui.Modal):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+
+                self.add_item(InputText(label = "What firmware are you using?"))
+                self.add_item(InputText(label = "Can you read?"))
+            
+            async def callback(
+                self: Modal = Modal,
+                interaction: discord.Interaction = discord.Interaction,
+            ):
+                for i in range(0, len(self.children)):
+                    WRONG = False
+                    if i == 0 and "18" in self.children[i].value:
+                        WRONG = True
+                    if i == 1 and "no" in self.children[i].value:
+                        WRONG = True
+                if WRONG:
+                    await interaction.response.send_message("YOU'RE WRONG\nWe're deleting your post bruv")
+                else:
+                    await interaction.response.send_message("oi bruv good job")
+
+        button = Button(label="Open Modal", style=discord.ButtonStyle.primary)
+
+        async def button_callback(interaction: discord.Interaction):
+            # Check if the user who clicked the button is the one we replied to
+            if interaction.user == ctx.author:
+                modal = QuizModal(
+                    title="Input player points after match"
+                )
+                await interaction.response.send_modal(modal)
+            else:
+                await interaction.response.send_message("You cannot use this button.", ephemeral=True)
+
+        button.callback = button_callback
+
+        # Create a view and add the button
+        view = View()
+        view.add_item(button)
+
+        # Send a reply with the button
+        await ctx.respond("Click the button below to open the modal:", view=view)
 
 def setup(bot: commands.Bot):
     bot.add_cog(support(bot))
