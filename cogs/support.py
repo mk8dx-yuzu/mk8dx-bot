@@ -51,9 +51,19 @@ class support(commands.Cog):
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, **kwargs)
 
+                self.add_item(
+                    discord.ui.Select(
+                        placeholder="What Emulator are you using?",
+                        options=[
+                            discord.SelectOption(label="Yuzu (or a fork like Suyu, Sudachi, Uzuy, ...)", value="yuzu"),
+                            discord.SelectOption(label="Ryujinx (or any fork of it)", value="ryujinx"),
+                            discord.SelectOption(label="Other", value="other"),
+                            discord.SelectOption(label="My question is not about an Emulator", value="none"),
+                        ],
+                    )
+                )
                 self.add_item(InputText(label = "What firmware are you using?"))
                 self.add_item(InputText(label = "Can you read?"))
-            
             async def callback(
                 self: Modal = Modal,
                 interaction: discord.Interaction = discord.Interaction,
