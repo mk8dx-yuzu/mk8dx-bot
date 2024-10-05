@@ -58,8 +58,8 @@ class support(commands.Cog):
                 self: Modal = Modal,
                 interaction: discord.Interaction = discord.Interaction,
             ):
+                WRONG = False
                 for i in range(0, len(self.children)):
-                    WRONG = False
                     if i == 0 and "18" in self.children[i].value:
                         WRONG = True
                     if i == 1 and "no" in self.children[i].value:
