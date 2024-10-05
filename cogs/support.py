@@ -70,9 +70,10 @@ class support(commands.Cog):
             ):
                 WRONG = False
                 for i in range(0, len(self.children)):
-                    if i == 0 and "18" in self.children[i].value:
+                    print(self.children[i].value)
+                    if i == 1 and "18" in self.children[i].value:
                         WRONG = True
-                    if i == 1 and "no" in self.children[i].value:
+                    if i == 2 and "no" in self.children[i].value:
                         WRONG = True
                 if WRONG:
                     await interaction.response.send_message("YOU'RE WRONG\nWe're deleting your post bruv")
@@ -82,10 +83,9 @@ class support(commands.Cog):
         button = Button(label="Open Modal", style=discord.ButtonStyle.primary)
 
         async def button_callback(interaction: discord.Interaction):
-            # Check if the user who clicked the button is the one we replied to
-            if interaction.user == ctx.author:
+            if interaction.user == ctx.author or True:
                 modal = QuizModal(
-                    title="Input player points after match"
+                    title="Questionnaire",
                 )
                 await interaction.response.send_modal(modal)
             else:
@@ -93,11 +93,9 @@ class support(commands.Cog):
 
         button.callback = button_callback
 
-        # Create a view and add the button
         view = View()
         view.add_item(button)
 
-        # Send a reply with the button
         await ctx.respond("Click the button below to open the modal:", view=view)
 
 def setup(bot: commands.Bot):
