@@ -6,7 +6,7 @@ from discord import slash_command, Option, ApplicationContext, SlashCommandGroup
 from discord.ext import commands
 from discord.utils import get
 
-from cogs.extras.utils import is_admin
+from cogs.extras.utils import is_admin, is_mogi_manager
 from cogs.extras.ranks import ranks
 
 class admin(commands.Cog):
@@ -168,6 +168,27 @@ class admin(commands.Cog):
             await ctx.respond(f"Max. Player amount is now {number}")
         else:
             await ctx.respond("Input not a valid integer")
+
+    @slash_command(name="suspend")
+    @is_mogi_manager()
+    async def suspend(self, ctx: ApplicationContext, player = Option(str, name="player", description="username or @ mention")):
+        profile = self.players.find_one({"name": player})
+        if not profile:
+            profile = self.players.find_one({"discord": player.strip("<@!>")})
+        if not profile:
+            return await ctx.respond("Couldn't find that player")
+        self.players.update_one({"name": profile["name"]}, {"$set": {"suspended": True}})
+
+    @slash_command(name="unsuspend")
+    @is_mogi_manager()
+    async def unsuspend(self, ctx: ApplicationContext, player = Option(str, name="player", description="username or @ mention")):
+        profile = self.players.find_one({"name": player})
+        if not profile:
+            profile = self.players.find_one({"discord": player.strip("<@!>")})
+        if not profile:
+            return await ctx.respond("Couldn't find that player")
+        self.players.update_one({"name": profile["name"]}, {"$unset": {"suspended": ""}})
+        await ctx.respond(f"{player} has been unsuspended")
 
 def setup(bot: commands.Bot):
     bot.add_cog(admin(bot))
