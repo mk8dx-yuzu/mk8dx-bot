@@ -158,7 +158,7 @@ class calc(commands.Cog):
         df = pd.DataFrame(data).set_index("Player")
         df = df.sort_values(by="Change", ascending=False)
 
-        if self.bot.mogi["format"] == "ffa":
+        if self.bot.mogi["format"].startswith("f"):
             df = df.sort_values(by="Pos.", ascending=True)
 
         buffer = BytesIO()
@@ -212,7 +212,7 @@ class calc(commands.Cog):
                 {"discord": player["discord"].strip("<@!>")},
                 {
                     "$set": {"mmr": player["new_mmr"] if player["new_mmr"] > 0 else 1},
-                    "$inc": {"losses" if player["delta"] < 0 else "wins": 1},
+                    "$inc": {"losses" if player["delta"] < 0 else "wins": 1} if self.bot.mogi["format"] != "ffa-mini" else {},
                     "$push": {"history": {"$each": [player["delta"]], "$slice": -30}},
                 },
                 upsert=False)
