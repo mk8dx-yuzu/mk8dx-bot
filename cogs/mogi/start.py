@@ -39,13 +39,10 @@ def startMogi(bot: commands.Bot, force=None):
     max_voted = force or max(bot.mogi["votes"], key=bot.mogi["votes"].get)
     bot.mogi["format"] = max_voted
     lineup_str = ""
-    if max_voted == "ffa" or max_voted == "ffa-mini":
+    if max_voted.startswith("f"):
         for i, player in enumerate(bot.mogi["players"]):
             lineup_str += f"`{i+1}:` {player}\n"
             bot.mogi["teams"].append([player])
-    
-    if max_voted == "ffa-mini":
-        bot.mogi["is-mini"] = True
 
     else:
         random.shuffle(bot.mogi["players"])
@@ -173,7 +170,7 @@ class Menu(discord.ui.View):
             await interaction.channel.send(startMogi(self.bot, random.choice(winners)))
 
     @discord.ui.button(label="FFA-mini")
-    async def btn6v6(self, button: discord.ui.Button, interaction: Interaction):
+    async def btnMini(self, button: discord.ui.Button, interaction: Interaction):
         if not canVote(self.bot, button.label.lower(), interaction.user.mention):
             return await interaction.respond("Can't vote on that", ephemeral=True)
 

@@ -3,7 +3,6 @@ mogi_config = {
     "player_cap": 12,
     "voting": False,
     "running": False,
-    "is-mini": False,
     "password": None,
     "locked": False,
     "players": [],

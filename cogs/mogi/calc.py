@@ -57,8 +57,8 @@ class calc(commands.Cog):
                 for i in range(0, len(self.children)):
                     mogi["input_points"].append(int(self.children[i].value))
                     mogi["point_count"] += 1
-                        
-                if mogi["format"] == "ffa":
+                
+                if mogi["format"].startswith("f"):
                     for i in range(0, len(self.children)):
                         mogi["points"].append([int(self.children[i].value)])
                 else:
