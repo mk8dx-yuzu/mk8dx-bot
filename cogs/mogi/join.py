@@ -14,7 +14,7 @@ async def join_player(self, ctx: ApplicationContext):
             return await ctx.respond("You are not properly registered for Lounge. Your Profile might not exist or be archived.")
 
         player = self.players.find_one({"discord": str(ctx.interaction.user.id)})
-        if player["suspended"] and player["suspended"] == True:
+        if player.get("suspended") and player["suspended"] == True:
             return await ctx.respond("You are on hold from playing mogis.")
 
         if not self.bot.mogi["status"]:
