@@ -39,10 +39,14 @@ def startMogi(bot: commands.Bot, force=None):
     max_voted = force or max(bot.mogi["votes"], key=bot.mogi["votes"].get)
     bot.mogi["format"] = max_voted
     lineup_str = ""
-    if max_voted == "ffa":
+    if max_voted == "ffa" or max_voted == "ffa-mini":
         for i, player in enumerate(bot.mogi["players"]):
             lineup_str += f"`{i+1}:` {player}\n"
             bot.mogi["teams"].append([player])
+    
+    if max_voted == "ffa-mini":
+        bot.mogi["is-mini"] = True
+
     else:
         random.shuffle(bot.mogi["players"])
         teams = []
@@ -168,6 +172,22 @@ class Menu(discord.ui.View):
             await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
             await interaction.channel.send(startMogi(self.bot, random.choice(winners)))
 
+    @discord.ui.button(label="FFA-mini")
+    async def btn6v6(self, button: discord.ui.Button, interaction: Interaction):
+        if not canVote(self.bot, button.label.lower(), interaction.user.mention):
+            return await interaction.respond("Can't vote on that", ephemeral=True)
+
+        vote(self.bot, button.label.lower(), interaction.user)
+        await interaction.respond("Voted for FFA-mini", ephemeral=True)
+
+        if isDecided(self.bot, interaction):
+            winners = isTied_winners(self.bot)
+            if len(winners) == 1:
+                return await interaction.channel.send(startMogi(self.bot))
+            await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
+            await interaction.channel.send(startMogi(self.bot, random.choice(winners)))
+
+
 
 class start(commands.Cog):
     def __init__(self, bot):
@@ -210,7 +230,7 @@ class start(commands.Cog):
             name="format",
             description="format to play",
             required=True,
-            choices=["ffa", "2v2", "3v3", "4v4", "5v5", "6v6"],
+            choices=["ffa", "2v2", "3v3", "4v4", "5v5", "6v6", "ffa-mini"],
         ),
     ):
         self.bot.mogi["teams"] = []

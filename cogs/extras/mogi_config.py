@@ -3,6 +3,7 @@ mogi_config = {
     "player_cap": 12,
     "voting": False,
     "running": False,
+    "is-mini": False,
     "password": None,
     "locked": False,
     "players": [],
@@ -18,5 +19,5 @@ mogi_config = {
     "results": [],
     "placements": [],
     "voters": [],
-    "votes": { "ffa": 0, "2v2": 0, "3v3": 0, "4v4": 0, "5v5": 0, "6v6": 0}
+    "votes": { "ffa": 0, "2v2": 0, "3v3": 0, "4v4": 0, "5v5": 0, "6v6": 0, "ffa-mini": 0}
 }

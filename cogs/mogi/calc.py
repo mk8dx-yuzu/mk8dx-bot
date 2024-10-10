@@ -121,6 +121,9 @@ class calc(commands.Cog):
             for i in placements:
                 self.bot.mogi['placements'].extend([i] * (int(form)))
 
+        if self.bot.mogi["format"] == "ffa-mini":
+            self.bot.mogi["results"] = [round(rating * 0.5) for rating in self.bot.mogi["results"]]
+            
         await ctx.respond(f"""
             Data has been processed and new mmr has been calculated. Use /table to view and /apply to apply the new mmr
         """)
