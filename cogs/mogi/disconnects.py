@@ -9,9 +9,8 @@ from cogs.extras.utils import is_mogi_manager
 
 class Disconnects(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
         self.players: collection.Collection = self.bot.players
-        self.disconnects: collection.Collection = self.bot.disconnects
 
     dc = SlashCommandGroup(name = "dc", description = "edit player disconnections records")
 
