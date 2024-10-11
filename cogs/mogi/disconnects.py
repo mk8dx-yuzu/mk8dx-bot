@@ -21,6 +21,7 @@ class Disconnects(commands.Cog):
     )
     @is_mogi_manager()
     async def add(self, ctx: ApplicationContext, player: str):
+        await ctx.interaction.response.defer()
         player_data = self.players.find_one_and_update(
             {"discord": player},
             {"$inc": {"dc": 1}},
@@ -41,6 +42,7 @@ class Disconnects(commands.Cog):
     )
     @is_mogi_manager()
     async def set(self, ctx: ApplicationContext, player: str, count: int):
+        await ctx.interaction.response.defer()
         player_data = self.players.find_one_and_update(
             {"discord": player},
             {"$set": {"dc": count}},
