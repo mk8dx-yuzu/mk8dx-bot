@@ -7,7 +7,7 @@ from pymongo import collection
 
 from cogs.extras.utils import is_mogi_manager
 
-class Disconnects(commands.Cog):
+class disconnects(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.players: collection.Collection = self.bot.players
@@ -55,5 +55,5 @@ class Disconnects(commands.Cog):
 
         await ctx.respond(f"Updated dc count for {player} to {player_data['dc']}")
 
-def setup(bot):
-    bot.add_cog(Disconnects(bot))
+def setup(bot: commands.Bot):
+    bot.add_cog(disconnects(bot))
