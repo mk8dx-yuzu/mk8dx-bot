@@ -24,7 +24,7 @@ class events(commands.Cog):
         
         # delete any unwanted messages in #lounge-information
         if message.channel.id == 1181312934803144724:
-            if not message.author.guild_permissions.administrator or not message.author.guild_permissions.moderate_members and not message.content.startswith("/register"):
+            if not message.author.guild_permissions.administrator or not message.author.guild_permissions.manage_messages and not message.content.startswith("/register"):
                 await message.delete()
 
         if message.channel.type == discord.ChannelType.private :
