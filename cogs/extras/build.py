@@ -1,6 +1,8 @@
 import random
 from itertools import combinations
 
+# players: list of dicts with keys "discord" and "mmr"
+# format: number of players per team
 def shuffle_teams(players: list[dict], format: int) -> list[dict]:
     def team_score(team):
         return sum(player["mmr"] for player in team)
