@@ -18,4 +18,4 @@ def shuffle_teams(players: list[dict], format: int) -> list[dict]:
                 min_score_diff = score_diff
                 best_teams = [teams, other_teams]
 
-    return [[f"<@{player['id']}>" for player in team] for team in best_teams]
+    return [[f"<@{player['discord']}>" for player in team] for team in best_teams]
