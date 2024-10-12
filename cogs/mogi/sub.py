@@ -12,14 +12,14 @@ class sub(commands.Cog):
 
     replace = SlashCommandGroup(name = "replace", description = "sub or swap players")
 
-    @replace.command(name="swap", description="Swap 2 players with each other")
+    """ @replace.command(name="swap", description="Swap 2 players with each other")
     @is_mogi_manager()
     async def swap(self, ctx: ApplicationContext, player1 = Option(str, name = "player1", description = "use @ mention"), player2 = Option(str, name = "player2", description = "use @ mention")):
         if not self.bot.mogi["running"]:
             return await ctx.respond("No running mogi")
         self.bot.mogi["players"] = swap(self.bot.mogi["players"], player1, player2)
         self.bot.mogi["teams"] = swap(self.bot.mogi["teams"], player1, player2)
-        await ctx.respond(f"Swapped {player1} and {player2}")
+        await ctx.respond(f"Swapped {player1} and {player2}") """
 
     @replace.command(name="sub", description="Replace a player in the mogi, dismissing mmr loss for the subbing player")
     @is_mogi_manager()
