@@ -10,6 +10,9 @@ from discord.ext import commands
 from discord.utils import get
 from discord.ui import View
 
+from pymongo import collection
+
+import cogs.extras.build as Build
 
 def vote(bot: commands.Bot, format: str, user: discord.User):
     bot.mogi["votes"][format] += 1
@@ -35,7 +38,7 @@ def isTied_winners(bot: commands.Bot):
     winners = [player for player, score in bot.mogi["votes"].items() if score == max_score]
     return winners
 
-def startMogi(bot: commands.Bot, force=None):
+def startMogi(bot: commands.Bot, players_collection: collection.Collection, force=None):
     max_voted = force or max(bot.mogi["votes"], key=bot.mogi["votes"].get)
     bot.mogi["format"] = max_voted
     lineup_str = ""
@@ -45,14 +48,21 @@ def startMogi(bot: commands.Bot, force=None):
             bot.mogi["teams"].append([player])
 
     else:
-        random.shuffle(bot.mogi["players"])
-        teams = []
+        player_data_mmrs = list(
+            players_collection.find(
+                {"discord": {"$in": [mention.strip("<@>") for mention in bot.mogi["players"]]}},
+                {"discord": 1, "mmr": 1}
+            )
+        )
+        bot.mogi["teams"] = Build.shuffle_teams(player_data_mmrs, int(max_voted[0]))
+
+        """ teams = []
         for i in range(0, len(bot.mogi["players"]), int(max_voted[0])):
             teams.append(
                 bot.mogi["players"][i : i + int(max_voted[0])]
             )
-        bot.mogi["teams"] = teams
-        for i, item in enumerate(teams):
+        bot.mogi["teams"] = teams """
+        for i, item in enumerate(bot.mogi["teams"]):
             lineup_str += f"\n `{i+1}`. {', '.join(item)}"
 
     votes = "## Vote results:\n"
@@ -70,6 +80,7 @@ class Menu(discord.ui.View):
         self.value = None
         self.count = count
         self.bot = bot
+        self.players: collection.Collection = self.bot.players
 
     def update_styles(self):
         self.btn2v2.style = (
@@ -105,9 +116,9 @@ class Menu(discord.ui.View):
         if isDecided(self.bot, interaction):
             winners = isTied_winners(self.bot)
             if len(winners) == 1:
-                return await interaction.channel.send(startMogi(self.bot))
+                return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
             await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(self.bot, random.choice(winners)))
+            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
 
     @discord.ui.button(label="2v2")
     async def btn2v2(self, button: discord.ui.Button, interaction: Interaction):
@@ -120,9 +131,9 @@ class Menu(discord.ui.View):
         if isDecided(self.bot, interaction):
             winners = isTied_winners(self.bot)
             if len(winners) == 1:
-                return await interaction.channel.send(startMogi(self.bot))
+                return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
             await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(self.bot, random.choice(winners)))
+            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
 
     @discord.ui.button(label="3v3")
     async def btn3v3(self, button: discord.ui.Button, interaction: Interaction):
@@ -135,9 +146,9 @@ class Menu(discord.ui.View):
         if isDecided(self.bot, interaction):
             winners = isTied_winners(self.bot)
             if len(winners) == 1:
-                return await interaction.channel.send(startMogi(self.bot))
+                return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
             await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(self.bot, random.choice(winners)))
+            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
 
     @discord.ui.button(label="4v4")
     async def btn4v4(self, button: discord.ui.Button, interaction: Interaction):
@@ -150,9 +161,9 @@ class Menu(discord.ui.View):
         if isDecided(self.bot, interaction):
             winners = isTied_winners(self.bot)
             if len(winners) == 1:
-                return await interaction.channel.send(startMogi(self.bot))
+                return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
             await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(self.bot, random.choice(winners)))
+            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
 
     """ @discord.ui.button(label="6v6", style=discord.ButtonStyle.blurple)
     async def btn6v6(self, button: discord.ui.Button, interaction: Interaction):
@@ -165,9 +176,9 @@ class Menu(discord.ui.View):
         if isDecided(self.bot, interaction):
             winners = isTied_winners(self.bot)
             if len(winners) == 1:
-                return await interaction.channel.send(startMogi(self.bot))
+                return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
             await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(self.bot, random.choice(winners))) """
+            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners))) """
 
     @discord.ui.button(label="FFA-mini")
     async def btnMini(self, button: discord.ui.Button, interaction: Interaction):
@@ -180,9 +191,9 @@ class Menu(discord.ui.View):
         if isDecided(self.bot, interaction):
             winners = isTied_winners(self.bot)
             if len(winners) == 1:
-                return await interaction.channel.send(startMogi(self.bot))
+                return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
             await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(self.bot, random.choice(winners)))
+            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
 
 
 
