@@ -200,6 +200,7 @@ class Menu(discord.ui.View):
 class start(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
+        self.players: collection.Collection = self.bot.players
 
     @slash_command(name="start", guild_only=True)
     async def start(self, ctx: ApplicationContext):
@@ -260,12 +261,20 @@ class start(commands.Cog):
                 self.bot.mogi["running"] = True
             return await ctx.respond(lineup_str)
 
+        player_data_mmrs = list(
+            self.players.find(
+                {"discord": {"$in": [mention.strip("<@>") for mention in self.bot.mogi["players"]]}},
+                {"discord": 1, "mmr": 1}
+            )
+        )
+        self.bot.mogi["teams"] = Build.shuffle_teams(player_data_mmrs, int(format[0]))
+
         random.shuffle(self.bot.mogi["players"])
-        teams = []
+        """ teams = []
         for i in range(0, len(self.bot.mogi["players"]), int(format[0])):
             teams.append(self.bot.mogi["players"][i : i + int(format[0])])
-        self.bot.mogi["teams"] = teams
-        for i, item in enumerate(teams):
+        self.bot.mogi["teams"] = teams """
+        for i, item in enumerate(self.bot.mogi["teams"]):
             lineup_str += f"\n `{i+1}`. {', '.join(item)}"
 
         await ctx.respond(lineup_str)
