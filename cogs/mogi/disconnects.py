@@ -25,7 +25,6 @@ class disconnects(commands.Cog):
         player_data = self.players.find_one_and_update(
             {"discord": player},
             {"$inc": {"dc": 1}},
-            upsert=True,
             return_document=pymongo.ReturnDocument.AFTER
         )
 
