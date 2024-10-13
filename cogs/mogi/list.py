@@ -24,7 +24,7 @@ class list(commands.Cog):
         
         if context == "mmr":
             all_inmogi_players = self.bot.mogi["players"]
-            mongo_all_inmogi = self.players.find({"discord": {"$in": [player.strip("<@!>") for player in all_inmogi_players]}})
+            mongo_all_inmogi = list(self.players.find({"discord": {"$in": [player.strip("<@!>") for player in all_inmogi_players]}}))
             all_inmogi_profiles = list(mongo_all_inmogi)
         
         if self.bot.mogi["format"] in ["ffa", ""]:
