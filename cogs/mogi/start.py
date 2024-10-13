@@ -165,7 +165,7 @@ class Menu(discord.ui.View):
             await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
             await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
 
-    """ @discord.ui.button(label="6v6", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="6v6", style=discord.ButtonStyle.blurple)
     async def btn6v6(self, button: discord.ui.Button, interaction: Interaction):
         if not canVote(self.bot, button.label.lower(), interaction.user.mention):
             return await interaction.respond("Can't vote on that", ephemeral=True)
@@ -178,9 +178,9 @@ class Menu(discord.ui.View):
             if len(winners) == 1:
                 return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
             await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners))) """
+            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
 
-    @discord.ui.button(label="FFA-mini")
+    """ @discord.ui.button(label="FFA-mini")
     async def btnMini(self, button: discord.ui.Button, interaction: Interaction):
         if not canVote(self.bot, button.label.lower(), interaction.user.mention):
             return await interaction.respond("Can't vote on that", ephemeral=True)
@@ -194,7 +194,7 @@ class Menu(discord.ui.View):
                 return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
             await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
             await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
-
+ """
 
 
 class start(commands.Cog):
