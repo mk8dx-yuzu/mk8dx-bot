@@ -2,9 +2,11 @@ import discord
 from discord import Option, ApplicationContext, slash_command
 from discord.ext import commands
 from discord.utils import get
+
+import pymongo
 from pymongo import collection
 
-class list(commands.Cog):
+class lists(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.players: collection.Collection = self.bot.players
@@ -80,4 +82,4 @@ class list(commands.Cog):
         await ctx.respond(player_list, allowed_mentions=discord.AllowedMentions(users=False))
         
 def setup(bot: commands.Bot):
-    bot.add_cog(list(bot))
+    bot.add_cog(lists(bot))
