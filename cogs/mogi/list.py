@@ -23,9 +23,14 @@ class list(commands.Cog):
             return await ctx.respond("Current mogi: \n No players")
         
         if context == "mmr":
-            all_inmogi_players = self.bot.mogi["players"]
-            mongo_all_inmogi = list(self.players.find({"discord": {"$in": [player.strip("<@!>") for player in all_inmogi_players]}}))
-            all_inmogi_profiles = list(mongo_all_inmogi)
+            all_inmogi_profiles = list(
+                self.players.find(
+                    {
+                        "discord": 
+                            {"$in": [player.strip("<@!>") for player in self.bot.mogi["players"]]}
+                    }
+                )
+            )
         
         if self.bot.mogi["format"] in ["ffa", ""]:
             player_list = "Current mogi:\n"
