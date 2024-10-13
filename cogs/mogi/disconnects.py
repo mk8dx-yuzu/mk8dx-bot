@@ -20,10 +20,10 @@ class disconnects(commands.Cog):
         player = Option(str, name="player", description="@ mention", required=True),
     )
     @is_mogi_manager()
-    async def add(self, ctx: ApplicationContext, player: str):
+    async def add(self, ctx: ApplicationContext, player = Option(str, name="player", description="@ mention", required=True)):
         await ctx.interaction.response.defer()
         player_data = self.players.find_one_and_update(
-            {"discord": player},
+            {"discord": player.strip("<@!>")},
             {"$inc": {"dc": 1}},
             return_document=pymongo.ReturnDocument.AFTER
         )
@@ -43,9 +43,8 @@ class disconnects(commands.Cog):
     async def set(self, ctx: ApplicationContext, player: str, count: int):
         await ctx.interaction.response.defer()
         player_data = self.players.find_one_and_update(
-            {"discord": player},
+            {"discord": player.strip("<@!>")},
             {"$set": {"dc": count}},
-            upsert=True,
             return_document=pymongo.ReturnDocument.AFTER
         )
 
