@@ -103,7 +103,8 @@ class calc(commands.Cog):
         ranks_dict = {}
         placements = []
         for i, score in enumerate(sorted(scores, reverse=True)):
-            ranks_dict[score[0]] = i + 1
+            if score[0] not in ranks_dict:
+                ranks_dict[score[0]] = i + 1
         for score in scores:
             placements.append(ranks_dict[score[0]])
         self.bot.mogi["placements"] = placements
