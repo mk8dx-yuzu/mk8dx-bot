@@ -24,6 +24,15 @@ def is_admin():
             return False
     return commands.check(predicate)
 
+def is_moderator():
+    async def predicate(ctx: ApplicationContext):
+        if is_allowed_server(ctx.guild_id) and (ctx.user.guild_permissions.administrator or get(ctx.guild.roles, name="Moderator") in ctx.user.roles):
+            return True
+        else:
+            await ctx.respond("You're not allowed to use this command.", ephemeral=True)
+            return False
+    return commands.check(predicate)
+
 def is_lounge_information_channel():
     async def predicate(ctx: ApplicationContext):
         if ctx.channel_id in [1181312934803144724]:
