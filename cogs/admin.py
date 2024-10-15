@@ -88,7 +88,10 @@ class admin(commands.Cog):
     ):
         if not isinstance(change, int):
             return await ctx.respond("Change is not a valid integer")
-        current_mmr = self.players.find_one({"name": player}).get("mmr")
+        profile = self.players.find_one({"name": player})
+        if not profile:
+            return await ctx.respond("Couldn't find that player")
+        current_mmr = profile.get("mmr")
         if not current_mmr:
             return await ctx.respond("Couldn't find that player")
         self.players.update_one({"name": player}, {"$set": {"mmr": current_mmr + change}})
