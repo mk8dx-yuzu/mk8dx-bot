@@ -6,7 +6,7 @@ from discord import slash_command, Option, ApplicationContext, SlashCommandGroup
 from discord.ext import commands
 from discord.utils import get
 
-from cogs.extras.utils import is_admin, is_mogi_manager
+from cogs.extras.utils import is_admin, is_mogi_manager, is_moderator
 from cogs.extras.ranks import ranks
 
 class admin(commands.Cog):
@@ -80,7 +80,7 @@ class admin(commands.Cog):
         self.players.update_one({"name": name}, {"$set": {stat: new_value}})
 
     @edit.command(name="mmr")
-    @is_admin()
+    @is_moderator()
     async def mmr(
         self, ctx: ApplicationContext, 
         player = Option(str, name="player", description="username of the player"), 
