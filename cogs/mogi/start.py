@@ -12,20 +12,23 @@ from discord.ui import View
 
 from pymongo import collection
 
-import cogs.extras.build as Build
+from cogs.extras.teams_algorithm import distribute_players_to_teams
+
 
 def vote(bot: commands.Bot, format: str, user: discord.User):
     bot.mogi["votes"][format] += 1
     bot.mogi["voters"].append(user.mention)
 
+
 def canVote(bot: commands.Bot, format: str, user: discord.User.mention):
     size = int(format[0]) if format[0] != "f" else 1
     return (
-        bot.mogi["voting"] and
-        (len(bot.mogi["players"]) % size == 0 and len(bot.mogi["players"]) > size)
+        bot.mogi["voting"]
+        and (len(bot.mogi["players"]) % size == 0 and len(bot.mogi["players"]) > size)
         and user in bot.mogi["players"]
         and user not in bot.mogi["voters"]
     )
+
 
 def isDecided(bot: commands.Bot, interaction: Interaction):
     return (len(bot.mogi["voters"]) >= len(bot.mogi["players"])) or (
@@ -33,10 +36,14 @@ def isDecided(bot: commands.Bot, interaction: Interaction):
         >= math.floor(len(bot.mogi["players"]) / 2) + 1
     )
 
+
 def isTied_winners(bot: commands.Bot):
     max_score = max(bot.mogi["votes"].values())
-    winners = [player for player, score in bot.mogi["votes"].items() if score == max_score]
+    winners = [
+        player for player, score in bot.mogi["votes"].items() if score == max_score
+    ]
     return winners
+
 
 def startMogi(bot: commands.Bot, players_collection: collection.Collection, force=None):
     max_voted = force or max(bot.mogi["votes"], key=bot.mogi["votes"].get)
@@ -50,11 +57,17 @@ def startMogi(bot: commands.Bot, players_collection: collection.Collection, forc
     else:
         player_data_mmrs = list(
             players_collection.find(
-                {"discord": {"$in": [mention.strip("<@>") for mention in bot.mogi["players"]]}},
-                {"discord": 1, "mmr": 1}
+                {
+                    "discord": {
+                        "$in": [mention.strip("<@>") for mention in bot.mogi["players"]]
+                    }
+                },
+                {"discord": 1, "mmr": 1},
             )
         )
-        bot.mogi["teams"] = Build.shuffle_teams(player_data_mmrs, int(max_voted[0]))
+        bot.mogi["teams"] = distribute_players_to_teams(
+            player_data_mmrs, int(max_voted[0])
+        )
 
         """ teams = []
         for i in range(0, len(bot.mogi["players"]), int(max_voted[0])):
@@ -72,7 +85,10 @@ def startMogi(bot: commands.Bot, players_collection: collection.Collection, forc
     bot.mogi["voting"] = False
     bot.mogi["running"] = True
 
-    return f"{votes}\n# Mogi starting!\n## Format: {max_voted}\n### Lineup:\n{lineup_str}"
+    return (
+        f"{votes}\n# Mogi starting!\n## Format: {max_voted}\n### Lineup:\n{lineup_str}"
+    )
+
 
 class Menu(discord.ui.View):
     def __init__(self, bot, count):
@@ -116,9 +132,19 @@ class Menu(discord.ui.View):
         if isDecided(self.bot, interaction):
             winners = isTied_winners(self.bot)
             if len(winners) == 1:
-                return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
-            await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
+                return await interaction.channel.send(
+                    startMogi(bot=self.bot, players_collection=self.players)
+                )
+            await interaction.channel.send(
+                f"# Vote is tied between {' and '.join(winners)}, chosing randomly..."
+            )
+            await interaction.channel.send(
+                startMogi(
+                    bot=self.bot,
+                    players_collection=self.players,
+                    force=random.choice(winners),
+                )
+            )
 
     @discord.ui.button(label="2v2")
     async def btn2v2(self, button: discord.ui.Button, interaction: Interaction):
@@ -131,9 +157,19 @@ class Menu(discord.ui.View):
         if isDecided(self.bot, interaction):
             winners = isTied_winners(self.bot)
             if len(winners) == 1:
-                return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
-            await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
+                return await interaction.channel.send(
+                    startMogi(bot=self.bot, players_collection=self.players)
+                )
+            await interaction.channel.send(
+                f"# Vote is tied between {' and '.join(winners)}, chosing randomly..."
+            )
+            await interaction.channel.send(
+                startMogi(
+                    bot=self.bot,
+                    players_collection=self.players,
+                    force=random.choice(winners),
+                )
+            )
 
     @discord.ui.button(label="3v3")
     async def btn3v3(self, button: discord.ui.Button, interaction: Interaction):
@@ -146,9 +182,19 @@ class Menu(discord.ui.View):
         if isDecided(self.bot, interaction):
             winners = isTied_winners(self.bot)
             if len(winners) == 1:
-                return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
-            await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
+                return await interaction.channel.send(
+                    startMogi(bot=self.bot, players_collection=self.players)
+                )
+            await interaction.channel.send(
+                f"# Vote is tied between {' and '.join(winners)}, chosing randomly..."
+            )
+            await interaction.channel.send(
+                startMogi(
+                    bot=self.bot,
+                    players_collection=self.players,
+                    force=random.choice(winners),
+                )
+            )
 
     @discord.ui.button(label="4v4")
     async def btn4v4(self, button: discord.ui.Button, interaction: Interaction):
@@ -161,9 +207,19 @@ class Menu(discord.ui.View):
         if isDecided(self.bot, interaction):
             winners = isTied_winners(self.bot)
             if len(winners) == 1:
-                return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
-            await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
+                return await interaction.channel.send(
+                    startMogi(bot=self.bot, players_collection=self.players)
+                )
+            await interaction.channel.send(
+                f"# Vote is tied between {' and '.join(winners)}, chosing randomly..."
+            )
+            await interaction.channel.send(
+                startMogi(
+                    bot=self.bot,
+                    players_collection=self.players,
+                    force=random.choice(winners),
+                )
+            )
 
     @discord.ui.button(label="6v6", style=discord.ButtonStyle.blurple)
     async def btn6v6(self, button: discord.ui.Button, interaction: Interaction):
@@ -176,9 +232,19 @@ class Menu(discord.ui.View):
         if isDecided(self.bot, interaction):
             winners = isTied_winners(self.bot)
             if len(winners) == 1:
-                return await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players))
-            await interaction.channel.send(f"# Vote is tied between {' and '.join(winners)}, chosing randomly...")
-            await interaction.channel.send(startMogi(bot=self.bot, players_collection=self.players, force=random.choice(winners)))
+                return await interaction.channel.send(
+                    startMogi(bot=self.bot, players_collection=self.players)
+                )
+            await interaction.channel.send(
+                f"# Vote is tied between {' and '.join(winners)}, chosing randomly..."
+            )
+            await interaction.channel.send(
+                startMogi(
+                    bot=self.bot,
+                    players_collection=self.players,
+                    force=random.choice(winners),
+                )
+            )
 
     """ @discord.ui.button(label="FFA-mini")
     async def btnMini(self, button: discord.ui.Button, interaction: Interaction):
@@ -224,7 +290,9 @@ class start(commands.Cog):
         player_count = len(self.bot.mogi["players"])
         view = Menu(self.bot, player_count)
         view.update_styles()
-        await ctx.respond(f"Voting start!\n ||{''.join(self.bot.mogi['players'])}||", view=view)
+        await ctx.respond(
+            f"Voting start!\n ||{''.join(self.bot.mogi['players'])}||", view=view
+        )
 
     @slash_command(
         name="force_start",
@@ -263,8 +331,14 @@ class start(commands.Cog):
 
         player_data_mmrs = list(
             self.players.find(
-                {"discord": {"$in": [mention.strip("<@>") for mention in self.bot.mogi["players"]]}},
-                {"discord": 1, "mmr": 1}
+                {
+                    "discord": {
+                        "$in": [
+                            mention.strip("<@>") for mention in self.bot.mogi["players"]
+                        ]
+                    }
+                },
+                {"discord": 1, "mmr": 1},
             )
         )
         self.bot.mogi["teams"] = Build.shuffle_teams(player_data_mmrs, int(format[0]))
@@ -285,7 +359,9 @@ class start(commands.Cog):
         guild_only=True,
     )
     async def stop(self, ctx: ApplicationContext):
-        if not self.bot.mogi["running"] or (self.bot.mogi["running"] and self.bot.mogi["voting"]):
+        if not self.bot.mogi["running"] or (
+            self.bot.mogi["running"] and self.bot.mogi["voting"]
+        ):
             return await ctx.respond(
                 "No running mogi yet. if vote is still in process, it needs to end or be force started before it can be stopped"
             )
