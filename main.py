@@ -133,7 +133,7 @@ if os.getenv("DO_LOUNGE").lower() == "true":
         if filename.endswith(".py"):
             bot.load_extension(f"cogs.mogi.{filename[:-3]}")
 else:
-    for cog_name in ["ping", "commands", "support", "funnies", "events"]:
+    for cog_name in ["ping", "commands", "support", "funnies", "events", "player_card"]:
         bot.load_extension(f"cogs.{cog_name}")
 
 bot.run(os.getenv("DISCORD_TOKEN"))
