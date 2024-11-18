@@ -27,43 +27,44 @@ class PlayerCardGenerator:
 
         try:
             # Scale up font size for 4K resolution
-            font = ImageFont.truetype("media/YouTubeSansRegular.otf", 180)
+            font_regular = ImageFont.truetype("media/YouTubeSansRegular.otf", 180)
+            font_bold = ImageFont.truetype("media/YouTubeSansBold.otf", 200)
 
             # Add player name and stats with adjusted positioning
-            margin_left = 200
-            text_spacing = 300
+            margin_left = 300
+            text_spacing = 400
             draw.text(
-                (margin_left, 200),
+                (margin_left, 300),
                 self.name,
                 fill=(255, 255, 255),
-                font=font,
+                font=font_bold,
             )
             draw.text(
-                (margin_left, 200 + text_spacing),
+                (margin_left, 300 + text_spacing),
                 f"MMR: {player_data.get('mmr', 'N/A')}",
                 fill=(255, 255, 255),
-                font=font,
+                font=font_regular,
             )
             draw.text(
-                (margin_left, 200 + text_spacing * 2),
+                (margin_left, 300 + text_spacing * 2),
                 f"Wins: {player_data.get('wins', 0)}",
                 fill=(255, 255, 255),
-                font=font,
+                font=font_regular,
             )
             draw.text(
-                (margin_left, 200 + text_spacing * 2),
+                (margin_left, 300 + text_spacing * 3),
                 f"Losses: {player_data.get('losses', 0)}",
                 fill=(255, 255, 255),
-                font=font,
+                font=font_regular,
             )
 
             # Add rank icon in top right
             rank_icon_path = self.media_path / "Wood-Cup.png"
             if rank_icon_path.exists():
                 rank_icon = Image.open(rank_icon_path).convert("RGBA")
-                icon_size = (800, 800)  # Larger icon size for 4K
+                icon_size = (1000, 1000)  # Larger icon size for 4K
                 rank_icon = rank_icon.resize(icon_size)
-                icon_padding = 150
+                icon_padding = 250
                 card.paste(
                     rank_icon,
                     (self.width - icon_size[0] - icon_padding, icon_padding),
