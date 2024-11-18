@@ -27,26 +27,32 @@ class PlayerCardGenerator:
 
         try:
             # Scale up font size for 4K resolution
-            font = ImageFont.truetype("media/YouTubeSansRegular.otf", 128)
+            font = ImageFont.truetype("media/YouTubeSansRegular.otf", 180)
 
             # Add player name and stats with adjusted positioning
-            margin_left = 100
-            text_spacing = 200
+            margin_left = 200
+            text_spacing = 300
             draw.text(
-                (margin_left, 100),
-                f"Name: {self.name}",
+                (margin_left, 200),
+                self.name,
                 fill=(255, 255, 255),
                 font=font,
             )
             draw.text(
-                (margin_left, 100 + text_spacing),
+                (margin_left, 200 + text_spacing),
                 f"MMR: {player_data.get('mmr', 'N/A')}",
                 fill=(255, 255, 255),
                 font=font,
             )
             draw.text(
-                (margin_left, 100 + text_spacing * 2),
+                (margin_left, 200 + text_spacing * 2),
                 f"Wins: {player_data.get('wins', 0)}",
+                fill=(255, 255, 255),
+                font=font,
+            )
+            draw.text(
+                (margin_left, 200 + text_spacing * 2),
+                f"Losses: {player_data.get('losses', 0)}",
                 fill=(255, 255, 255),
                 font=font,
             )
@@ -55,9 +61,9 @@ class PlayerCardGenerator:
             rank_icon_path = self.media_path / "Wood-Cup.png"
             if rank_icon_path.exists():
                 rank_icon = Image.open(rank_icon_path).convert("RGBA")
-                icon_size = (400, 400)  # Larger icon size for 4K
+                icon_size = (800, 800)  # Larger icon size for 4K
                 rank_icon = rank_icon.resize(icon_size)
-                icon_padding = 50
+                icon_padding = 150
                 card.paste(
                     rank_icon,
                     (self.width - icon_size[0] - icon_padding, icon_padding),
