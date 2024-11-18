@@ -52,10 +52,10 @@ class PlayerCardGenerator:
             margin_left = 300
             text_spacing = 400
             draw.text(
-                (500, 300),
+                (margin_left, 300),
                 "MK8DX-Yuzu-Lounge Season 2 - Recap",
                 fill=(255, 255, 255),
-                font=font_bold,
+                font=font_regular,
             )
             draw.text(
                 (margin_left, 300 + text_spacing),
