@@ -22,7 +22,7 @@ class PlayerCardGenerator:
 
         try:
             # Add player name and stats
-            font = ImageFont.truetype("arial.ttf", 32)
+            font = ImageFont.truetype("media/YouTubeSansRegular.otf", 32)
             draw.text((20, 20), f"Name: {self.name}", fill=(255, 255, 255), font=font)
             draw.text(
                 (20, 70),
