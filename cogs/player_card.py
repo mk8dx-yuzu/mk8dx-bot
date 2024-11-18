@@ -17,7 +17,7 @@ class PlayerCardGenerator:
 
     def create_card(self, player_data):
         # Load and resize the background image
-        background_image_path = self.media_path / "background.png"
+        background_image_path = self.media_path / "Artboard_12x.png"
         background = Image.open(background_image_path).resize((self.width, self.height))
 
         # Create base card
