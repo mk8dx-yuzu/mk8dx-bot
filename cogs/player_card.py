@@ -94,6 +94,15 @@ class PlayerCardGenerator:
                     (self.width - icon_size[0] - icon_padding, icon_padding),
                     rank_icon,
                 )
+                draw.text(
+                    (
+                        self.width - icon_size[0] - icon_padding,
+                        icon_padding + icon_size[1] + 30,
+                    ),
+                    calcRank(player_data.get("mmr", 0)),
+                    fill=(255, 255, 255),
+                    font=font_regular,
+                )
 
             # Save to buffer instead of file
             buffer = BytesIO()
@@ -113,7 +122,7 @@ class PlayerCardCog(commands.Cog):
 
     @slash_command(name="player_card", description="Get your own season 2 player card")
     async def get_player_card(self, ctx: ApplicationContext):
-        await ctx.defer()  # Defer response for potentially slow operations
+        await ctx.defer()
 
         try:
             player = self.players.find_one({"discord": str(ctx.author.id)})
@@ -124,7 +133,6 @@ class PlayerCardCog(commands.Cog):
                 )
                 return
 
-            # Generate card
             card_generator = PlayerCardGenerator(player.get("name", "Unknown"))
             buffer = card_generator.create_card(player)
 
