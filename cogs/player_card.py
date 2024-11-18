@@ -11,38 +11,58 @@ from pymongo import collection
 class PlayerCardGenerator:
     def __init__(self, name):
         self.name = name
-        self.width = 400
-        self.height = 600
+        self.width = 3840  # 4K width
+        self.height = 2160  # 4K height
         self.media_path = Path("media")
 
     def create_card(self, player_data):
-        # Create base card with gradient background
-        card = Image.new("RGBA", (self.width, self.height), (44, 47, 51, 255))
+        # Load and resize the background image
+        background_image_path = self.media_path / "background.png"
+        background = Image.open(background_image_path).resize((self.width, self.height))
+
+        # Create base card
+        card = Image.new("RGBA", (self.width, self.height))
+        card.paste(background, (0, 0))
         draw = ImageDraw.Draw(card)
 
         try:
-            # Add player name and stats
-            font = ImageFont.truetype("media/YouTubeSansRegular.otf", 32)
-            draw.text((20, 20), f"Name: {self.name}", fill=(255, 255, 255), font=font)
+            # Scale up font size for 4K resolution
+            font = ImageFont.truetype("media/YouTubeSansRegular.otf", 128)
+
+            # Add player name and stats with adjusted positioning
+            margin_left = 100
+            text_spacing = 200
             draw.text(
-                (20, 70),
+                (margin_left, 100),
+                f"Name: {self.name}",
+                fill=(255, 255, 255),
+                font=font,
+            )
+            draw.text(
+                (margin_left, 100 + text_spacing),
                 f"MMR: {player_data.get('mmr', 'N/A')}",
                 fill=(255, 255, 255),
                 font=font,
             )
             draw.text(
-                (20, 120),
+                (margin_left, 100 + text_spacing * 2),
                 f"Wins: {player_data.get('wins', 0)}",
                 fill=(255, 255, 255),
                 font=font,
             )
 
-            # Add rank icon
+            # Add rank icon in top right
             rank_icon_path = self.media_path / "Wood-Cup.png"
             if rank_icon_path.exists():
                 rank_icon = Image.open(rank_icon_path).convert("RGBA")
-                rank_icon = rank_icon.resize((100, 100))
-                card.paste(rank_icon, (self.width - 120, self.height - 120), rank_icon)
+                icon_size = (400, 400)  # Larger icon size for 4K
+                rank_icon = rank_icon.resize(icon_size)
+                icon_padding = 50
+                card.paste(
+                    rank_icon,
+                    (self.width - icon_size[0] - icon_padding, icon_padding),
+                    rank_icon,
+                )
 
             # Save to buffer instead of file
             buffer = BytesIO()
