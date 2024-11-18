@@ -44,18 +44,16 @@ class PlayerCardGenerator:
         draw = ImageDraw.Draw(card)
 
         try:
-            # Scale up font size for 4K resolution
             font_regular = ImageFont.truetype("media/YouTubeSansRegular.otf", 180)
             font_bold = ImageFont.truetype("media/YouTubeSansBold.otf", 200)
 
-            # Add player name and stats with adjusted positioning
             margin_left = 300
-            text_spacing = 400
+            text_spacing = 370
             draw.text(
                 (margin_left, 300),
-                "MK8DX-Yuzu-Lounge Season 2 - Recap",
+                "MK8DX-Yuzu-Lounge Season 2",
                 fill=(255, 255, 255),
-                font=font_regular,
+                font=font_bold,
             )
             draw.text(
                 (margin_left, 300 + text_spacing),
