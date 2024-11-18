@@ -1,4 +1,5 @@
 import os
+import math
 from io import BytesIO
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
@@ -6,6 +7,23 @@ import discord
 from discord import Option, ApplicationContext, slash_command
 from discord.ext import commands
 from pymongo import collection
+
+
+def calcRank(mmr):
+    ranks = [
+        {"name": "Wood", "range": (-math.inf, 1)},
+        {"name": "Bronze", "range": (2, 1499)},
+        {"name": "Silver", "range": (1400, 2999)},
+        {"name": "Gold", "range": (3000, 5099)},
+        {"name": "Platinum", "range": (5100, 6999)},
+        {"name": "Diamond", "range": (7000, 9499)},
+        {"name": "Master", "range": (9500, math.inf)},
+    ]
+    for range_info in ranks:
+        start, end = range_info["range"]
+        if start <= mmr <= end:
+            return range_info["name"]
+    return "---"
 
 
 class PlayerCardGenerator:
@@ -34,35 +52,41 @@ class PlayerCardGenerator:
             margin_left = 300
             text_spacing = 400
             draw.text(
-                (margin_left, 300),
+                (500, 300),
                 self.name,
                 fill=(255, 255, 255),
                 font=font_bold,
             )
             draw.text(
                 (margin_left, 300 + text_spacing),
+                "MK8DX-Yuzu-Lounge Season 2 - Recap",
+                fill=(255, 255, 255),
+                font=font_bold,
+            )
+            draw.text(
+                (margin_left, 300 + text_spacing * 2),
                 f"MMR: {player_data.get('mmr', 'N/A')}",
                 fill=(255, 255, 255),
                 font=font_regular,
             )
             draw.text(
-                (margin_left, 300 + text_spacing * 2),
+                (margin_left, 300 + text_spacing * 3),
                 f"Wins: {player_data.get('wins', 0)}",
                 fill=(255, 255, 255),
                 font=font_regular,
             )
             draw.text(
-                (margin_left, 300 + text_spacing * 3),
+                (margin_left, 300 + text_spacing * 4),
                 f"Losses: {player_data.get('losses', 0)}",
                 fill=(255, 255, 255),
                 font=font_regular,
             )
 
             # Add rank icon in top right
-            rank_icon_path = self.media_path / "Wood-Cup.png"
+            rank_icon_path = "https://raw.githubusercontent.com/mk8dx-yuzu/ranks/refs/heads/main/Platinum.png"
             if rank_icon_path.exists():
                 rank_icon = Image.open(rank_icon_path).convert("RGBA")
-                icon_size = (1000, 1000)  # Larger icon size for 4K
+                icon_size = (850, 850)
                 rank_icon = rank_icon.resize(icon_size)
                 icon_padding = 250
                 card.paste(
