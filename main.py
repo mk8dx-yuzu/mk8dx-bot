@@ -32,7 +32,7 @@ class customBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.mogi: object = default_mogi_state
         self.client = pymongo.MongoClient(f"{os.getenv('MONGODB_HOST')}")
-        self.db = self.client["lounge"]
+        self.db = self.client["season-2-lounge"]
         self.players: collection = self.db["players"]
         self.archived: collection = self.db["archived"]
 
