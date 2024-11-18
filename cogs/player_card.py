@@ -65,9 +65,7 @@ class PlayerCardCog(commands.Cog):
         await ctx.defer()  # Defer response for potentially slow operations
 
         try:
-            # Query player data
-            player_id = str(ctx.author.id)
-            player = self.players.find_one({"_id": player_id})
+            player = self.players.find_one({"discord": str(ctx.author.id)})
 
             if player is None:
                 await ctx.respond(
