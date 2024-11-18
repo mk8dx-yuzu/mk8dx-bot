@@ -83,7 +83,9 @@ class PlayerCardGenerator:
             )
 
             # Add rank icon in top right
-            rank_icon_path = "https://raw.githubusercontent.com/mk8dx-yuzu/ranks/refs/heads/main/Platinum.png"
+            rank_icon_path = (
+                self.media_path / f"ranks/{calcRank(player_data.get('mmr', 0))}.png"
+            )
             if rank_icon_path.exists():
                 rank_icon = Image.open(rank_icon_path).convert("RGBA")
                 icon_size = (850, 850)
