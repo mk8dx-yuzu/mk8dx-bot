@@ -53,13 +53,13 @@ class PlayerCardGenerator:
             text_spacing = 400
             draw.text(
                 (500, 300),
-                self.name,
+                "MK8DX-Yuzu-Lounge Season 2 - Recap",
                 fill=(255, 255, 255),
                 font=font_bold,
             )
             draw.text(
                 (margin_left, 300 + text_spacing),
-                "MK8DX-Yuzu-Lounge Season 2 - Recap",
+                self.name,
                 fill=(255, 255, 255),
                 font=font_bold,
             )
@@ -88,9 +88,9 @@ class PlayerCardGenerator:
             )
             if rank_icon_path.exists():
                 rank_icon = Image.open(rank_icon_path).convert("RGBA")
-                icon_size = (850, 850)
+                icon_size = (800, 800)
                 rank_icon = rank_icon.resize(icon_size)
-                icon_padding = 250
+                icon_padding = 350
                 card.paste(
                     rank_icon,
                     (self.width - icon_size[0] - icon_padding, icon_padding),
