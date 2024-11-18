@@ -51,7 +51,7 @@ class PlayerCardGenerator:
             text_spacing = 370
             draw.text(
                 (margin_left, 300),
-                "MK8DX-Yuzu-Lounge Season 2",
+                "Yuzu-Lounge Season 2",
                 fill=(255, 255, 255),
                 font=font_bold,
             )
@@ -101,7 +101,7 @@ class PlayerCardGenerator:
                     ),
                     calcRank(player_data.get("mmr", 0)),
                     fill=(255, 255, 255),
-                    font=font_regular,
+                    font=font_bold,
                 )
 
             # Save to buffer instead of file
